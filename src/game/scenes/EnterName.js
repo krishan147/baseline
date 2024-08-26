@@ -1,9 +1,12 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
-import { getPlayer } from './Sounds.js'
-import { postPlayer } from './Sounds.js'
+//import { getPlayer } from './Sounds.js'
+//import { postPlayer } from './Sounds.js'
 import { fetchAuthSession } from 'aws-amplify/auth';
+
+import { getPlayer } from './Access.js'
+import { postPlayer } from './Access.js'
 
 const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
@@ -608,8 +611,6 @@ export class EnterName extends Scene {
                 var gameDataString = JSON.stringify(gameData);
                 localStorage.setItem('myGameData', gameDataString);
 
-                
-
                 audioButton(isChecked);
                 submitButton.setStyle({ fill: '#ffff00' });
                 setTimeout(() => {
@@ -635,7 +636,6 @@ export class EnterName extends Scene {
         .on('pointerdown', handleSubmit.bind(this))
         .setAlpha(0);
 
-        // Add an event listener for the Enter key
         this.input.keyboard.on('keydown-ENTER', handleSubmit.bind(this));
 
         EventBus.emit('current-scene-ready', this);

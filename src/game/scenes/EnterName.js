@@ -75,9 +75,9 @@ export class EnterName extends Scene {
 
         }
 
-        const idToken = runfetchAuthSession()
+      //  const idToken = runfetchAuthSession()
 
-        console.log(idToken);
+    //    console.log(idToken);
 
 
 

@@ -8,9 +8,9 @@ async function runfetchAuthSession(){
 
 }
 
-const idToken = runfetchAuthSession()
+//const idToken = runfetchAuthSession()
 
-console.log(idToken);
+//console.log(idToken);
 
 
 export async function getPlayer(playerName){

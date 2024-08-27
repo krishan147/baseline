@@ -13,6 +13,8 @@ async function runfetchAuthSession(){
     var gameDataString = JSON.stringify(gameData);
     localStorage.setItem('myGameData', gameDataString);
 
+    
+
     return idToken
 
 }
@@ -35,17 +37,14 @@ function getTokenLocally(){
     return idToken
 }
 
-var ido = getTokenLocally()
-console.log(ido)
-
-
 export async function getPlayer(playerName){
+    console.log(getTokenLocally());
 
     const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?playerName=' + playerName;
 
     const headers = {
         'Content-Type': 'application/json',
-        'x-api-key': getTokenLocally()
+        "Authorization": `Bearer ${getTokenLocally()}`
     };
 
     try {
@@ -68,28 +67,23 @@ export async function getPlayer(playerName){
 
 }
 
+// var ddd = getPlayer("Player1")
+// console.log(ddd);
+
 export async function postPlayer(playerData) {
-    try { 
+    console.log(getTokenLocally());
+
+    try {
         const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable';
         const headers = {
             'Content-Type': 'application/json',
-            'x-api-key': getTokenLocally() 
-        };
-
-        const body = {
-            "playerId": playerData.playerId,
-            "gold_cpu": 1000,
-            "gold_cpu_date_issue": 1720683935,
-            "gold_multi": 1000,
-            "gold_multi_date_issue": 1720683935,
-            "gold_multi_real": 1000,
-            "playerName": playerData.playerName,
+            'Authorization': `Bearer ${getTokenLocally()}`
         };
 
         const response = await fetch(url, {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify(body)
+            body: JSON.stringify(playerData)
         });
 
         if (!response.ok) {
@@ -97,13 +91,55 @@ export async function postPlayer(playerData) {
         }
         return 'Username created';
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error here:', error);
         throw error;
     }
 }
 
-export async function patchPlayer(emailAddress){
+// var playerData = {
+//     playerId:92323324,
+//     playerName: "heiPlayer2",
+//     mute: false,
+//     volume: 5,
+//     gold_cpu_date_issue:1720683935,
+//     gold_multi_date_issue:1720683935,
+//     gold_cpu:1000,
+//     gold_multi:1000,
+//     gold_multi_real:1000,
+//     token:"dfg",
+//     email:"hwllo@gmail.com"
+// };
+// var ddd = postPlayer(playerData)
+// console.log(ddd);
 
+export async function patchPlayer(playerId, updateKey, updateValue) {
+    const playerData = {
+        playerId: playerId,
+        updateKey: updateKey,
+        updateValue: updateValue
+    };
+
+    try {
+        const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable';
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getTokenLocally()}`
+        };
+
+        const response = await fetch(url, {
+            method: 'PATCH',
+            headers: headers,
+            body: JSON.stringify(playerData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json(); // Return the response body if needed
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
 }
 
 export async function getGame(data){

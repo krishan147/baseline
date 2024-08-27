@@ -44,12 +44,13 @@ export class Preloader extends Scene
                 playerName: "Player1",
                 mute: false,
                 volume: 0.5,
-                gold_cpu_date_issue:"2023-01-01",
-                gold_multi_date_issue:"2023-01-01",
+                gold_cpu_date_issue:1720683935,
+                gold_multi_date_issue:1720683935,
                 gold_cpu:1000,
                 gold_multi:1000,
                 gold_multi_real:1000,
-                token:"zzzz"
+                token:"zzzz",
+                email:"test@gmail.com"
             };
             let gameDataString = JSON.stringify(gameData);
             localStorage.setItem('myGameData', gameDataString);

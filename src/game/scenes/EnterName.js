@@ -7,6 +7,7 @@ import { fetchAuthSession } from 'aws-amplify/auth';
 
 import { getPlayer } from './Access.js'
 import { postPlayer } from './Access.js'
+import { runfetchAuthSession } from './Access.js'
 
 const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
@@ -63,26 +64,22 @@ export class EnterName extends Scene {
     }
 
     create() {
+
+       
+
+        // try {
+        //     var idtoken = runfetchAuthSession()
+        //     console.log(idtoken)
+        // }
+        // catch (err) {
+        //     console.log("auth failed in entername.js")
+        // } 
+
+
         var gameDataString = localStorage.getItem('myGameData');
         var gameData = JSON.parse(gameDataString);
         var volume = gameData["volume"];
         var isChecked = gameData["mute"];
-
-
-        async function runfetchAuthSession(){
-
-            const session = await fetchAuthSession()
-            const idToken = session.tokens.idToken.toString();
-
-            return idToken
-
-        }
-
-      //  const idToken = runfetchAuthSession()
-
-    //    console.log(idToken);
-
-
 
         this.cameras.main.setBackgroundColor(0x000000);
 
@@ -617,6 +614,8 @@ export class EnterName extends Scene {
                     submitButton.setStyle({ fill: '#0f0' });
                 }, 200);
                 this.scene.start('Menu');
+
+                console.log(gameData);
 
                 postPlayer(gameData);
 

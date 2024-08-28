@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { runfetchAuthSession } from './Access.js'
 
 export class Preloader extends Scene
 {
@@ -9,7 +10,6 @@ export class Preloader extends Scene
 
     init ()
     {
-        //  We loaded this image in our Boot Scene, so we can display it here
         this.add.image(512, 384, 'background');
 
     }
@@ -31,7 +31,8 @@ export class Preloader extends Scene
         let gameDataExists = localStorage.getItem('myGameData') !== null;
 
         if (gameDataExists) {
-            console.log("Game data exists in localStorage.");            
+            console.log("Game data exists in localStorage.");
+       
         } else {
             console.log("No game data found in localStorage.");
             resetGame()
@@ -43,7 +44,7 @@ export class Preloader extends Scene
                 playerId:123,
                 playerName: "Player1",
                 mute: false,
-                volume: 0.5,
+                volume: 100,
                 gold_cpu_date_issue:1720683935,
                 gold_multi_date_issue:1720683935,
                 gold_cpu:1000,
@@ -64,6 +65,7 @@ export class Preloader extends Scene
             this.scene.start('EnterName');
         } else {
             this.scene.start('Menu');
+            console.log("Menu")
         }
     }
 }

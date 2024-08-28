@@ -9,6 +9,8 @@ import { getPlayer } from './Access.js'
 import { postPlayer } from './Access.js'
 import { runfetchAuthSession } from './Access.js'
 
+import { Auth } from 'aws-amplify';
+
 const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
 const COLOR_DARK = 0x260e04;
@@ -63,18 +65,9 @@ export class EnterName extends Scene {
         this.load.image('grass', 'spritesheet/grass.png');
     }
 
-    create() {
+    async create() {
 
-       
-
-        // try {
-        //     var idtoken = runfetchAuthSession()
-        //     console.log(idtoken)
-        // }
-        // catch (err) {
-        //     console.log("auth failed in entername.js")
-        // } 
-
+        
 
         var gameDataString = localStorage.getItem('myGameData');
         var gameData = JSON.parse(gameDataString);
@@ -589,6 +582,8 @@ export class EnterName extends Scene {
             "🖕"                           
             ]
 
+            console.log(gameData);
+
             if (list_profanity.some(rejectWord => username.includes(rejectWord))) {
                 showMessageObscenity.call(this);
             } else if (trimmed_username === "") {
@@ -600,7 +595,6 @@ export class EnterName extends Scene {
             } else if (await getPlayer(username) != "no username found") {
                 showMessageExists.call(this);
             } else {
-
                 var playerId = generateRandomId.call(this)
 
                 gameData["playerName"] = username;
@@ -615,7 +609,7 @@ export class EnterName extends Scene {
                 }, 200);
                 this.scene.start('Menu');
 
-                console.log(gameData);
+                
 
                 postPlayer(gameData);
 

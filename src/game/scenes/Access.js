@@ -4,7 +4,7 @@ var gameDataString = localStorage.getItem('myGameData');
 var gameData = JSON.parse(gameDataString);
 
 
-async function runfetchAuthSession(){
+export async function runfetchAuthSession(){
 
     const session = await fetchAuthSession({ forceRefresh: true });
     const idToken = session.tokens.idToken.toString();
@@ -12,8 +12,6 @@ async function runfetchAuthSession(){
     gameData["token"] = idToken;
     var gameDataString = JSON.stringify(gameData);
     localStorage.setItem('myGameData', gameDataString);
-
-    
 
     return idToken
 
@@ -71,19 +69,27 @@ export async function getPlayer(playerName){
 // console.log(ddd);
 
 export async function postPlayer(playerData) {
-    console.log(getTokenLocally());
+    var idToken = await runfetchAuthSession()
+
+    console.log(idToken);
+
+    console.log("playerData")
+    console.log(playerData)
+
+    var playerData_drop = playerData;
+    delete playerData_drop.token;
 
     try {
         const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable';
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getTokenLocally()}`
+            'Authorization': `Bearer ${idToken}`
         };
 
         const response = await fetch(url, {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify(playerData)
+            body: JSON.stringify(playerData_drop)
         });
 
         if (!response.ok) {
@@ -97,8 +103,8 @@ export async function postPlayer(playerData) {
 }
 
 // var playerData = {
-//     playerId:92323324,
-//     playerName: "heiPlayer2",
+//     playerId:9992323324,
+//     playerName: "asddev",
 //     mute: false,
 //     volume: 5,
 //     gold_cpu_date_issue:1720683935,
@@ -107,7 +113,7 @@ export async function postPlayer(playerData) {
 //     gold_multi:1000,
 //     gold_multi_real:1000,
 //     token:"dfg",
-//     email:"hwllo@gmail.com"
+//     email:"ggg@gmail.com"
 // };
 // var ddd = postPlayer(playerData)
 // console.log(ddd);

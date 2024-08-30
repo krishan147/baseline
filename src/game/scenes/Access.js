@@ -1,4 +1,5 @@
 import { fetchAuthSession } from 'aws-amplify/auth';
+import { jwtDecode } from "jwt-decode"
 
 var gameDataString = localStorage.getItem('myGameData');
 var gameData = JSON.parse(gameDataString);
@@ -9,7 +10,11 @@ export async function runfetchAuthSession(){
     const session = await fetchAuthSession({ forceRefresh: true });
     const idToken = session.tokens.idToken.toString();
 
+    const decodedToken = jwtDecode(idToken);
+    const email = decodedToken.email;
+
     gameData["token"] = idToken;
+    gameData["email"] = email;
     var gameDataString = JSON.stringify(gameData);
     localStorage.setItem('myGameData', gameDataString);
 
@@ -17,13 +22,32 @@ export async function runfetchAuthSession(){
 
 }
 
-async function checkTokenValidity() {
 
-    var idToken = gameData["token"]
 
-    return idToken
+export async function checkTokenValidity() {
+    console.log("heyhey");
+    var idToken = gameData["token"];
 
+    if (!idToken) {
+        return { valid: false, reason: 'No token provided' };
+    }
+
+    try {
+        const decodedToken = jwtDecode(idToken);
+        const currentTime = Date.now() / 1000; // Current time in seconds
+
+        if (decodedToken.exp > currentTime) {
+            return { valid: true };
+        } else {
+            return { valid: false, reason: 'Token has expired' };
+        }
+    } catch (error) {
+        return { valid: false, reason: 'Token decoding failed', error };
+    }
 }
+
+
+
 
 async function refreshToken() {
 
@@ -39,6 +63,37 @@ export async function getPlayer(playerName){
     console.log(getTokenLocally());
 
     const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?playerName=' + playerName;
+
+    const headers = {
+        'Content-Type': 'application/json',
+        "Authorization": `Bearer ${getTokenLocally()}`
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: headers
+        });
+
+        if (!response.ok) {
+            console.log("no username found");
+            return "no username found";
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+
+}
+
+
+export async function getPlayerWithEmail(email){
+    console.log(getTokenLocally());
+
+    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?email=' + email;
 
     const headers = {
         'Content-Type': 'application/json',

@@ -7,9 +7,11 @@ import { fetchAuthSession } from 'aws-amplify/auth';
 
 import { getPlayer } from './Access.js'
 import { postPlayer } from './Access.js'
+import { checkTokenValidity } from './Access.js'
 import { runfetchAuthSession } from './Access.js'
 
 import { Auth } from 'aws-amplify';
+
 
 const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
@@ -67,12 +69,40 @@ export class EnterName extends Scene {
 
     async create() {
 
-        
+        var result = await checkTokenValidity(); // krishan if this fails, go back to sign in page
+
 
         var gameDataString = localStorage.getItem('myGameData');
         var gameData = JSON.parse(gameDataString);
         var volume = gameData["volume"];
         var isChecked = gameData["mute"];
+
+
+        function checkUsernameExists() {
+
+            console.log("checkuser")
+            console.log(gameData)
+            console.log("eneded")
+
+            var playerName = gameData["playerName"]
+
+            if (playerName == "Player1"){
+                console.log("player name doesnt exist. enter one")
+            } else {
+                this.scene.start('Menu');
+            }
+        }
+
+        checkUsernameExists()
+
+
+
+        if (result.valid) {
+            console.log("Token is valid");
+
+        } else {
+            console.log("Token is invalid", result.reason);
+        }
 
         this.cameras.main.setBackgroundColor(0x000000);
 
@@ -582,8 +612,6 @@ export class EnterName extends Scene {
             "🖕"                           
             ]
 
-            console.log(gameData);
-
             if (list_profanity.some(rejectWord => username.includes(rejectWord))) {
                 showMessageObscenity.call(this);
             } else if (trimmed_username === "") {
@@ -602,14 +630,12 @@ export class EnterName extends Scene {
                 var gameDataString = JSON.stringify(gameData);
                 localStorage.setItem('myGameData', gameDataString);
 
+                console.log("datatata")
+                console.log(gameDataString)
+
                 audioButton(isChecked);
                 submitButton.setStyle({ fill: '#ffff00' });
-                setTimeout(() => {
-                    submitButton.setStyle({ fill: '#0f0' });
-                }, 200);
                 this.scene.start('Menu');
-
-                
 
                 postPlayer(gameData);
 

@@ -13,6 +13,7 @@
     "aws-amplify": "^6.5.2",
     "core-js": "^3.8.3",
     "fs": "^0.0.1-security",
+    "jwt-decode": "^4.0.0",
     "phaser": "^3.80.1",
     "vue": "^3.2.13"
   },

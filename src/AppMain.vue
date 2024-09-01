@@ -9,7 +9,7 @@ const phaserRef = ref();
 const currentScene = (scene) => {
 
     // canMoveSprite.value = (scene.scene.key !== 'MainMenu');
-    canMoveSprite.value = (scene.scene.key !== 'EnterName');
+  //  canMoveSprite.value = (scene.scene.key !== 'EnterName');
 
 }
 </script>

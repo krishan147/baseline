@@ -18,15 +18,19 @@ export async function runfetchAuthSession(){
     var gameDataString = JSON.stringify(gameData);
     localStorage.setItem('myGameData', gameDataString);
 
-    return idToken
+    return { idToken, email }
 
 }
 
 
-
-export async function checkTokenValidity() {
-    console.log("heyhey");
-    var idToken = gameData["token"];
+export async function checkTokenValidity(token) {
+    
+    try {
+        var idToken = token;
+    }
+    catch (error){
+        return {error}
+    }
 
     if (!idToken) {
         return { valid: false, reason: 'No token provided' };
@@ -34,7 +38,7 @@ export async function checkTokenValidity() {
 
     try {
         const decodedToken = jwtDecode(idToken);
-        const currentTime = Date.now() / 1000; // Current time in seconds
+        const currentTime = Date.now() / 1000;
 
         if (decodedToken.exp > currentTime) {
             return { valid: true };
@@ -46,13 +50,6 @@ export async function checkTokenValidity() {
     }
 }
 
-
-
-
-async function refreshToken() {
-
-
-}
 
 function getTokenLocally(){
     var idToken = gameData["token"]
@@ -93,7 +90,7 @@ export async function getPlayer(playerName){
 export async function getPlayerWithEmail(email){
     console.log(getTokenLocally());
 
-    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?email=' + email;
+    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?emailaddress=' + email;
 
     const headers = {
         'Content-Type': 'application/json',
@@ -120,17 +117,13 @@ export async function getPlayerWithEmail(email){
 
 }
 
+// var data2 = getPlayerWithEmail("ztggt@gmail.com")
+// console.log(data2)
 // var ddd = getPlayer("Player1")
 // console.log(ddd);
 
 export async function postPlayer(playerData) {
-    var idToken = await runfetchAuthSession()
-
-    console.log(idToken);
-
-    console.log("playerData")
-    console.log(playerData)
-
+    var { idToken } = await runfetchAuthSession()
     var playerData_drop = playerData;
     delete playerData_drop.token;
 

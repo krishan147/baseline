@@ -1,16 +1,10 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
-//import { getPlayer } from './Sounds.js'
-//import { postPlayer } from './Sounds.js'
-import { fetchAuthSession } from 'aws-amplify/auth';
-
 import { getPlayer } from './Access.js'
 import { postPlayer } from './Access.js'
-import { checkTokenValidity } from './Access.js'
 import { runfetchAuthSession } from './Access.js'
-
-import { Auth } from 'aws-amplify';
+import { getPlayerWithEmail } from './Access.js'
 
 
 const COLOR_PRIMARY = 0x4e342e;
@@ -69,41 +63,15 @@ export class EnterName extends Scene {
 
     async create() {
 
-        var result = await checkTokenValidity(); // krishan if this fails, go back to sign in page
+        var { email } = await runfetchAuthSession()
 
+        var data = await getPlayerWithEmail(email) //check if its still player1
+        console.log(data);
 
         var gameDataString = localStorage.getItem('myGameData');
         var gameData = JSON.parse(gameDataString);
         var volume = gameData["volume"];
         var isChecked = gameData["mute"];
-
-
-        function checkUsernameExists() {
-
-            console.log("checkuser")
-            console.log(gameData)
-            console.log("eneded")
-
-            var playerName = gameData["playerName"]
-
-            if (playerName == "Player1"){
-                console.log("player name doesnt exist. enter one")
-            } else {
-                this.scene.start('Menu');
-            }
-        }
-
-        checkUsernameExists()
-
-
-
-        if (result.valid) {
-            console.log("Token is valid");
-
-        } else {
-            console.log("Token is invalid", result.reason);
-        }
-
         this.cameras.main.setBackgroundColor(0x000000);
 
         const title = this.add.text(50, 110, 'BASELINE', { fill: '#0f0', fontSize: '240px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding: { right: 35} })
@@ -630,7 +598,6 @@ export class EnterName extends Scene {
                 var gameDataString = JSON.stringify(gameData);
                 localStorage.setItem('myGameData', gameDataString);
 
-                console.log("datatata")
                 console.log(gameDataString)
 
                 audioButton(isChecked);

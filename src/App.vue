@@ -3,31 +3,35 @@
     :hideSignUp="true"
     :formFields="customFormFields"
     :social-providers="['apple', 'google']"
-    :hideSignIn="true"
+    v-if="!isTokenValid"
   >
     <template v-slot="{ user }">
       <div v-if="user">
         <component :is="AppMain" />
       </div>
+      <div v-else>
+        <p>No user authenticated</p>
+      </div>
     </template>
 
     <template v-slot:sign-in-header>
-      class="amplify-heading"
       <h1>BASELINE</h1>
       <h2>TURN-BASED TENNIS FOR WINNERS</h2>
     </template>
-
   </authenticator>
 
 
 </template>
 
 <script setup>
+import { ref, watch } from 'vue';
 import { Authenticator } from "@aws-amplify/ui-vue";
 import "@aws-amplify/ui-vue/styles.css";
 import { Amplify } from 'aws-amplify';
 import outputs from './amplifyconfiguration.json';
 import AppMain from '@/AppMain.vue';
+import jwtDecode from "jwt-decode";
+import { signOut } from 'aws-amplify/auth';
 
 Amplify.configure(outputs);
 
@@ -45,6 +49,45 @@ const customFormFields = {
     }
   }
 };
+
+const isTokenValid = ref(false);
+
+// const checkTokenValid = async () => {
+//   try {
+//     const gameDataString = localStorage.getItem('myGameData');
+//     if (!gameDataString) {
+//       return false;
+//     }
+
+//     const gameData = JSON.parse(gameDataString);
+//     const idToken = gameData?.token;
+
+//     if (!idToken) {
+//       return false;
+//     }
+
+//     const decodedToken = jwtDecode(idToken);
+//     const currentTime = Date.now() / 1000;
+
+//     return decodedToken.exp > currentTime;
+//   } catch (error) {
+//       signoutCheck()
+//     return false;
+//   }
+// };
+
+// checkTokenValid().then(valid => {
+//   isTokenValid.value = valid;
+// });
+
+// if (!isTokenValid.value) {
+//   signoutCheck()
+// }
+
+// async function signoutCheck(){
+//   await signOut({ global: true });
+// }
+
 </script>
 
 
@@ -82,23 +125,23 @@ form[data-amplify-form] {
 }
 
 h1 {
-            color:rgb(0, 255, 0);
-            font-family: 'playwritereg';
-            opacity: 0;
-            animation: fadeIn 2s forwards;
-        }
+  color: rgb(0, 255, 0);
+  font-family: 'playwritereg';
+  opacity: 0;
+  animation: fadeIn 2s forwards;
+}
 
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-            }
-        }
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
 
-        h2 {
-            color:rgb(0, 255, 0);
-            font-family: 'playwritereg';
-            font-size: 15px;
-            opacity: 0;
-            animation: fadeIn 2s forwards;
-        }
+h2 {
+  color: rgb(0, 255, 0);
+  font-family: 'playwritereg';
+  font-size: 15px;
+  opacity: 0;
+  animation: fadeIn 2s forwards;
+}
 </style>

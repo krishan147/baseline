@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
-import { runfetchAuthSession } from './Access.js'
+import { checkTokenValidity } from './Access.js'
+import { signOut } from 'aws-amplify/auth';
 
 export class Preloader extends Scene
 {
@@ -25,16 +26,16 @@ export class Preloader extends Scene
         })
     }
 
-    create ()
+    async create ()
     {
 
         let gameDataExists = localStorage.getItem('myGameData') !== null;
 
         if (gameDataExists) {
-            console.log("Game data exists in localStorage.");
+            //console.log("Game data exists in localStorage.");
        
         } else {
-            console.log("No game data found in localStorage.");
+            //console.log("No game data found in localStorage.");
             resetGame()
         }
         
@@ -61,11 +62,32 @@ export class Preloader extends Scene
         var gameData = JSON.parse(gameDataString);
         var playerName = gameData["playerName"];
 
-        if (playerName == "Player1"){
-            this.scene.start('EnterName');
-        } else {
-            this.scene.start('Menu');
-            console.log("Menu")
+        console.log(gameData);
+
+
+        async function signoutCheck(){
+            await signOut({ global: true });
+          }
+        
+        
+        var token_check = await checkTokenValidity();
+
+
+        if (token_check.valid == false){
+            signoutCheck()
         }
+
+        else if (token_check.valid == true){
+            this.scene.start('EnterName');
+        }
+
+
+        
+
+        // if (playerName == "Player1"){
+        //     this.scene.start('EnterName');
+        // } else {
+        //     this.scene.start('Menu');
+        // }
     }
 }

@@ -7,6 +7,8 @@ var gameData = JSON.parse(gameDataString);
 
 export async function runfetchAuthSession(){
 
+    try{
+
     const session = await fetchAuthSession({ forceRefresh: true });
     const idToken = session.tokens.idToken.toString();
 
@@ -19,6 +21,10 @@ export async function runfetchAuthSession(){
     localStorage.setItem('myGameData', gameDataString);
 
     return { idToken, email }
+
+    } catch(error) {
+        console.log("Access.js ", error)
+    }
 
 }
 
@@ -86,11 +92,10 @@ export async function getPlayer(playerName){
 
 }
 
-
 export async function getPlayerWithEmail(email){
     console.log(getTokenLocally());
 
-    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?emailaddress=' + email;
+    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?email=' + email;
 
     const headers = {
         'Content-Type': 'application/json',
@@ -104,8 +109,7 @@ export async function getPlayerWithEmail(email){
         });
 
         if (!response.ok) {
-            console.log("no username found");
-            return "no username found";
+            return "no data found";
         }
 
         const data = await response.json();

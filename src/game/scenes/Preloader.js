@@ -1,6 +1,9 @@
 import { Scene } from 'phaser';
 import { checkTokenValidity } from './Access.js'
 import { signOut } from 'aws-amplify/auth';
+import { cognitoUserPoolsTokenProvider } from 'aws-amplify/auth/cognito';
+import { defaultStorage } from 'aws-amplify/utils';
+import { runfetchAuthSession } from './Access.js'
 
 export class Preloader extends Scene
 {
@@ -28,6 +31,15 @@ export class Preloader extends Scene
 
     async create ()
     {
+
+        cognitoUserPoolsTokenProvider.setKeyValueStorage(defaultStorage);
+
+
+        try{
+            runfetchAuthSession();
+        } catch (error){
+            console.log("Preloader.js ", error)
+        }
 
         let gameDataExists = localStorage.getItem('myGameData') !== null;
 
@@ -61,6 +73,7 @@ export class Preloader extends Scene
         var gameDataString = localStorage.getItem('myGameData');
         var gameData = JSON.parse(gameDataString);
         var playerName = gameData["playerName"];
+        var token = gameData["token"];
 
         console.log(gameData);
 
@@ -69,8 +82,7 @@ export class Preloader extends Scene
             await signOut({ global: true });
           }
         
-        
-        var token_check = await checkTokenValidity();
+        var token_check = await checkTokenValidity(token);
 
 
         if (token_check.valid == false){

@@ -64,9 +64,14 @@ export class EnterName extends Scene {
     async create() {
 
         var { email } = await runfetchAuthSession()
+        var data = await getPlayerWithEmail(email) 
+        console.log("data:", data)
+        if (data["playerName"] === "Player1"){
+            console.log("EnterName")
+        }else {
+            this.scene.start('Menu');
+        }
 
-        var data = await getPlayerWithEmail(email) //check if its still player1
-        console.log(data);
 
         var gameDataString = localStorage.getItem('myGameData');
         var gameData = JSON.parse(gameDataString);
@@ -597,8 +602,6 @@ export class EnterName extends Scene {
                 gameData["playerId"] = playerId;
                 var gameDataString = JSON.stringify(gameData);
                 localStorage.setItem('myGameData', gameDataString);
-
-                console.log(gameDataString)
 
                 audioButton(isChecked);
                 submitButton.setStyle({ fill: '#ffff00' });

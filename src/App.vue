@@ -30,8 +30,7 @@ import "@aws-amplify/ui-vue/styles.css";
 import { Amplify } from 'aws-amplify';
 import outputs from './amplifyconfiguration.json';
 import AppMain from '@/AppMain.vue';
-import jwtDecode from "jwt-decode";
-import { signOut } from 'aws-amplify/auth';
+
 
 Amplify.configure(outputs);
 

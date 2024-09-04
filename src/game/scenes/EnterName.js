@@ -5,6 +5,8 @@ import { getPlayer } from './Access.js'
 import { postPlayer } from './Access.js'
 import { runfetchAuthSession } from './Access.js'
 import { getPlayerWithEmail } from './Access.js'
+import { writeLocally } from './Access.js'
+import { readLocally } from './Access.js'
 
 
 const COLOR_PRIMARY = 0x4e342e;
@@ -62,7 +64,8 @@ export class EnterName extends Scene {
     }
 
     async create() {
-
+        
+        try {
         var { email } = await runfetchAuthSession()
         var data = await getPlayerWithEmail(email) 
         console.log("data:", data)
@@ -71,6 +74,9 @@ export class EnterName extends Scene {
         }else {
             this.scene.start('Menu');
         }
+    } catch(error){
+        console.log("Entername.js ", error)
+    }
 
 
         var gameDataString = localStorage.getItem('myGameData');
@@ -597,16 +603,14 @@ export class EnterName extends Scene {
                 showMessageExists.call(this);
             } else {
                 var playerId = generateRandomId.call(this)
-
-                gameData["playerName"] = username;
-                gameData["playerId"] = playerId;
-                var gameDataString = JSON.stringify(gameData);
-                localStorage.setItem('myGameData', gameDataString);
+                var local_data = readLocally()
+                local_data["playerName"] = username;
+                local_data["playerId"] = playerId;
 
                 audioButton(isChecked);
                 submitButton.setStyle({ fill: '#ffff00' });
                 this.scene.start('Menu');
-
+                writeLocally(gameData);
                 postPlayer(gameData);
 
             }

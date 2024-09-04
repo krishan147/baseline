@@ -6,7 +6,7 @@ import { audioButton } from './Options.js';
 
 // updatePlayer2(1, "gold_cpu", 1000)
 
-var game_version = 'v0.107'
+var game_version = 'v0.108'
 
 export class Menu extends Scene
 {
@@ -71,7 +71,7 @@ export class Menu extends Scene
         this.cameras.main.setBackgroundColor(0x000000);
 
 
-        const version = this.add.text(0, 40, game_version, { fill: '#0f0', fontSize: '10px', fontFamily: 'playwritereg',padding: { right: 35}})
+        const version = this.add.text(10, 40, game_version, { fill: '#0f0', fontSize: '10px', fontFamily: 'playwritereg',padding: { right: 35}})
 
 
         const title = this.add.text(50, 110, 'BASELINE', { fill: '#0f0', fontSize: '60px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
@@ -207,8 +207,7 @@ export class Menu extends Scene
     })
     .setAlpha(0);
 
-    // 840
-    const username = this.add.text(10, 800, 'NAME: '+ playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
+    const username = this.add.text(10, 790, 'NAME: '+ playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
 
     this.tweens.add({
         targets: [botSprite, onlineButton, username, optionsButton, richestButton, offlineButton],    

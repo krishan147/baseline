@@ -4,6 +4,9 @@ import { signOut } from 'aws-amplify/auth';
 import { cognitoUserPoolsTokenProvider } from 'aws-amplify/auth/cognito';
 import { defaultStorage } from 'aws-amplify/utils';
 import { runfetchAuthSession } from './Access.js'
+import { writeLocally } from './Access.js'
+import { readLocally } from './Access.js'
+import { resetLocally } from './Access.js'
 
 export class Preloader extends Scene
 {
@@ -33,7 +36,8 @@ export class Preloader extends Scene
     {
 
         cognitoUserPoolsTokenProvider.setKeyValueStorage(defaultStorage);
-
+        
+        var local_data = readLocally()
 
         try{
             runfetchAuthSession();
@@ -41,41 +45,8 @@ export class Preloader extends Scene
             console.log("Preloader.js ", error)
         }
 
-        let gameDataExists = localStorage.getItem('myGameData') !== null;
 
-        if (gameDataExists) {
-            //console.log("Game data exists in localStorage.");
-       
-        } else {
-            //console.log("No game data found in localStorage.");
-            resetGame()
-        }
-        
-        function resetGame() {
-            localStorage.removeItem('myGameData');
-            var gameData = {
-                playerId:123,
-                playerName: "Player1",
-                mute: false,
-                volume: 100,
-                gold_cpu_date_issue:1720683935,
-                gold_multi_date_issue:1720683935,
-                gold_cpu:1000,
-                gold_multi:1000,
-                gold_multi_real:1000,
-                token:"zzzz",
-                email:"test@gmail.com"
-            };
-            let gameDataString = JSON.stringify(gameData);
-            localStorage.setItem('myGameData', gameDataString);
-        }
-
-        var gameDataString = localStorage.getItem('myGameData');
-        var gameData = JSON.parse(gameDataString);
-        var playerName = gameData["playerName"];
-        var token = gameData["token"];
-
-        console.log(gameData);
+        var token = local_data["token"];
 
 
         async function signoutCheck(){
@@ -92,14 +63,5 @@ export class Preloader extends Scene
         else if (token_check.valid == true){
             this.scene.start('EnterName');
         }
-
-
-        
-
-        // if (playerName == "Player1"){
-        //     this.scene.start('EnterName');
-        // } else {
-        //     this.scene.start('Menu');
-        // }
     }
 }

@@ -211,3 +211,44 @@ export async function postGame(data){
 export async function patchGame(data){
 
 }
+
+
+export async function writeLocally(new_data){
+
+}
+
+export async function readLocally(){
+
+    let gameDataExists = localStorage.getItem('myGameData') !== null;
+
+    if (gameDataExists) {
+        console.log("Game data exists in localStorage.");
+        var gameDataString = localStorage.getItem('myGameData');
+        var gameData = JSON.parse(gameDataString);
+        return gameData
+    } else {
+        resetLocally()
+        console.log("reset locally")
+        return "reset locally"
+    }
+}
+
+export async function resetLocally(){
+    localStorage.removeItem('myGameData');
+    var gameData = {
+        playerId:123,
+        playerName: "Player1",
+        mute: false,
+        volume: 100,
+        gold_cpu_date_issue:1720683935,
+        gold_multi_date_issue:1720683935,
+        gold_cpu:1000,
+        gold_multi:1000,
+        gold_multi_real:1000,
+        token:"zzzz",
+        email:"test@gmail.com"
+    };
+    let gameDataString = JSON.stringify(gameData);
+    localStorage.setItem('myGameData', gameDataString);
+    console.log("reset locally")
+}

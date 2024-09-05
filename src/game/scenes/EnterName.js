@@ -66,8 +66,10 @@ export class EnterName extends Scene {
     async create() {
         
         try {
-        var { email } = await runfetchAuthSession()
-        var data = await getPlayerWithEmail(email) 
+        var gameData = readLocally()
+        var data = await getPlayerWithEmail(gameData["email"]) 
+        var volume = gameData["volume"];
+        var isChecked = gameData["mute"];
         console.log("data:", data)
         if (data["playerName"] === "Player1"){
             console.log("EnterName")
@@ -76,13 +78,10 @@ export class EnterName extends Scene {
         }
     } catch(error){
         console.log("Entername.js ", error)
+        volume = 100;
+        isChecked = 0;
     }
 
-
-        var gameDataString = localStorage.getItem('myGameData');
-        var gameData = JSON.parse(gameDataString);
-        var volume = gameData["volume"];
-        var isChecked = gameData["mute"];
         this.cameras.main.setBackgroundColor(0x000000);
 
         const title = this.add.text(50, 110, 'BASELINE', { fill: '#0f0', fontSize: '240px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding: { right: 35} })

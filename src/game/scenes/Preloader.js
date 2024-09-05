@@ -6,7 +6,6 @@ import { defaultStorage } from 'aws-amplify/utils';
 import { runfetchAuthSession } from './Access.js'
 import { writeLocally } from './Access.js'
 import { readLocally } from './Access.js'
-import { resetLocally } from './Access.js'
 
 export class Preloader extends Scene
 {
@@ -37,26 +36,23 @@ export class Preloader extends Scene
 
         cognitoUserPoolsTokenProvider.setKeyValueStorage(defaultStorage);
         
+        await runfetchAuthSession();
+
         var local_data = readLocally()
-
-        try{
-            runfetchAuthSession();
-        } catch (error){
-            console.log("Preloader.js ", error)
-        }
-
-
         var token = local_data["token"];
-
 
         async function signoutCheck(){
             await signOut({ global: true });
           }
+
+          console.log("Preloader.js ", token);
         
         var token_check = await checkTokenValidity(token);
+        console.log(token_check);
 
 
         if (token_check.valid == false){
+            console.log("signing out")
             signoutCheck()
         }
 

@@ -1,26 +1,28 @@
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { jwtDecode } from "jwt-decode"
 
-var gameDataString = localStorage.getItem('myGameData');
-var gameData = JSON.parse(gameDataString);
-
-
 export async function runfetchAuthSession(){
+
+        console.log("Access.js, Getting token")
 
     try{
 
-    const session = await fetchAuthSession({ forceRefresh: true });
-    const idToken = session.tokens.idToken.toString();
+        var gameData = readLocally()
 
-    const decodedToken = jwtDecode(idToken);
-    const email = decodedToken.email;
+        const session = await fetchAuthSession({ forceRefresh: true });
+        const idToken = session.tokens.idToken.toString();
 
-    gameData["token"] = idToken;
-    gameData["email"] = email;
-    var gameDataString = JSON.stringify(gameData);
-    localStorage.setItem('myGameData', gameDataString);
+        const decodedToken = jwtDecode(idToken);
+        const email = decodedToken.email;
 
-    return { idToken, email }
+        gameData["token"] = idToken;
+        gameData["email"] = email;
+        var gameDataString = JSON.stringify(gameData);
+        localStorage.setItem('myGameData', gameDataString);
+
+        console.log("idToken ", idToken);
+
+        return { idToken, email }
 
     } catch(error) {
         console.log("Access.js ", error)
@@ -58,6 +60,7 @@ export async function checkTokenValidity(token) {
 
 
 function getTokenLocally(){
+    var gameData = readLocally()
     var idToken = gameData["token"]
     return idToken
 }

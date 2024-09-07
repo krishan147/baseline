@@ -3,9 +3,11 @@ import { checkTokenValidity } from './Access.js'
 import { signOut } from 'aws-amplify/auth';
 import { cognitoUserPoolsTokenProvider } from 'aws-amplify/auth/cognito';
 import { defaultStorage } from 'aws-amplify/utils';
-import { runfetchAuthSession } from './Access.js'
+import { getToken } from './Access.js'
 import { writeLocally } from './Access.js'
 import { readLocally } from './Access.js'
+import { resetLocally } from './Access.js'
+import { resetTokenLocally } from './Access.js'
 
 export class Preloader extends Scene
 {
@@ -33,21 +35,25 @@ export class Preloader extends Scene
 
     async create ()
     {
-
         cognitoUserPoolsTokenProvider.setKeyValueStorage(defaultStorage);
-        
-        await runfetchAuthSession();
-
-        var local_data = readLocally()
-        var token = local_data["token"];
 
         async function signoutCheck(){
+            resetTokenLocally() 
+            resetLocally()
             await signOut({ global: true });
           }
 
-          console.log("Preloader.js ", token);
-        
-        var token_check = await checkTokenValidity(token);
+        const result = await getToken();
+
+        if (result) {
+            var { idToken } = result;
+            console.log("Preloader.js Token obtained: ", idToken);
+        } else {
+            console.error("Failed to fetch session");
+        }
+
+
+        var token_check = await checkTokenValidity(idToken);
         console.log(token_check);
 
 

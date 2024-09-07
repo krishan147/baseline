@@ -1,33 +1,104 @@
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { jwtDecode } from "jwt-decode"
+import { cognitoUserPoolsTokenProvider } from 'aws-amplify/auth/cognito';
+import { KeyValueStorageInterface } from 'aws-amplify/utils';
+  
 
-export async function runfetchAuthSession(){
 
-        console.log("Access.js, Getting token")
+const originalGameData = {
+    playerId: 123,
+    playerName: "Player1",
+    mute: false,
+    volume: 100,
+    gold_cpu_date_issue: 1720683935,
+    gold_multi_date_issue: 1720683935,
+    gold_cpu: 1000,
+    gold_multi: 1000,
+    gold_multi_real: 1000,
+    email: "test@gmail.com"
+};
 
-    try{
+const tokenGameData = {
+    token: "zzzz",
+    email: "test@gmail.com"
+};
 
-        var gameData = readLocally()
-
+export async function getToken() {
+    try {
         const session = await fetchAuthSession({ forceRefresh: true });
         const idToken = session.tokens.idToken.toString();
-
         const decodedToken = jwtDecode(idToken);
         const email = decodedToken.email;
+        
+        var gameData = await readLocally();
+        gameData['email'] = email;
 
-        gameData["token"] = idToken;
-        gameData["email"] = email;
         var gameDataString = JSON.stringify(gameData);
         localStorage.setItem('myGameData', gameDataString);
 
-        console.log("idToken ", idToken);
+        var tokenData = await readTokenLocally()
+        tokenData["email"] = email;
+        tokenData["token"] = idToken;
+        var tokenDataString = JSON.stringify(tokenData);
+        localStorage.setItem('tokenData', tokenDataString);
 
-        return { idToken, email }
-
-    } catch(error) {
-        console.log("Access.js ", error)
+        console.log("getToken ", gameData)
+        console.log("getToken ", tokenData)
+    
+        return { idToken, email };
+    } catch (error) {
+        console.log("Access.js ", error);
+        return null; 
     }
+}
 
+export async function readLocally() {
+    let gameDataString = localStorage.getItem('myGameData');
+    if (gameDataString) {
+        try {
+            var gameData = JSON.parse(gameDataString);
+            // Check if gameData is missing keys, if so, reset to originalGameData
+            if (!gameData || Object.keys(gameData).length !== Object.keys(originalGameData).length) {
+                gameData = { ...originalGameData };
+                writeLocally(gameData); // Persist the corrected gameData
+            }
+            return gameData;
+        } catch (error) {
+            console.error("Error parsing gameData from localStorage:", error);
+            return originalGameData; // Fall back to default if error occurs
+        }
+    } else {
+        resetLocally();
+        return originalGameData;
+    }
+}
+
+
+export async function readTokenLocally() {
+    let tokenDataExists = localStorage.getItem('tokenGameData') !== null;
+
+    if (tokenDataExists) {
+        var tokenDataString = localStorage.getItem('tokenGameData');
+        var tokenData = JSON.parse(tokenDataString);
+        return tokenData;
+    } else {
+        resetTokenLocally();
+        return tokenData; 
+    }
+}
+
+
+export async function resetTokenLocally() {
+    localStorage.removeItem('tokenGameData');
+    let tokenDataString = JSON.stringify(tokenGameData);
+    localStorage.setItem('tokenGameData', tokenDataString);
+    return tokenGameData;
+}
+
+
+export async function writeLocally(new_data){
+    var gameDataString = JSON.stringify(new_data);
+    localStorage.setItem('myGameData', gameDataString);
 }
 
 
@@ -58,21 +129,13 @@ export async function checkTokenValidity(token) {
     }
 }
 
-
-function getTokenLocally(){
-    var gameData = readLocally()
-    var idToken = gameData["token"]
-    return idToken
-}
-
 export async function getPlayer(playerName){
-    console.log(getTokenLocally());
 
     const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?playerName=' + playerName;
 
     const headers = {
         'Content-Type': 'application/json',
-        "Authorization": `Bearer ${getTokenLocally()}`
+        "Authorization": `Bearer ${readTokenLocally()}`
     };
 
     try {
@@ -96,13 +159,13 @@ export async function getPlayer(playerName){
 }
 
 export async function getPlayerWithEmail(email){
-    console.log(getTokenLocally());
+    console.log(readTokenLocally());
 
     const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?email=' + email;
 
     const headers = {
         'Content-Type': 'application/json',
-        "Authorization": `Bearer ${getTokenLocally()}`
+        "Authorization": `Bearer ${readTokenLocally()}`
     };
 
     try {
@@ -124,17 +187,16 @@ export async function getPlayerWithEmail(email){
 
 }
 
-// var data2 = getPlayerWithEmail("ztggt@gmail.com")
-// console.log(data2)
-// var ddd = getPlayer("Player1")
-// console.log(ddd);
-
-export async function postPlayer(playerData) {
-    var { idToken } = await runfetchAuthSession()
-    var playerData_drop = playerData;
-    delete playerData_drop.token;
+export async function postPlayer(playerDataPromise) {
 
     try {
+        const playerData = await playerDataPromise;
+
+        const idToken = await readTokenLocally() 
+
+        console.log(idToken);
+        console.log(playerData);
+
         const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable';
         const headers = {
             'Content-Type': 'application/json',
@@ -144,12 +206,13 @@ export async function postPlayer(playerData) {
         const response = await fetch(url, {
             method: 'POST',
             headers: headers,
-            body: JSON.stringify(playerData_drop)
+            body: JSON.stringify(playerData)
         });
 
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
+
         return 'Username created';
     } catch (error) {
         console.error('Error here:', error);
@@ -157,21 +220,8 @@ export async function postPlayer(playerData) {
     }
 }
 
-// var playerData = {
-//     playerId:9992323324,
-//     playerName: "asddev",
-//     mute: false,
-//     volume: 5,
-//     gold_cpu_date_issue:1720683935,
-//     gold_multi_date_issue:1720683935,
-//     gold_cpu:1000,
-//     gold_multi:1000,
-//     gold_multi_real:1000,
-//     token:"dfg",
-//     email:"ggg@gmail.com"
-// };
-// var ddd = postPlayer(playerData)
-// console.log(ddd);
+
+
 
 export async function patchPlayer(playerId, updateKey, updateValue) {
     const playerData = {
@@ -184,7 +234,7 @@ export async function patchPlayer(playerId, updateKey, updateValue) {
         const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable';
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getTokenLocally()}`
+            'Authorization': `Bearer ${readTokenLocally()}`
         };
 
         const response = await fetch(url, {
@@ -203,6 +253,18 @@ export async function patchPlayer(playerId, updateKey, updateValue) {
     }
 }
 
+
+export async function resetLocally() {
+    localStorage.removeItem('myGameData');
+    let gameDataString = JSON.stringify(originalGameData);
+    localStorage.setItem('myGameData', gameDataString);
+    return originalGameData;
+}
+
+
+
+
+
 export async function getGame(data){
 
 }
@@ -215,43 +277,3 @@ export async function patchGame(data){
 
 }
 
-
-export async function writeLocally(new_data){
-
-}
-
-export async function readLocally(){
-
-    let gameDataExists = localStorage.getItem('myGameData') !== null;
-
-    if (gameDataExists) {
-        console.log("Game data exists in localStorage.");
-        var gameDataString = localStorage.getItem('myGameData');
-        var gameData = JSON.parse(gameDataString);
-        return gameData
-    } else {
-        resetLocally()
-        console.log("reset locally")
-        return "reset locally"
-    }
-}
-
-export async function resetLocally(){
-    localStorage.removeItem('myGameData');
-    var gameData = {
-        playerId:123,
-        playerName: "Player1",
-        mute: false,
-        volume: 100,
-        gold_cpu_date_issue:1720683935,
-        gold_multi_date_issue:1720683935,
-        gold_cpu:1000,
-        gold_multi:1000,
-        gold_multi_real:1000,
-        token:"zzzz",
-        email:"test@gmail.com"
-    };
-    let gameDataString = JSON.stringify(gameData);
-    localStorage.setItem('myGameData', gameDataString);
-    console.log("reset locally")
-}

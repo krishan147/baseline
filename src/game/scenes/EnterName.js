@@ -3,7 +3,7 @@ import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import { getPlayer } from './Access.js'
 import { postPlayer } from './Access.js'
-import { runfetchAuthSession } from './Access.js'
+import { getToken } from './Access.js'
 import { getPlayerWithEmail } from './Access.js'
 import { writeLocally } from './Access.js'
 import { readLocally } from './Access.js'
@@ -71,7 +71,7 @@ export class EnterName extends Scene {
         var volume = gameData["volume"];
         var isChecked = gameData["mute"];
         console.log("data:", data)
-        if (data["playerName"] === "Player1"){
+        if (data["playerName"] === "Player1" || data["playerName"] === undefined) {
             console.log("EnterName")
         }else {
             this.scene.start('Menu');
@@ -602,15 +602,15 @@ export class EnterName extends Scene {
                 showMessageExists.call(this);
             } else {
                 var playerId = generateRandomId.call(this)
-                var local_data = readLocally()
+                var local_data = await readLocally()
                 local_data["playerName"] = username;
                 local_data["playerId"] = playerId;
 
                 audioButton(isChecked);
                 submitButton.setStyle({ fill: '#ffff00' });
                 this.scene.start('Menu');
-                writeLocally(gameData);
-                postPlayer(gameData);
+                await writeLocally(gameData);
+                await postPlayer(gameData);
 
             }
         }

@@ -62,7 +62,7 @@ export class Menu extends Scene
 
     async create ()
     {
-        var gameDataString = await localStorage.getItem('myGameData');
+        var gameDataString = await localStorage.getItem('gameData');
         var gameData = JSON.parse(gameDataString);
         var volume = gameData["volume"]
         var isChecked = gameData["mute"]

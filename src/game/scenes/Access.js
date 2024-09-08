@@ -1,25 +1,17 @@
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { jwtDecode } from "jwt-decode"
-import { cognitoUserPoolsTokenProvider } from 'aws-amplify/auth/cognito';
-import { KeyValueStorageInterface } from 'aws-amplify/utils';
-  
-
+import { getCurrentUser } from 'aws-amplify/auth';
 
 const originalGameData = {
     playerId: 123,
     playerName: "Player1",
     mute: false,
-    volume: 100,
+    volume: 10,
     gold_cpu_date_issue: 1720683935,
     gold_multi_date_issue: 1720683935,
     gold_cpu: 1000,
     gold_multi: 1000,
     gold_multi_real: 1000,
-    email: "test@gmail.com"
-};
-
-const tokenGameData = {
-    token: "zzzz",
     email: "test@gmail.com"
 };
 
@@ -34,16 +26,7 @@ export async function getToken() {
         gameData['email'] = email;
 
         var gameDataString = JSON.stringify(gameData);
-        localStorage.setItem('myGameData', gameDataString);
-
-        var tokenData = await readTokenLocally()
-        tokenData["email"] = email;
-        tokenData["token"] = idToken;
-        var tokenDataString = JSON.stringify(tokenData);
-        localStorage.setItem('tokenData', tokenDataString);
-
-        console.log("getToken ", gameData)
-        console.log("getToken ", tokenData)
+        localStorage.setItem('gameData', gameDataString);
     
         return { idToken, email };
     } catch (error) {
@@ -52,53 +35,37 @@ export async function getToken() {
     }
 }
 
+
+
 export async function readLocally() {
-    let gameDataString = localStorage.getItem('myGameData');
+    let gameDataString = localStorage.getItem('gameData');
     if (gameDataString) {
         try {
             var gameData = JSON.parse(gameDataString);
-            // Check if gameData is missing keys, if so, reset to originalGameData
-            if (!gameData || Object.keys(gameData).length !== Object.keys(originalGameData).length) {
-                gameData = { ...originalGameData };
-                writeLocally(gameData); // Persist the corrected gameData
-            }
+            writeLocally(gameData);
             return gameData;
         } catch (error) {
             console.error("Error parsing gameData from localStorage:", error);
-            return originalGameData; // Fall back to default if error occurs
+            return originalGameData;
         }
     } else {
-        resetLocally();
+        resetGameLocally();
         return originalGameData;
     }
 }
 
 
-export async function readTokenLocally() {
-    let tokenDataExists = localStorage.getItem('tokenGameData') !== null;
-
-    if (tokenDataExists) {
-        var tokenDataString = localStorage.getItem('tokenGameData');
-        var tokenData = JSON.parse(tokenDataString);
-        return tokenData;
-    } else {
-        resetTokenLocally();
-        return tokenData; 
-    }
-}
-
-
-export async function resetTokenLocally() {
-    localStorage.removeItem('tokenGameData');
-    let tokenDataString = JSON.stringify(tokenGameData);
-    localStorage.setItem('tokenGameData', tokenDataString);
-    return tokenGameData;
-}
-
-
 export async function writeLocally(new_data){
     var gameDataString = JSON.stringify(new_data);
-    localStorage.setItem('myGameData', gameDataString);
+    localStorage.setItem('gameData', gameDataString);
+}
+
+
+export async function resetGameLocally() {
+    localStorage.removeItem('gameData');
+    let gameDataString = JSON.stringify(originalGameData);
+    localStorage.setItem('gameData', gameDataString);
+    return originalGameData;
 }
 
 
@@ -135,7 +102,7 @@ export async function getPlayer(playerName){
 
     const headers = {
         'Content-Type': 'application/json',
-        "Authorization": `Bearer ${readTokenLocally()}`
+        "Authorization": `Bearer ${getToken()}`
     };
 
     try {
@@ -159,13 +126,12 @@ export async function getPlayer(playerName){
 }
 
 export async function getPlayerWithEmail(email){
-    console.log(readTokenLocally());
 
     const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?email=' + email;
 
     const headers = {
         'Content-Type': 'application/json',
-        "Authorization": `Bearer ${readTokenLocally()}`
+        "Authorization": `Bearer ${getToken()}`
     };
 
     try {
@@ -192,10 +158,17 @@ export async function postPlayer(playerDataPromise) {
     try {
         const playerData = await playerDataPromise;
 
-        const idToken = await readTokenLocally() 
+        const { idToken } = await getToken()
 
+        console.log("playerData ", playerData);
         console.log(idToken);
-        console.log(playerData);
+
+
+        if (!playerData || !playerData.volume) {
+            console.error('playerData is null or volume is undefined.');
+        } else{
+            console.log("not null")
+        }
 
         const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable';
         const headers = {
@@ -210,7 +183,7 @@ export async function postPlayer(playerDataPromise) {
         });
 
         if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
+            throw new Error('Network response was not good ' + response.statusText);
         }
 
         return 'Username created';
@@ -219,9 +192,6 @@ export async function postPlayer(playerDataPromise) {
         throw error;
     }
 }
-
-
-
 
 export async function patchPlayer(playerId, updateKey, updateValue) {
     const playerData = {
@@ -234,7 +204,7 @@ export async function patchPlayer(playerId, updateKey, updateValue) {
         const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable';
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${readTokenLocally()}`
+            'Authorization': `Bearer ${getToken()}`
         };
 
         const response = await fetch(url, {
@@ -254,12 +224,6 @@ export async function patchPlayer(playerId, updateKey, updateValue) {
 }
 
 
-export async function resetLocally() {
-    localStorage.removeItem('myGameData');
-    let gameDataString = JSON.stringify(originalGameData);
-    localStorage.setItem('myGameData', gameDataString);
-    return originalGameData;
-}
 
 
 

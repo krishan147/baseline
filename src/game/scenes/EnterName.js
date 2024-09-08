@@ -70,14 +70,12 @@ export class EnterName extends Scene {
         var data = await getPlayerWithEmail(gameData["email"]) 
         var volume = gameData["volume"];
         var isChecked = gameData["mute"];
-        console.log("data:", data)
         if (data["playerName"] === "Player1" || data["playerName"] === undefined) {
-            console.log("EnterName")
+            console.log("EnterName.js error")
         }else {
             this.scene.start('Menu');
         }
     } catch(error){
-        console.log("Entername.js ", error)
         volume = 100;
         isChecked = 0;
     }
@@ -602,9 +600,9 @@ export class EnterName extends Scene {
                 showMessageExists.call(this);
             } else {
                 var playerId = generateRandomId.call(this)
-                var local_data = await readLocally()
-                local_data["playerName"] = username;
-                local_data["playerId"] = playerId;
+                var gameData = await readLocally()
+                gameData["playerName"] = username;
+                gameData["playerId"] = playerId;
 
                 audioButton(isChecked);
                 submitButton.setStyle({ fill: '#ffff00' });

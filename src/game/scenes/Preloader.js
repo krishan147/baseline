@@ -6,7 +6,7 @@ import { defaultStorage } from 'aws-amplify/utils';
 import { getToken } from './Access.js'
 import { writeLocally } from './Access.js'
 import { readLocally } from './Access.js'
-import { resetLocally } from './Access.js'
+import { resetGameLocally } from './Access.js'
 import { resetTokenLocally } from './Access.js'
 
 export class Preloader extends Scene
@@ -38,8 +38,7 @@ export class Preloader extends Scene
         cognitoUserPoolsTokenProvider.setKeyValueStorage(defaultStorage);
 
         async function signoutCheck(){
-            resetTokenLocally() 
-            resetLocally()
+            resetGameLocally()
             await signOut({ global: true });
           }
 
@@ -47,15 +46,13 @@ export class Preloader extends Scene
 
         if (result) {
             var { idToken } = result;
-            console.log("Preloader.js Token obtained: ", idToken);
+            console.log("Preloader.js Token obtained");
         } else {
             console.error("Failed to fetch session");
         }
 
 
         var token_check = await checkTokenValidity(idToken);
-        console.log(token_check);
-
 
         if (token_check.valid == false){
             console.log("signing out")

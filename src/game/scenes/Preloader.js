@@ -7,7 +7,7 @@ import { getToken } from './Access.js'
 import { writeLocally } from './Access.js'
 import { readLocally } from './Access.js'
 import { resetGameLocally } from './Access.js'
-import { resetTokenLocally } from './Access.js'
+import { getPlayerWithEmail } from './Access.js'
 
 export class Preloader extends Scene
 {
@@ -37,7 +37,7 @@ export class Preloader extends Scene
     {
         cognitoUserPoolsTokenProvider.setKeyValueStorage(defaultStorage);
 
-        async function signoutCheck(){
+        async function signOutCheck(){
             resetGameLocally()
             await signOut({ global: true });
           }
@@ -56,11 +56,19 @@ export class Preloader extends Scene
 
         if (token_check.valid == false){
             console.log("signing out")
-            signoutCheck()
+            signOutCheck()
         }
 
         else if (token_check.valid == true){
-            this.scene.start('EnterName');
+
+            var data = await getPlayerWithEmail()
+
+            if (data["playerName"] === "Player1" || data["playerName"] === undefined) {
+                this.scene.start('EnterName');
+            }else {
+                this.scene.start('Menu');
+            }
+
         }
     }
 }

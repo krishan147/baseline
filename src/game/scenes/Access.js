@@ -1,6 +1,7 @@
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { jwtDecode } from "jwt-decode"
 import { getCurrentUser } from 'aws-amplify/auth';
+import { signOut } from 'aws-amplify/auth';
 
 const originalGameData = {
     playerId: 123,
@@ -17,11 +18,11 @@ const originalGameData = {
 
 export async function getToken() {
     try {
-        const session = await fetchAuthSession({ forceRefresh: true });
+        const session = await fetchAuthSession({ forceRefresh: true }); 
         const idToken = session.tokens.idToken.toString();
         const decodedToken = jwtDecode(idToken);
         const email = decodedToken.email;
-        
+
         var gameData = await readLocally();
         gameData['email'] = email;
 
@@ -100,9 +101,11 @@ export async function getPlayer(playerName){
 
     const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?playerName=' + playerName;
 
+    const { idToken } = getToken()
+
     const headers = {
         'Content-Type': 'application/json',
-        "Authorization": `Bearer ${getToken()}`
+        "Authorization": `Bearer ${idToken}`
     };
 
     try {
@@ -112,7 +115,6 @@ export async function getPlayer(playerName){
         });
 
         if (!response.ok) {
-            console.log("no username found");
             return "no username found";
         }
 
@@ -127,31 +129,40 @@ export async function getPlayer(playerName){
 
 export async function getPlayerWithEmail(email){
 
-    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?email=' + email;
+    var gameData = await readLocally();
 
-    const headers = {
-        'Content-Type': 'application/json',
-        "Authorization": `Bearer ${getToken()}`
-    };
+    if (gameData["playerName"] === "Player1" || gameData["playerName"] === undefined) {
 
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: headers
-        });
+        const { idToken } = await getToken()
+    
+        const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?email=' + email;
 
-        if (!response.ok) {
-            return "no data found";
+        const headers = {
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${idToken}`
+        };
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: headers
+            });
+
+            if (!response.ok) {
+                return "no data found";
+            }
+
+            const data = await response.json();
+            writeLocally(data);
+
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
         }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error:', error);
-        throw error;
     }
-
 }
+
 
 export async function postPlayer(playerDataPromise) {
 

@@ -1,10 +1,7 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
-//import { getPlayer } from './Sounds.js'
-// import { updatePlayer2 } from './Sounds.js';
-
-// updatePlayer2(1, "gold_cpu", 1000)
+import { readLocally } from './Access.js'
 
 var game_version = 'v0.108'
 
@@ -62,11 +59,13 @@ export class Menu extends Scene
 
     async create ()
     {
-        var gameDataString = await localStorage.getItem('gameData');
-        var gameData = JSON.parse(gameDataString);
+
+        var gameData = await readLocally()
         var volume = gameData["volume"]
         var isChecked = gameData["mute"]
         var playerName = gameData["playerName"]
+
+        console.log("menu.js", gameData)
 
         this.cameras.main.setBackgroundColor(0x000000);
 

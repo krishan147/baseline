@@ -64,21 +64,26 @@ export class EnterName extends Scene {
     }
 
     async create() {
+
+        var volume = 100;
+        var isChecked = 0;
         
-        try {
-        var gameData = readLocally()
-        var data = await getPlayerWithEmail(gameData["email"]) 
-        var volume = gameData["volume"];
-        var isChecked = gameData["mute"];
-        if (data["playerName"] === "Player1" || data["playerName"] === undefined) {
-            console.log("EnterName.js error")
-        }else {
-            this.scene.start('Menu');
-        }
-    } catch(error){
-        volume = 100;
-        isChecked = 0;
-    }
+    //     try {
+    //         var gameData = await readLocally()
+    //         var volume = gameData["volume"];
+    //         var isChecked = gameData["mute"];
+
+    //         if (gameData["playerName"] === "Player1" || gameData["playerName"] === undefined) {
+    //             var data = getPlayerWithEmail()
+    //             console.log("EnterName.js, locally name is Player1/undefined")
+    //         }else {
+    //             this.scene.start('Menu');
+    //         }
+    // } catch(error){
+    //     volume = 100;
+    //     isChecked = 0;
+    //     console.log(error)
+    // }
 
         this.cameras.main.setBackgroundColor(0x000000);
 

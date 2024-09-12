@@ -1,7 +1,8 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import Phaser from 'phaser';
-
+import { readLocally } from './Access.js'
+import { writeLocally } from './Access.js'
 
 var audio_music = new Audio('/sounds/music.mp3')
 // audio_music.play()
@@ -62,10 +63,9 @@ export class Options extends Scene
     }
 
 
-    create ()
+    async create ()
     {
-        var gameDataString = localStorage.getItem('myGameData');
-        var gameData = JSON.parse(gameDataString);
+        var gameData = await readLocally()
         var volume = gameData["volume"]
         var isChecked = gameData["mute"]
         var playerName = gameData["playerName"]
@@ -167,7 +167,7 @@ export class Options extends Scene
         // Handle properties
         const handleRadius = 15;
         const handleY = sliderBarY + sliderBarHeight / 2;
-
+        volume = volume/100
         // Calculate the initial handle X position based on the initial volume
         const handleX = sliderBarX + (volume * sliderBarWidth);
 
@@ -216,11 +216,9 @@ export class Options extends Scene
 
         audioButton(isChecked)
 
-        gameDataString = localStorage.getItem('myGameData');
-        gameData = JSON.parse(gameDataString);
+        
         gameData["volume"] = volume
-        var gameDataString = JSON.stringify(gameData);
-        localStorage.setItem('myGameData', gameDataString);
+        writeLocally(gameData);
         checkMute(volume, isChecked);
         });
 
@@ -230,23 +228,16 @@ export class Options extends Scene
                 audio_music.volume = 0
                 audio_button.volume = 0
 
-                gameDataString = localStorage.getItem('myGameData');
-                gameData = JSON.parse(gameDataString);
                 gameData["mute"] = true
-                var gameDataString = JSON.stringify(gameData);
-                localStorage.setItem('myGameData', gameDataString);
+                writeLocally(gameData);
 
             }
 
             if (isChecked == false){
                 audio_music.volume = volume
                 audio_button.volume = volume
-
-                gameDataString = localStorage.getItem('myGameData');
-                gameData = JSON.parse(gameDataString);
                 gameData["mute"] = false
-                gameDataString = JSON.stringify(gameData);
-                localStorage.setItem('myGameData', gameDataString);
+                writeLocally(gameData);
             }
 
         }

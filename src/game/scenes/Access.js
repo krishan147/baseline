@@ -129,38 +129,34 @@ export async function getPlayer(playerName){
 
 export async function getPlayerWithEmail(email){
 
-    var gameData = await readLocally();
+    const { idToken } = await getToken()
 
-    if (gameData["playerName"] === "Player1" || gameData["playerName"] === undefined) {
+    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?email=' + email;
 
-        const { idToken } = await getToken()
-    
-        const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?email=' + email;
+    const headers = {
+        'Content-Type': 'application/json',
+        "Authorization": `Bearer ${idToken}`
+    };
 
-        const headers = {
-            'Content-Type': 'application/json',
-            "Authorization": `Bearer ${idToken}`
-        };
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: headers
+        });
 
-        try {
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: headers
-            });
-
-            if (!response.ok) {
-                return "no data found";
-            }
-
-            const data = await response.json();
-            writeLocally(data);
-
-            return data;
-        } catch (error) {
-            console.error('Error:', error);
-            throw error;
+        if (!response.ok) {
+            return "no data found";
         }
+
+        const data = await response.json();
+        writeLocally(data);
+
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
     }
+    
 }
 
 

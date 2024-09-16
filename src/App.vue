@@ -14,10 +14,16 @@
       </div>
     </template>
 
-    <template v-slot:sign-in-header>
+    <template v-slot:header>
       <h1>BASELINE</h1>
       <h2>TURN-BASED TENNIS FOR WINNERS</h2>
     </template>
+
+    <template v-slot:footer>
+      <h3>By signing in, you've consented to the following <a href="https://krishgames.com/privacyPolicy.html" style="color: yellow;">terms & conditions + privacy policy</a> which describes the rules and conditions that apply to you when playing the game. We value being transparent about how we connect and use your persoanl data. Thanks!</h3>
+    </template>
+
+    
   </authenticator>
 
 
@@ -51,42 +57,6 @@ const customFormFields = {
 
 const isTokenValid = ref(false);
 
-// const checkTokenValid = async () => {
-//   try {
-//     const gameDataString = localStorage.getItem('myGameData');
-//     if (!gameDataString) {
-//       return false;
-//     }
-
-//     const gameData = JSON.parse(gameDataString);
-//     const idToken = gameData?.token;
-
-//     if (!idToken) {
-//       return false;
-//     }
-
-//     const decodedToken = jwtDecode(idToken);
-//     const currentTime = Date.now() / 1000;
-
-//     return decodedToken.exp > currentTime;
-//   } catch (error) {
-//       signoutCheck()
-//     return false;
-//   }
-// };
-
-// checkTokenValid().then(valid => {
-//   isTokenValid.value = valid;
-// });
-
-// if (!isTokenValid.value) {
-//   signoutCheck()
-// }
-
-// async function signoutCheck(){
-//   await signOut({ global: true });
-// }
-
 </script>
 
 
@@ -108,19 +78,13 @@ button.amplify-button {
   border: 0px solid rgb(0, 255, 0);
 }
 
-.amplify-text {
-  color: black;
-}
 
 form[data-amplify-form] {
-  background-color: #000;
-  color: #fff;
-  padding: 20px;
+
 }
 
 [data-amplify-router-content] {
   background-color: #000;
-  color: #000;
 }
 
 h1 {
@@ -140,6 +104,14 @@ h2 {
   color: rgb(0, 255, 0);
   font-family: 'playwritereg';
   font-size: 15px;
+  opacity: 0;
+  animation: fadeIn 2s forwards;
+}
+
+h3 {
+  color: rgb(0, 255, 0);
+  font-family: 'playwritereg';
+  font-size: 11px;
   opacity: 0;
   animation: fadeIn 2s forwards;
 }

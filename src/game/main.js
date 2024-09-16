@@ -40,10 +40,8 @@ const config = {
     },
 };
 
-// Initialize the game and attach it to the 'game-container'
 const game = new Phaser.Game(config);
 
-// Handle window resize
 window.addEventListener('resize', () => {
     game.scale.resize(window.innerWidth, window.innerHeight);
 });

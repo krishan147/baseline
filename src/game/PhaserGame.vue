@@ -38,14 +38,3 @@ defineExpose({ scene, game });
 <template>
     <div id="game-container"></div>
 </template>
-
-
-
-
-<!-- <template>
-    <h1>YOURffdgfdggdgfghE IN!!!</h1>
-</template>
-  
-<script>
-
-</script> -->

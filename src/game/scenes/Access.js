@@ -167,9 +167,6 @@ export async function postPlayer(playerDataPromise) {
 
         const { idToken } = await getToken()
 
-        console.log("playerData ", playerData);
-        console.log(idToken);
-
 
         if (!playerData || !playerData.volume) {
             console.error('playerData is null or volume is undefined.');
@@ -201,6 +198,9 @@ export async function postPlayer(playerDataPromise) {
 }
 
 export async function patchPlayer(playerId, updateKey, updateValue) {
+
+    const { idToken } = await getToken()
+
     const playerData = {
         playerId: playerId,
         updateKey: updateKey,
@@ -211,7 +211,7 @@ export async function patchPlayer(playerId, updateKey, updateValue) {
         const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable';
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getToken()}`
+            'Authorization': `Bearer ${idToken}`
         };
 
         const response = await fetch(url, {

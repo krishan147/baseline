@@ -3,7 +3,7 @@ import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import { readLocally } from './Access.js'
 
-var game_version = 'v0.108'
+var game_version = 'v0.109'
 
 export class Menu extends Scene
 {
@@ -65,34 +65,13 @@ export class Menu extends Scene
         var isChecked = gameData["mute"]
         var playerName = gameData["playerName"]
 
-        console.log("menu.js", gameData)
-
         this.cameras.main.setBackgroundColor(0x000000);
 
 
         const version = this.add.text(10, 40, game_version, { fill: '#0f0', fontSize: '10px', fontFamily: 'playwritereg',padding: { right: 35}})
 
 
-        const title = this.add.text(50, 110, 'BASELINE', { fill: '#0f0', fontSize: '60px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
-
-        const byText = this.add.text(50, 190, 'BY ', { fill: '#0f0', fontSize: '20px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg' });
-
-        const krishgames = this.add.text(byText.x + byText.width, 190, 'KRISHGAMES', { fill: '#0f0', fontSize: '20px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg' })
-            .setInteractive()
-            .on('pointerdown', () => {
-                krishgames.setStyle({ fill: '#ffff00' });
-                setTimeout(() => {
-                    krishgames.setStyle({ fill: '#0f0' });
-                }, 200);
-                audioButton(isChecked);
-                window.open('http://krishgames.com', '_blank');
-            })
-            .on('pointerover', () => {
-                krishgames.setStyle({ fill: '#ffff00' });
-            })
-            .on('pointerout', () => {
-                krishgames.setStyle({ fill: '#0f0' });
-            });
+        const title = this.add.text(50, 110, 'BASELINE', { fill: '#0f0', fontSize: '60px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
   
 
         const grassImages = [];
@@ -207,9 +186,22 @@ export class Menu extends Scene
     .setAlpha(0);
 
     const username = this.add.text(10, 790, 'NAME: '+ playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
+    .setInteractive()
+    .on('pointerdown', () => {
+        username.setStyle({ fill: '#ffff00'});
+
+        audioButton(isChecked)
+        this.scene.start('Bank');
+    })
+    .on('pointerover', () => {
+        username.setStyle({ fill: '#ffff00' });
+    })
+    .on('pointerout', () => {
+        username.setStyle({ fill: '#0f0' });
+    })
 
     this.tweens.add({
-        targets: [botSprite, onlineButton, username, optionsButton, richestButton, offlineButton],    
+        targets: [botSprite, onlineButton, username, optionsButton, richestButton, offlineButton, title],    
         alpha: 1,               
         duration: 1000,        
         ease: 'Power2',    

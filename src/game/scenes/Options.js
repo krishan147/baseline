@@ -3,6 +3,9 @@ import { Scene } from 'phaser';
 import Phaser from 'phaser';
 import { readLocally } from './Access.js'
 import { writeLocally } from './Access.js'
+import { patchPlayer } from './Access.js'
+import { resetGameLocally } from './Access.js'
+import { signOut } from 'aws-amplify/auth';
 
 var audio_music = new Audio('/sounds/music.mp3')
 // audio_music.play()
@@ -69,12 +72,11 @@ export class Options extends Scene
         var volume = gameData["volume"]
         var isChecked = gameData["mute"]
         var playerName = gameData["playerName"]
+        var playerId = gameData["playerId"]
         
         this.cameras.main.setBackgroundColor(0x000000);
 
         const title = this.add.text(50, 110, 'OPTIONS', { fill: '#0f0', fontSize: '60px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
-
-
 
         const grassImages = [];
         const startX = 0; 
@@ -109,7 +111,7 @@ export class Options extends Scene
 
         this.anims.create({
             key: anim_to_run,
-            frames: this.anims.generateFrameNumbers(anim_to_run, { start: 0, end: 5 }),
+            frames: this.anims.generateFrameNumbers(anim_to_run, { start: 0, end: 3 }),
             frameRate: 5,
             repeat: -1
         });
@@ -127,11 +129,11 @@ export class Options extends Scene
             }
         });
 
-        const muteTitle = this.add.text(150, 550, 'MUTE', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+        const muteTitle = this.add.text(150, 510, 'MUTE', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
 
         const checkboxSize = 50;
         const checkboxX = 300;
-        const checkboxY = 550;
+        const checkboxY = 510;
     
         const checkbox = this.add.rectangle(checkboxX, checkboxY, checkboxSize, checkboxSize, 0x00FF00)
           .setStrokeStyle(2, 0x000000) // Border color
@@ -156,11 +158,11 @@ export class Options extends Scene
 
         });
 
-        const volumeTitle = this.add.text(50, 640, 'VOLUME', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+        const volumeTitle = this.add.text(50, 570, 'VOLUME', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
 
         // Slider bar properties
         const sliderBarX = 250;
-        const sliderBarY = 665;
+        const sliderBarY = 595;
         const sliderBarWidth = 200;
         const sliderBarHeight = 50;
 
@@ -176,8 +178,7 @@ export class Options extends Scene
         .setOrigin(0, 0.5); // Centered vertically
 
         // Draw the slider handle
-        const sliderHandle = this.add.circle(handleX, handleY, handleRadius, 0x00FF00)
-        .setInteractive({ useHandCursor: true, draggable: true });
+        const sliderHandle = this.add.circle(handleX, handleY, handleRadius, 0x00FF00).setInteractive({ useHandCursor: true, draggable: true });
 
         // Add input drag events for the handle
         this.input.setDraggable(sliderHandle);
@@ -204,7 +205,6 @@ export class Options extends Scene
         const initialColor = interpolateColor(0xffffff, 0x00ff00, volume);
         sliderBar.fillColor = initialColor;
 
-        // Listen for drag events
         sliderHandle.on('drag', (pointer, dragX) => {
         const newX = Phaser.Math.Clamp(dragX, sliderBarX, sliderBarX + sliderBarWidth);
         sliderHandle.x = newX;
@@ -215,9 +215,8 @@ export class Options extends Scene
         sliderBar.fillColor = newColor;
 
         audioButton(isChecked)
-
-        
-        gameData["volume"] = volume
+        var volume_int = Math.floor(volume * 100);
+        gameData["volume"] = volume_int
         writeLocally(gameData);
         checkMute(volume, isChecked);
         });
@@ -230,20 +229,92 @@ export class Options extends Scene
 
                 gameData["mute"] = true
                 writeLocally(gameData);
-
             }
 
             if (isChecked == false){
                 audio_music.volume = volume
                 audio_button.volume = volume
+
                 gameData["mute"] = false
                 writeLocally(gameData);
             }
 
         }
 
-        const username = this.add.text(10, 800, 'NAME: ' + playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+        async function signOutCheck() {
+            resetGameLocally();
+            await signOut({ global: true });
+        }
+        
+        const signOutText = this.add.text(150, 640, 'SIGN OUT ', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg' })
+            .setInteractive()
+            .on('pointerdown', () => {
+                signOutText.setStyle({ fill: '#ffff00' });
+        
+                setTimeout(() => {
+                    privacyPolicy.setStyle({ fill: '#0f0' });
+                }, 200);
+                audioButton(isChecked);
+                signOutCheck();
+            })
+            .on('pointerover', () => {
+                signOutText.setStyle({ fill: '#ffff00' });
+            })
+            .on('pointerout', () => {
+                signOutText.setStyle({ fill: '#0f0' });
+            });
+        
 
+        const privacyPolicy = this.add.text(100, 690, 'PRIVACY POLICY ', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg' })            .setInteractive()
+        .on('pointerdown', () => {
+            privacyPolicy.setStyle({ fill: '#ffff00' });
+            setTimeout(() => {
+                privacyPolicy.setStyle({ fill: '#0f0' });
+            }, 200);
+            audioButton(isChecked);
+            window.open('https://krishgames.com/privacyPolicy.html', '_blank');
+        })
+        .on('pointerover', () => {
+            privacyPolicy.setStyle({ fill: '#ffff00' });
+        })
+        .on('pointerout', () => {
+            privacyPolicy.setStyle({ fill: '#0f0' });
+        });
+
+        const byText = this.add.text(20, 740, 'MADE BY ', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg' });
+
+        const krishgames = this.add.text(byText.x + byText.width, 740, 'KRISHGAMES', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:30}})
+            .setInteractive()
+            .on('pointerdown', () => {
+                krishgames.setStyle({ fill: '#ffff00' });
+                setTimeout(() => {
+                    krishgames.setStyle({ fill: '#0f0' });
+                }, 200);
+                audioButton(isChecked);
+                window.open('http://krishgames.com', '_blank');
+            })
+            .on('pointerover', () => {
+                krishgames.setStyle({ fill: '#ffff00' });
+            })
+            .on('pointerout', () => {
+                krishgames.setStyle({ fill: '#0f0' });
+            });
+        
+
+        const username = this.add.text(10, 800, 'NAME: ' + playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+        .setInteractive()
+        .on('pointerdown', () => {
+            username.setStyle({ fill: '#ffff00'});
+    
+            audioButton(isChecked)
+            this.scene.start('Bank');
+        })
+        .on('pointerover', () => {
+            username.setStyle({ fill: '#ffff00' });
+        })
+        .on('pointerout', () => {
+            username.setStyle({ fill: '#0f0' });
+        })
   
         const backButton = this.add.text(350, 785, 'BACK', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
         .setInteractive()

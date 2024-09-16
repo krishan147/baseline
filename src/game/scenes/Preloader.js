@@ -62,15 +62,12 @@ export class Preloader extends Scene
         else if (token_check.valid == true){
             var gameData = await readLocally()
             const email = gameData["email"]
-            console.log(email)
             var data = await getPlayerWithEmail(email)
-
-            console.log(data);
 
             if (data["playerName"] === "Player1" || data["playerName"] === undefined) {
                 this.scene.start('EnterName');
             }else {
-                this.scene.start('Menu');
+                this.scene.start('Menu'); 
             }
 
         }

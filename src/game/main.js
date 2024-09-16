@@ -8,6 +8,7 @@ import { Richest } from './scenes/Richest';
 import { EnterName } from './scenes/EnterName';
 import { PlayOnline } from './scenes/PlayOnline';
 import { Bet } from './scenes/Bet';
+import { Bank } from './scenes/Bank';
 
 const config = {
     type: Phaser.AUTO,
@@ -18,6 +19,10 @@ const config = {
     scale: {
         mode: Phaser.Scale.FIT,
     },
+    input: {
+        activePointers: 1,
+        touch: true
+    },
     scene: [
         Boot,
         Preloader,
@@ -27,7 +32,8 @@ const config = {
         Options,
         Richest,
         EnterName,
-        Bet
+        Bet,
+        Bank
     ],
     dom: {
         createContainer: true

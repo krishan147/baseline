@@ -2,6 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import Phaser from 'phaser';
+import { readLocally } from './Access.js'
 
 export class Bet extends Scene
 {
@@ -56,11 +57,10 @@ export class Bet extends Scene
         });
     }
 
-    create ()
+    async create ()
     {
 
-        var gameDataString = localStorage.getItem('myGameData');
-        var gameData = JSON.parse(gameDataString);
+        var gameData = await readLocally()
         var volume = gameData["volume"]
         var isChecked = gameData["mute"]
         var playerName = gameData["playerName"]

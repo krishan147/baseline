@@ -4,6 +4,7 @@ import { audioButton } from './Options.js';
 import Phaser from 'phaser';
 import { readLocally } from './Access.js'
 
+
 export class Bet extends Scene
 {
     constructor ()

@@ -3,8 +3,8 @@ import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import { getPlayer } from './Access.js'
 import { postPlayer } from './Access.js'
-import { getToken } from './Access.js'
-import { getPlayerWithEmail } from './Access.js'
+// import { getToken } from './Access.js'
+// import { getPlayerWithEmail } from './Access.js'
 import { writeLocally } from './Access.js'
 import { readLocally } from './Access.js'
 

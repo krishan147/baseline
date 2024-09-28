@@ -230,7 +230,49 @@ export async function patchPlayer(playerId, updateKey, updateValue) {
     }
 }
 
+export async function lookingForGame(playerDataPromise){
+    console.log("lookingforgame")
+    try {
+        const playerData = await playerDataPromise;
+        const { idToken } = await getToken()
 
+
+        if (!playerData || !playerData.volume) {
+            console.error('playerData is null or volume is undefined.');
+        } else{
+            console.log("not null")
+        }
+        
+        playerData["id"] = 'er3432rwe34r'
+        playerData["bet"] = 1000
+        playerData["try"] = 0
+        playerData["game"] = "finding_game"
+        playerData["datetime"] = "2024-02-01 16:05:01"
+
+        console.log(playerData)
+
+        const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame';
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+        };
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(playerData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not good ' + response.statusText);
+        }
+
+        return 'lookingforgame run';
+    } catch (error) {
+        console.error('Error here:', error);
+        throw error;
+    }
+}
 
 
 

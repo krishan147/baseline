@@ -3,6 +3,7 @@ import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import Phaser from 'phaser';
 import { readLocally } from './Access.js'
+import { lookingForGame } from './Access.js'
 
 
 export class Bet extends Scene
@@ -322,22 +323,44 @@ export class Bet extends Scene
         }
   
         const backButton = this.add.text(350, 785, 'BACK', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
+            .setInteractive()
+            .on('pointerdown', () => {
+                backButton.setStyle({ fill: '#ffff00'});
+            audioButton(isChecked)
+            this.scene.start('Menu');
+        })
+        .on('pointerover', () => {
+            backButton.setStyle({ fill: '#ffff00' });
+        })
+        .on('pointerout', () => {
+            backButton.setStyle({ fill: '#0f0' });
+        }).setAlpha(0)
+
+
+        const testbutton = this.add.text(350, 755, 'TEST', { 
+            fill: '#0f0', 
+            fontSize: '30px', 
+            strokeThickness: 1, 
+            stroke: '#0f0', 
+            fontFamily: 'playwritereg', 
+            padding: {right: 50}
+        })
         .setInteractive()
-        .on('pointerdown', () => {
-            backButton.setStyle({ fill: '#ffff00'});
-        audioButton(isChecked)
-        this.scene.start('Menu');
-    })
-    .on('pointerover', () => {
-        backButton.setStyle({ fill: '#ffff00' });
-    })
-    .on('pointerout', () => {
-        backButton.setStyle({ fill: '#0f0' });
-    }).setAlpha(0)
+        .on('pointerdown', async () => { // Make this function async
+            testbutton.setStyle({ fill: '#ffff00' });
+            audioButton(isChecked);
+            
+            try {
+                await lookingForGame(gameData)
+            } catch (error) {
+                console.error('Error looking for game:', error);
+            }
+        });
+        
 
         const coins = this.add.text(10, 770, 'COINS: ' + str_coins, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
         const username = this.add.text(10, 800, 'NAME: ' + playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
-
+    
         this.tweens.add({
             targets: [username, coins, backButton, confirm, title],    
             alpha: 1,               
@@ -346,6 +369,11 @@ export class Bet extends Scene
             onComplete: function() {
             }
         });
+
+
+
+
+
 
     
 

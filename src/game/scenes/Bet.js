@@ -4,6 +4,7 @@ import { audioButton } from './Options.js';
 import Phaser from 'phaser';
 import { readLocally } from './Access.js'
 import { lookingForGame } from './Access.js'
+import { matchGames } from './Access.js'
 
 
 export class Bet extends Scene
@@ -351,7 +352,8 @@ export class Bet extends Scene
             audioButton(isChecked);
             
             try {
-                await lookingForGame(gameData)
+              //  await lookingForGame(gameData)
+                 await matchGames()
             } catch (error) {
                 console.error('Error looking for game:', error);
             }

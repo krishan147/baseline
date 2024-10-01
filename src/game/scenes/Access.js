@@ -231,7 +231,6 @@ export async function patchPlayer(playerId, updateKey, updateValue) {
 }
 
 export async function lookingForGame(playerDataPromise){
-    console.log("lookingforgame")
     try {
         const playerData = await playerDataPromise;
         const { idToken } = await getToken()
@@ -273,6 +272,40 @@ export async function lookingForGame(playerDataPromise){
         throw error;
     }
 }
+
+
+export async function matchGames() {
+
+
+    try {
+ 
+        const { idToken } = await getToken();
+
+        const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame?' + 
+                    'playerName=ddtest&playerId=fewr3rfdsf&try=0&bet=1000&game=finding_game';
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+        };
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: headers
+        });
+
+    console.log(response.json());
+    
+    return response
+
+
+    } catch (error){
+        console.error('Error:', error);
+        throw error;
+}
+
+
+}
+
 
 
 

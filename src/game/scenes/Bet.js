@@ -4,7 +4,7 @@ import { audioButton } from './Options.js';
 import Phaser from 'phaser';
 import { readLocally } from './Access.js'
 import { lookingForGame } from './Access.js'
-import { matchGames } from './Access.js'
+import { matchGame } from './Access.js'
 
 
 export class Bet extends Scene
@@ -127,11 +127,11 @@ export class Bet extends Scene
 
         const buttons = [
             { text: 'NONE', y: 530, x: 50 , frequency:1000, bet_x:110, bet_y:550},
-            { text: 'ALL IN', y: 530, x: 200, frequency:1, bet_x:260, bet_y:550 },
-            { text: '100', y: 530, x: 350, frequency:18, bet_x:380, bet_y:550 },
-            { text: '200', y: 610, x: 50, frequency:12, bet_x:90, bet_y:630 },
-            { text: '500', y: 610, x: 200, frequency:6, bet_x:240, bet_y:630 },
-            { text: '1000', y: 610, x: 350, frequency:2, bet_x:400, bet_y:630 }
+            { text: '100', y: 530, x: 200, frequency:24, bet_x:260, bet_y:550 },
+            { text: '200', y: 530, x: 350, frequency:16, bet_x:380, bet_y:550 },
+            { text: '500', y: 610, x: 50, frequency:12, bet_x:90, bet_y:630 },
+            { text: '1000', y: 610, x: 200, frequency:6, bet_x:240, bet_y:630 },
+            { text: '2000', y: 610, x: 350, frequency:2, bet_x:400, bet_y:630 }
         ];
 
         buttons.forEach(button => {
@@ -352,8 +352,8 @@ export class Bet extends Scene
             audioButton(isChecked);
             
             try {
-              //  await lookingForGame(gameData)
-                 await matchGames()
+                await lookingForGame(gameData)
+              //   await matchGame()
             } catch (error) {
                 console.error('Error looking for game:', error);
             }

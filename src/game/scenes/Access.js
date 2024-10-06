@@ -197,6 +197,7 @@ export async function postPlayer(playerDataPromise) {
     }
 }
 
+
 export async function patchPlayer(playerId, updateKey, updateValue) {
 
     const { idToken } = await getToken()
@@ -230,6 +231,10 @@ export async function patchPlayer(playerId, updateKey, updateValue) {
     }
 }
 
+function create_unique_id() {
+    return Math.random().toString().slice(2) + Date.now().toString() + Math.random().toString().slice(2);
+}
+
 export async function lookingForGame(playerDataPromise){
     try {
         const playerData = await playerDataPromise;
@@ -242,13 +247,20 @@ export async function lookingForGame(playerDataPromise){
             console.log("not null")
         }
         
-        playerData["id"] = 'er3432rwe34r'
-        playerData["bet"] = 1000
-        playerData["try"] = 0
-        playerData["game"] = "finding_game"
-        playerData["datetime"] = "2024-02-01 16:05:01"
+        
+        // playerData["playerName"] = '1moose'
+        // playerData["playerId"] = '25555'
+        playerData["id"] = create_unique_id()
 
-        console.log(playerData)
+
+        playerData["id"] = "8873673970119842172821907237608764684944035328"
+
+        playerData["bet"] = 100
+        playerData["game"] = "finding_game"
+        playerData["datetime"] = new Date().toISOString();
+        playerData["against_player_name"] = ""
+        playerData["against_player_id"] = ""
+        playerData["session_id"] = ""
 
         const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame';
         const headers = {
@@ -262,9 +274,11 @@ export async function lookingForGame(playerDataPromise){
             body: JSON.stringify(playerData)
         });
 
-        if (!response.ok) {
-            throw new Error('Network response was not good ' + response.statusText);
-        }
+        console.log(response);
+
+        // if (!response.ok) {
+        //     throw new Error('Network response was not good ' + response.statusText);
+        // }
 
         return 'lookingforgame run';
     } catch (error) {
@@ -274,11 +288,15 @@ export async function lookingForGame(playerDataPromise){
 }
 
 
-export async function matchGames() {
+export async function matchGame() {
+    const maxRetries = 3;
+    const delayInMs = 3000; // 3 seconds delay
+    let attempt = 0;
+    let response;
 
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     try {
- 
         const { idToken } = await getToken();
 
         const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame?' + 
@@ -288,38 +306,40 @@ export async function matchGames() {
             'Authorization': `Bearer ${idToken}`
         };
 
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: headers
-        });
+        while (attempt < maxRetries) {
+            attempt++;
+            response = await fetch(url, {
+                method: 'GET',
+                headers: headers
+            });
 
-    console.log(response.json());
-    
-    return response
+            if (response.status === 200) {
+                console.log(response.json())
+                return response;
+            } else {
+                console.log(`Attempt ${attempt} failed with status: ${response.status}`);
+                if (attempt < maxRetries) {
+                    await delay(delayInMs);  
+                }
+            }
+        }
 
+        console.log("Cannot find player. Try again in a minute.");
+        return null; 
 
-    } catch (error){
+    } catch (error) {
         console.error('Error:', error);
         throw error;
+    }
+}
+
+export async function foundGame() {
+ // this function is now in lambda function
 }
 
 
-}
 
 
 
 
-
-
-export async function getGame(data){
-
-}
-
-export async function postGame(data){
-
-}
-
-export async function patchGame(data){
-
-}
 

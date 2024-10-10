@@ -124,6 +124,7 @@ export class Bet extends Scene
         });
  
         let currentBet = null;
+        var bet_to_execute = null
 
         const buttons = [
             { text: 'NONE', y: 530, x: 50 , frequency:1000, bet_x:110, bet_y:550},
@@ -151,7 +152,11 @@ export class Bet extends Scene
                 newButton.setStyle({ fill: '#ffff00' }); // Set clicked button color to yellow
                 currentBet = newButton; // Update the reference to the current button
         
-                console.log(button.text);
+                bet_to_execute = button.text;
+
+                if (bet_to_execute === 'NONE' || bet_to_execute === null) {
+                    bet_to_execute = 0;
+                }
         
                 audioButton(isChecked);
                 betEffect.call(this, button.frequency, button.bet_x, button.bet_y);
@@ -171,13 +176,22 @@ export class Bet extends Scene
 
         const confirm = this.add.text(50, 690, 'START GAME', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding: { right: 35 } })
         .setInteractive()
-        .on('pointerdown', () => {
+        .on('pointerdown', async () => {
             confirm.setStyle({ fill: '#ffff00' });
             setTimeout(() => {
                 confirm.setStyle({ fill: '#0f0' });
             }, 200);
             audioButton(isChecked)
             // this.scene.start('Options');
+
+            try {
+                await lookingForGame(gameData, bet_to_execute)
+            } catch (error) {
+                console.error('Error looking for game:', error);
+            }
+
+
+
         })
         .on('pointerover', () => {
             confirm.setStyle({ fill: '#ffff00' });
@@ -338,26 +352,7 @@ export class Bet extends Scene
         }).setAlpha(0)
 
 
-        const testbutton = this.add.text(350, 755, 'TEST', { 
-            fill: '#0f0', 
-            fontSize: '30px', 
-            strokeThickness: 1, 
-            stroke: '#0f0', 
-            fontFamily: 'playwritereg', 
-            padding: {right: 50}
-        })
-        .setInteractive()
-        .on('pointerdown', async () => { // Make this function async
-            testbutton.setStyle({ fill: '#ffff00' });
-            audioButton(isChecked);
-            
-            try {
-                await lookingForGame(gameData)
-              //   await matchGame()
-            } catch (error) {
-                console.error('Error looking for game:', error);
-            }
-        });
+
         
 
         const coins = this.add.text(10, 770, 'COINS: ' + str_coins, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)

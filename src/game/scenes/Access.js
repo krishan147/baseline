@@ -235,7 +235,7 @@ function create_unique_id() {
     return Math.random().toString().slice(2) + Date.now().toString() + Math.random().toString().slice(2);
 }
 
-export async function lookingForGame(playerDataPromise){
+export async function lookingForGame(playerDataPromise, bet){
     try {
         const playerData = await playerDataPromise;
         const { idToken } = await getToken()
@@ -246,16 +246,9 @@ export async function lookingForGame(playerDataPromise){
         } else{
             console.log("not null")
         }
-        
-        
-        // playerData["playerName"] = '1moose'
-        // playerData["playerId"] = '25555'
+
         playerData["id"] = create_unique_id()
-
-
-        playerData["id"] = "8873673970119842172821907237608764684944035328"
-
-        playerData["bet"] = 100
+        playerData["bet"] = bet
         playerData["game"] = "finding_game"
         playerData["datetime"] = new Date().toISOString();
         playerData["against_player_name"] = ""

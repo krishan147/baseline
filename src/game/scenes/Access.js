@@ -66,6 +66,7 @@ export async function resetGameLocally() {
     localStorage.removeItem('gameData');
     let gameDataString = JSON.stringify(originalGameData);
     localStorage.setItem('gameData', gameDataString);
+
     return originalGameData;
 }
 
@@ -267,72 +268,14 @@ export async function lookingForGame(playerDataPromise, bet){
             body: JSON.stringify(playerData)
         });
 
-        console.log(response);
+        if (!response.ok) {
+            return 'Error here:', response.statusText
+        }
+        
+        return response.json();
 
-        // if (!response.ok) {
-        //     throw new Error('Network response was not good ' + response.statusText);
-        // }
-
-        return 'lookingforgame run';
     } catch (error) {
         console.error('Error here:', error);
-        throw error;
+        return 'Error here:', error
     }
 }
-
-
-export async function matchGame() {
-    const maxRetries = 3;
-    const delayInMs = 3000; // 3 seconds delay
-    let attempt = 0;
-    let response;
-
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-    try {
-        const { idToken } = await getToken();
-
-        const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame?' + 
-                    'playerName=ddtest&playerId=fewr3rfdsf&try=0&bet=1000&game=finding_game';
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${idToken}`
-        };
-
-        while (attempt < maxRetries) {
-            attempt++;
-            response = await fetch(url, {
-                method: 'GET',
-                headers: headers
-            });
-
-            if (response.status === 200) {
-                console.log(response.json())
-                return response;
-            } else {
-                console.log(`Attempt ${attempt} failed with status: ${response.status}`);
-                if (attempt < maxRetries) {
-                    await delay(delayInMs);  
-                }
-            }
-        }
-
-        console.log("Cannot find player. Try again in a minute.");
-        return null; 
-
-    } catch (error) {
-        console.error('Error:', error);
-        throw error;
-    }
-}
-
-export async function foundGame() {
- // this function is now in lambda function
-}
-
-
-
-
-
-
-

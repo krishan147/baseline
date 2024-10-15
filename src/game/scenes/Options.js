@@ -250,10 +250,6 @@ export class Options extends Scene
             .setInteractive()
             .on('pointerdown', () => {
                 signOutText.setStyle({ fill: '#ffff00' });
-        
-                setTimeout(() => {
-                    privacyPolicy.setStyle({ fill: '#0f0' });
-                }, 200);
                 audioButton(isChecked);
                 signOutCheck();
             })

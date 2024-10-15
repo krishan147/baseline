@@ -4,8 +4,6 @@ import { audioButton } from './Options.js';
 import Phaser from 'phaser';
 import { readLocally } from './Access.js'
 import { lookingForGame } from './Access.js'
-import { matchGame } from './Access.js'
-
 
 export class Bet extends Scene
 {
@@ -173,24 +171,22 @@ export class Bet extends Scene
             });
         });
         
-
         const confirm = this.add.text(50, 690, 'START GAME', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding: { right: 35 } })
         .setInteractive()
         .on('pointerdown', async () => {
             confirm.setStyle({ fill: '#ffff00' });
-            setTimeout(() => {
-                confirm.setStyle({ fill: '#0f0' });
-            }, 200);
-            audioButton(isChecked)
+            audioButton(isChecked);
             // this.scene.start('Options');
-
+            this.scene.start('Wait');
             try {
-                await lookingForGame(gameData, bet_to_execute)
+
+                var response = await lookingForGame(gameData, bet_to_execute)
+                this.scene.start('Play');
+
             } catch (error) {
+                this.scene.start('Menu');
                 console.error('Error looking for game:', error);
             }
-
-
 
         })
         .on('pointerover', () => {

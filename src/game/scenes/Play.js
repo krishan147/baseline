@@ -2,6 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import Phaser from 'phaser';
+import { readLocally } from './Access.js'
 
 export class Play extends Scene
 {
@@ -16,13 +17,13 @@ export class Play extends Scene
         this.load.image('particle', 'spritesheet/particle.png');
     }
 
-    create ()
+    async create ()
     {
-        var gameDataString = localStorage.getItem('myGameData');
-        var gameData = JSON.parse(gameDataString);
+        var gameData = await readLocally()
         var volume = gameData["volume"]
         var isChecked = gameData["mute"]
         var playerName = gameData["playerName"]
+        var str_coins = gameData["gold_cpu"]
 
         this.cameras.main.setBackgroundColor(0x000000);
 
@@ -31,9 +32,6 @@ export class Play extends Scene
         .on('pointerdown', () => {
             title.setStyle({ fill: '#ffff00'});
             window.open('http://krishgames.com', '_blank');
-        setTimeout(() => {
-            title.setStyle({ fill: '#0f0' });
-        }, 200);
         audioButton(isChecked)
         })
 

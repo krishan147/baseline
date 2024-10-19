@@ -10,6 +10,7 @@ import { PlayOnline } from './scenes/PlayOnline';
 import { Bet } from './scenes/Bet';
 import { Bank } from './scenes/Bank';
 import { Wait } from './scenes/Wait';
+import { Nomatch } from './scenes/Nomatch';
 
 const config = {
     type: Phaser.AUTO,
@@ -35,7 +36,8 @@ const config = {
         EnterName,
         Bet,
         Bank,
-        Wait
+        Wait,
+        Nomatch
     ],
     dom: {
         createContainer: true

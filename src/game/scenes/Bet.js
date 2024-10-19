@@ -2,8 +2,8 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import Phaser from 'phaser';
-import { readLocally } from './Access.js'
-import { lookingForGame } from './Access.js'
+import { readLocally, writeLocally } from './Access.js'
+import { looking_for_game } from './Access.js'
 
 export class Bet extends Scene
 {
@@ -155,6 +155,10 @@ export class Bet extends Scene
                 if (bet_to_execute === 'NONE' || bet_to_execute === null) {
                     bet_to_execute = 0;
                 }
+
+                bet_to_execute = parseInt(bet_to_execute);
+
+                writeLocally["online_bet"] = bet_to_execute
         
                 audioButton(isChecked);
                 betEffect.call(this, button.frequency, button.bet_x, button.bet_y);
@@ -176,18 +180,7 @@ export class Bet extends Scene
         .on('pointerdown', async () => {
             confirm.setStyle({ fill: '#ffff00' });
             audioButton(isChecked);
-            // this.scene.start('Options');
             this.scene.start('Wait');
-            try {
-
-                var response = await lookingForGame(gameData, bet_to_execute)
-                this.scene.start('Play');
-
-            } catch (error) {
-                this.scene.start('Menu');
-                console.error('Error looking for game:', error);
-            }
-
         })
         .on('pointerover', () => {
             confirm.setStyle({ fill: '#ffff00' });
@@ -362,13 +355,6 @@ export class Bet extends Scene
             onComplete: function() {
             }
         });
-
-
-
-
-
-
-    
 
         EventBus.emit('current-scene-ready', this);
     }

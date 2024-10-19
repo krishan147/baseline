@@ -48,11 +48,13 @@ export class Preloader extends Scene
             var { idToken } = result;
             console.log("Preloader.js Token obtained");
         } else {
-            console.error("Failed to fetch session");
+            console.log("Failed to fetch session");
         }
 
 
         var token_check = await checkTokenValidity(idToken);
+
+        console.log(token_check);
 
         if (token_check.valid == false){
             console.log("signing out")
@@ -61,8 +63,6 @@ export class Preloader extends Scene
 
         else if (token_check.valid == true){
 
-
-            
             var gameData = await readLocally()
             const email = gameData["email"]
             var data = await getPlayerWithEmail(email)
@@ -71,7 +71,7 @@ export class Preloader extends Scene
             if (data["playerName"] === "Player1" || data["playerName"] === undefined) {
                 this.scene.start('EnterName');
             }else {
-                this.scene.start('Menu'); //Menu
+                this.scene.start('Menu');                
             }
 
         }

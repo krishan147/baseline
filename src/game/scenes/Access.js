@@ -13,7 +13,9 @@ const originalGameData = {
     gold_cpu: 1000,
     gold_multi: 1000,
     gold_multi_real: 1000,
-    email: "test@gmail.com"
+    email: "test@gmail.com",
+    online_bet:0,
+    offline_bet:0
 };
 
 export async function getToken() {
@@ -28,7 +30,7 @@ export async function getToken() {
 
         var gameDataString = JSON.stringify(gameData);
         localStorage.setItem('gameData', gameDataString);
-    
+
         return { idToken, email };
     } catch (error) {
         console.log("Access.js ", error);
@@ -102,7 +104,7 @@ export async function getPlayer(playerName){
 
     const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?playerName=' + playerName;
 
-    const { idToken } = getToken()
+    const { idToken } = await getToken()
 
     const headers = {
         'Content-Type': 'application/json',
@@ -120,6 +122,7 @@ export async function getPlayer(playerName){
         }
 
         const data = await response.json();
+
         return data;
     } catch (error) {
         console.error('Error:', error);
@@ -236,25 +239,18 @@ function create_unique_id() {
     return Math.random().toString().slice(2) + Date.now().toString() + Math.random().toString().slice(2);
 }
 
-export async function lookingForGame(playerDataPromise, bet){
+export async function looking_for_game(playerDataPromise, bet) {
     try {
         const playerData = await playerDataPromise;
-        const { idToken } = await getToken()
+        const { idToken } = await getToken();
 
-
-        if (!playerData || !playerData.volume) {
-            console.error('playerData is null or volume is undefined.');
-        } else{
-            console.log("not null")
-        }
-
-        playerData["id"] = create_unique_id()
-        playerData["bet"] = bet
-        playerData["game"] = "finding_game"
+        playerData["id"] = create_unique_id();
+        playerData["bet"] = bet;
+        playerData["game"] = "finding_game";
         playerData["datetime"] = new Date().toISOString();
-        playerData["against_player_name"] = ""
-        playerData["against_player_id"] = ""
-        playerData["session_id"] = ""
+        playerData["against_player_name"] = "";
+        playerData["against_player_id"] = "";
+        playerData["session_id"] = "";
 
         const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame';
         const headers = {
@@ -268,14 +264,16 @@ export async function lookingForGame(playerDataPromise, bet){
             body: JSON.stringify(playerData)
         });
 
+        const responseData = await response.json();
+
         if (!response.ok) {
-            return 'Error here:', response.statusText
+            return 'Error here:', response.statusText;
         }
-        
-        return response.json();
+
+        return responseData;
 
     } catch (error) {
         console.error('Error here:', error);
-        return 'Error here:', error
+        return 'Error here:', error;
     }
 }

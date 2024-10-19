@@ -2,6 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import { readLocally } from './Access.js'
+import { looking_for_game } from './Access.js'
 
 
 export class Wait extends Scene {
@@ -57,6 +58,25 @@ export class Wait extends Scene {
         .on('pointerout', () => {
             cancelButton.setStyle({ fill: '#0f0' });
         });
+
+    
+    
+        try {
+
+            var response = await looking_for_game(gameData, gameData["online_bet"])
+            console.log("hello run play")
+            this.scene.start('Play');
+            console.log("heyheyhey")
+
+        } catch (error) {
+
+            console.log("nomatch", error)
+            this.scene.start('Nomatch');
+        }
+
+
+
+
     }
 
 }

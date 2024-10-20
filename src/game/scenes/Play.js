@@ -9,8 +9,6 @@ export class Play extends Scene
     constructor ()
     {
         super('Play');
-
-        
     }
 
     preload () {
@@ -24,10 +22,13 @@ export class Play extends Scene
         var isChecked = gameData["mute"]
         var playerName = gameData["playerName"]
         var str_coins = gameData["gold_cpu"]
+        var game_type = gameData["game_type"]
+        var opponent_name = 'CPU'
+        
 
         this.cameras.main.setBackgroundColor(0x000000);
 
-        const title = this.add.text(50, 110, 'Play', { fill: '#0f0', fontSize: '60px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+        const title = this.add.text(50, 110, game_type, { fill: '#0f0', fontSize: '60px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
         .setInteractive()
         .on('pointerdown', () => {
             title.setStyle({ fill: '#ffff00'});
@@ -150,21 +151,46 @@ export class Play extends Scene
                 }
             });
         }
-  
-        const backButton = this.add.text(350, 785, 'BACK', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
+
+        if (gameData["game_type"] == "online_play"){
+            opponent_name = 'jimmy'
+        }
+
+        const oppenent_username = this.add.text(10, 100, 'OPPONENT: ' + opponent_name, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+
+        const username = this.add.text(10, 800, 'YOU: ' + playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+
+        let lastClickTime = 0;
+        let clickedOnce = false; // Track if clicked once
+        let message; // To hold the temporary message
+        
+        const backButton = this.add.text(320, 785, 'FORFEIT', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
             .setInteractive()
             .on('pointerdown', () => {
-                backButton.setStyle({ fill: '#ffff00'});
-            setTimeout(() => {
-                backButton.setStyle({ fill: '#0f0' });
-            }, 200);
-            audioButton(isChecked)
-            this.scene.start('Menu');
-        })
-
-        const username = this.add.text(10, 800, 'NAME: ' + playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
-
-
+                const currentTime = this.time.now;
+                const timeSinceLastClick = currentTime - lastClickTime;
+        
+                if (timeSinceLastClick < 2000 && clickedOnce) { // Second click within 2 seconds
+                    backButton.setStyle({ fill: '#ffff00' });
+                    audioButton(isChecked);
+                    this.scene.start('Menu');
+                } else {
+                    // First click, show message and set clickedOnce flag
+                    if (!clickedOnce) {
+                        clickedOnce = true;
+                        lastClickTime = currentTime;
+        
+                        // Display a temporary message to press again
+                        message = this.add.text(165, 755, 'PRESS AGAIN TO FORFEIT', { fill: 'yellow', fontSize: '20px', fontFamily: 'playwritereg', padding:{right:20}});
+        
+                        // Hide the message after 2 seconds
+                        this.time.delayedCall(2000, () => {
+                            message.destroy();
+                            clickedOnce = false; // Reset after 2 seconds
+                        });
+                    }
+                }
+            });
 
     
 

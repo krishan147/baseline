@@ -1,9 +1,9 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
-import { readLocally } from './Access.js'
+import { readLocally, writeLocally } from './Access.js'
 
-var game_version = 'v0.109'
+var game_version = 'v0.111'
 
 export class Menu extends Scene
 {
@@ -129,6 +129,8 @@ export class Menu extends Scene
         .on('pointerdown', () => {
             onlineButton.setStyle({ fill: '#ffff00' });
             audioButton(isChecked);
+            gameData["game_type"] = "online_play"
+            writeLocally(gameData)
             this.scene.start('Bet');
         })
         .on('pointerover', () => {
@@ -144,6 +146,8 @@ export class Menu extends Scene
         .on('pointerdown', () => {
             offlineButton.setStyle({ fill: '#ffff00'});
         audioButton(isChecked)
+        gameData["game_type"] = "offline_play"
+        writeLocally(gameData)
         this.scene.start('Bet');
     })
     .on('pointerover', () => {
@@ -185,7 +189,7 @@ export class Menu extends Scene
     })
     .setAlpha(0);
 
-    const username = this.add.text(10, 790, 'NAME: '+ playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
+    const username = this.add.text(10, 790, 'YOU: '+ playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
     .setInteractive()
     .on('pointerdown', () => {
         username.setStyle({ fill: '#ffff00'});

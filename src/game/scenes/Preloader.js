@@ -54,7 +54,7 @@ export class Preloader extends Scene
 
         var token_check = await checkTokenValidity(idToken);
 
-        console.log(token_check);
+        console.log("token check", token_check);
 
         if (token_check.valid == false){
             console.log("signing out")
@@ -66,12 +66,13 @@ export class Preloader extends Scene
             var gameData = await readLocally()
             const email = gameData["email"]
             var data = await getPlayerWithEmail(email)
+
             await writeLocally(data);
 
             if (data["playerName"] === "Player1" || data["playerName"] === undefined) {
                 this.scene.start('EnterName');
             }else {
-                this.scene.start('Menu');                
+                this.scene.start('Play');          //Menu      
             }
 
         }

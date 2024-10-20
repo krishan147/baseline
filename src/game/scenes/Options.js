@@ -297,7 +297,7 @@ export class Options extends Scene
             });
         
 
-        const username = this.add.text(10, 800, 'NAME: ' + playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+        const username = this.add.text(10, 800, 'YOU: ' + playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
         .setInteractive()
         .on('pointerdown', () => {
             username.setStyle({ fill: '#ffff00'});

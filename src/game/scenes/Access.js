@@ -15,7 +15,8 @@ const originalGameData = {
     gold_multi_real: 1000,
     email: "test@gmail.com",
     online_bet:0,
-    offline_bet:0
+    offline_bet:0,
+    game_type:"offline play"
 };
 
 export async function getToken() {

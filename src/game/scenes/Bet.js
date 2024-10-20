@@ -180,7 +180,21 @@ export class Bet extends Scene
         .on('pointerdown', async () => {
             confirm.setStyle({ fill: '#ffff00' });
             audioButton(isChecked);
-            this.scene.start('Wait');
+
+            console.log(gameData);
+
+            var game_type = gameData["game_type"]
+
+            if (game_type == "online_play"){
+                this.scene.start('Wait');
+            }
+
+            if (game_type == "offline_play"){
+                this.scene.start('Play');
+            }
+
+
+            
         })
         .on('pointerover', () => {
             confirm.setStyle({ fill: '#ffff00' });
@@ -345,7 +359,7 @@ export class Bet extends Scene
         
 
         const coins = this.add.text(10, 770, 'COINS: ' + str_coins, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
-        const username = this.add.text(10, 800, 'NAME: ' + playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
+        const username = this.add.text(10, 800, 'YOU: ' + playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
     
         this.tweens.add({
             targets: [username, coins, backButton, confirm, title],    

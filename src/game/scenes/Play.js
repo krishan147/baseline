@@ -13,6 +13,7 @@ export class Play extends Scene
 
     preload () {
         this.load.image('particle', 'spritesheet/particle.png');
+        this.load.image('grass', 'spritesheet/grass.png');
     }
 
     async create ()
@@ -24,21 +25,105 @@ export class Play extends Scene
         var str_coins = gameData["gold_cpu"]
         var game_type = gameData["game_type"]
         var opponent_name = 'CPU'
+
+        const grassImages = [];
+        const startX = 55; 
+        const startY = 250; 
+        const gapX = 35; 
+        const gapY = 45;
+  
+        for (let row = 0; row < 11; row++) { 
+          for (let col = 0; col < 12; col++) {
+            const x = startX + col * gapX;
+            const y = startY + row * gapY;
+            const grassImage = this.add.image(x, y, 'grass');
+            grassImage.alpha = 0;
+            grassImage.setTint(0x00FF00);
+            grassImages.push(grassImage);
+          }
+        }
+
+        this.tweens.add({
+            targets: grassImages,    
+            alpha: 1,               
+            duration: 2000,        
+            ease: 'Power2',    
+            onComplete: function() {
+            }
+        });
+
+        // court
+        const graphic_box = this.add.graphics();
+        graphic_box.lineStyle(3, 0xffffff, 1);
+        graphic_box.moveTo(45, 250); 
+        graphic_box.lineTo(450, 250); 
+        graphic_box.lineTo(450, 675);
+        graphic_box.lineTo(45, 675);
+        graphic_box.lineTo(45, 250);  
+        graphic_box.strokePath();
+
+        const graphic_halfway = this.add.graphics();
+        graphic_halfway.lineStyle(3, 0xffffff, 1);
+        graphic_halfway.moveTo(45, 465); 
+        graphic_halfway.lineTo(450, 465); 
+        graphic_halfway.strokePath();
+
+        const graphic_left = this.add.graphics();
+        graphic_left.lineStyle(3, 0xffffff, 1);
+        graphic_left.moveTo(90, 250); 
+        graphic_left.lineTo(90, 675); 
+        graphic_left.strokePath();
+
+        const graphic_right = this.add.graphics();
+        graphic_right.lineStyle(3, 0xffffff, 1);
+        graphic_right.moveTo(405, 250); 
+        graphic_right.lineTo(405, 675); 
+        graphic_right.strokePath();
+
+        const graphic_middle = this.add.graphics();
+        graphic_middle.lineStyle(3, 0xffffff, 1);
+        graphic_middle.moveTo(250, 375); 
+        graphic_middle.lineTo(250, 550); 
+        graphic_middle.strokePath();
+
+        const graphic_bottom_box = this.add.graphics();
+        graphic_bottom_box.lineStyle(3, 0xffffff, 1);
+        graphic_bottom_box.moveTo(90, 550); 
+        graphic_bottom_box.lineTo(405, 550); 
+        graphic_bottom_box.strokePath();
+
+        const graphic_top_box = this.add.graphics();
+        graphic_top_box.lineStyle(3, 0xffffff, 1);
+        graphic_top_box.moveTo(90, 375); 
+        graphic_top_box.lineTo(405, 375); 
+        graphic_top_box.strokePath();
+
+        // net        
+        const net = this.add.graphics();
+        net.lineStyle(3, 0xffffff, 1);
+        net.moveTo(45, 415); 
+        net.lineTo(450, 415); 
+        net.moveTo(45, 425); 
+        net.lineTo(450, 425); 
+        net.moveTo(45, 435); 
+        net.lineTo(450, 435);
+        net.moveTo(45, 445); 
+        net.lineTo(450, 445);  
+        net.moveTo(45, 455); 
+        net.lineTo(450, 455);  
+        net.strokePath();
+
+        const net_col = this.add.graphics();
+        net_col.lineStyle(3, 0xffffff, 1);
         
-
-        this.cameras.main.setBackgroundColor(0x000000);
-
-        const title = this.add.text(50, 110, game_type, { fill: '#0f0', fontSize: '60px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
-        .setInteractive()
-        .on('pointerdown', () => {
-            title.setStyle({ fill: '#ffff00'});
-            window.open('http://krishgames.com', '_blank');
-        audioButton(isChecked)
-        })
-
-
+        for (let x = 440; x >= 50; x -= 10) {
+            net_col.moveTo(x, 415);
+            net_col.lineTo(x, 465);
+        }
+        
+        net_col.strokePath();
  
-        // runVictory.call(this)
+       //  runVictory.call(this)
        // runDefeat.call(this)
 
 
@@ -79,6 +164,7 @@ export class Play extends Scene
           const victory = this.add.text(100, 400, 'VICTORY', { fill: '#0f0', fontSize: '240px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
         
           const colors = [
+            { r: 0, g: 0, b: 0 },   // Black
               { r: 255, g: 0, b: 0 },   // Red
               { r: 0, g: 255, b: 0 },   // Green
               { r: 0, g: 0, b: 255 },   // Blue
@@ -138,7 +224,7 @@ export class Play extends Scene
         }
 
         function runDefeat() {
-            const defeat = this.add.text(100, 400, 'DEFEAT', { fill: '#0f0', fontSize: '240px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
+            const defeat = this.add.text(100, 400, 'DEFEAT', { fill: 'black', fontSize: '240px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
             
             this.tweens.add({
                 targets: defeat,

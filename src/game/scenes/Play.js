@@ -55,28 +55,22 @@ export class Play extends Scene
         // court
         const graphic_box = this.add.graphics();
         graphic_box.lineStyle(3, 0xffffff, 1);
-        graphic_box.moveTo(45, 250); 
-        graphic_box.lineTo(450, 250); 
+        graphic_box.moveTo(65, 250); 
+        graphic_box.lineTo(420, 250); //
         graphic_box.lineTo(450, 675);
         graphic_box.lineTo(45, 675);
-        graphic_box.lineTo(45, 250);  
+        graphic_box.lineTo(65, 250);  
         graphic_box.strokePath();
-
-        const graphic_halfway = this.add.graphics();
-        graphic_halfway.lineStyle(3, 0xffffff, 1);
-        graphic_halfway.moveTo(45, 465); 
-        graphic_halfway.lineTo(450, 465); 
-        graphic_halfway.strokePath();
 
         const graphic_left = this.add.graphics();
         graphic_left.lineStyle(3, 0xffffff, 1);
-        graphic_left.moveTo(90, 250); 
+        graphic_left.moveTo(100, 250); 
         graphic_left.lineTo(90, 675); 
         graphic_left.strokePath();
 
         const graphic_right = this.add.graphics();
         graphic_right.lineStyle(3, 0xffffff, 1);
-        graphic_right.moveTo(405, 250); 
+        graphic_right.moveTo(385, 250); 
         graphic_right.lineTo(405, 675); 
         graphic_right.strokePath();
 
@@ -88,19 +82,19 @@ export class Play extends Scene
 
         const graphic_bottom_box = this.add.graphics();
         graphic_bottom_box.lineStyle(3, 0xffffff, 1);
-        graphic_bottom_box.moveTo(90, 550); 
-        graphic_bottom_box.lineTo(405, 550); 
+        graphic_bottom_box.moveTo(93, 550); 
+        graphic_bottom_box.lineTo(400, 550); 
         graphic_bottom_box.strokePath();
 
         const graphic_top_box = this.add.graphics();
         graphic_top_box.lineStyle(3, 0xffffff, 1);
-        graphic_top_box.moveTo(90, 375); 
-        graphic_top_box.lineTo(405, 375); 
+        graphic_top_box.moveTo(95, 375); 
+        graphic_top_box.lineTo(390, 375); 
         graphic_top_box.strokePath();
 
         // net        
         const net = this.add.graphics();
-        net.lineStyle(3, 0xffffff, 1);
+        net.lineStyle(3, 0x00000, 1);
         net.moveTo(45, 415); 
         net.lineTo(450, 415); 
         net.moveTo(45, 425); 
@@ -114,14 +108,29 @@ export class Play extends Scene
         net.strokePath();
 
         const net_col = this.add.graphics();
-        net_col.lineStyle(3, 0xffffff, 1);
+        net_col.lineStyle(3, 0x00000, 1);
         
         for (let x = 440; x >= 50; x -= 10) {
             net_col.moveTo(x, 415);
             net_col.lineTo(x, 465);
         }
-        
         net_col.strokePath();
+
+
+        const net_frame = this.add.graphics();
+        net_frame.lineStyle(6, 0xffffff, 1);
+
+        net_frame.moveTo(49, 415); 
+        net_frame.lineTo(49, 465); 
+
+
+        net_frame.moveTo(45, 415); 
+        net_frame.lineTo(450, 415); 
+
+        net_frame.moveTo(447, 415); 
+        net_frame.lineTo(447, 465); 
+
+        net_frame.strokePath();
  
        //  runVictory.call(this)
        // runDefeat.call(this)

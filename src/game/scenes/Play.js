@@ -14,6 +14,118 @@ export class Play extends Scene
     preload () {
         this.load.image('particle', 'spritesheet/particle.png');
         this.load.image('grass', 'spritesheet/grass.png');
+
+        this.load.spritesheet({
+            key: '1_female_idle_left',
+            url: 'spritesheet/Player_Female_A_T1_Idle_North_Left_strip4_scaled_10x_pngcrushed.png',
+            frameConfig: {
+                frameWidth: 240,
+                frameHeight: 240,
+                startFrame: 0,
+                endFrame: 4
+            }
+        });
+
+        this.load.spritesheet({
+            key: '1_female_idle_right',
+            url: 'spritesheet/Player_Female_A_T1_Idle_North_Right_strip4_scaled_10x_pngcrushed.png',
+            frameConfig: {
+                frameWidth: 240,
+                frameHeight: 240,
+                startFrame: 0,
+                endFrame: 4
+            }
+        });
+
+        this.load.spritesheet({
+            key: '1_female_run_left',
+            url: 'spritesheet/Player_Female_A_T1_Run_North_Left_strip4_scaled_10x_pngcrushed.png',
+            frameConfig: {
+                frameWidth: 240,
+                frameHeight: 240,
+                startFrame: 0,
+                endFrame: 4
+            }
+        });
+
+        this.load.spritesheet({
+            key: '1_female_run_right',
+            url: 'spritesheet/Player_Female_A_T1_Run_North_Right_strip4_scaled_10x_pngcrushed.png',
+            frameConfig: {
+                frameWidth: 240,
+                frameHeight: 240,
+                startFrame: 0,
+                endFrame: 4
+            }
+        });
+
+        this.load.spritesheet({
+            key: '1_female_hit_left',
+            url: 'spritesheet/Player_Female_A_T1_Hit_North_Left_strip3_scaled_14x_pngcrushed.png',
+            frameConfig: {
+                frameWidth: 336,
+                frameHeight: 336,
+                startFrame: 0,
+                endFrame: 3
+            }
+        }); 
+
+        this.load.spritesheet({
+            key: '1_female_hit_right',
+            url: 'spritesheet/Player_Female_A_T1_Hit_North_Right_strip3_scaled_14x_pngcrushed.png',
+            frameConfig: {
+                frameWidth: 336,
+                frameHeight: 336,
+                startFrame: 0,
+                endFrame: 3
+            }
+        }); 
+
+        this.load.spritesheet({
+            key: '2_female_idle_left',
+            url: 'spritesheet/Player_Female_A_T1_Idle_South_Left_strip4_scaled_10x_pngcrushed.png',
+            frameConfig: {
+                frameWidth: 240,
+                frameHeight: 240,
+                startFrame: 0,
+                endFrame: 4
+            }
+        });
+
+        this.load.spritesheet({
+            key: '2_female_idle_right',
+            url: 'spritesheet/Player_Female_A_T1_Idle_South_Right_strip4_scaled_10x_pngcrushed.png',
+            frameConfig: {
+                frameWidth: 240,
+                frameHeight: 240,
+                startFrame: 0,
+                endFrame: 4
+            }
+        });
+
+        this.load.spritesheet({
+            key: '2_female_hit_left',
+            url: 'spritesheet/Player_Female_A_T1_Hit_South_Left_strip3_scaled_14x_pngcrushed.png',
+            frameConfig: {
+                frameWidth: 336,
+                frameHeight: 336,
+                startFrame: 0,
+                endFrame: 3
+            }
+        });
+
+        this.load.spritesheet({
+            key: '2_female_hit_right',
+            url: 'spritesheet/Player_Female_A_T1_Hit_South_Right_strip3_scaled_14x_pngcrushed.png',
+            frameConfig: {
+                frameWidth: 336,
+                frameHeight: 336,
+                startFrame: 0,
+                endFrame: 3
+            }
+        });
+
+
     }
 
     async create ()
@@ -25,10 +137,10 @@ export class Play extends Scene
         var str_coins = gameData["gold_cpu"]
         var game_type = gameData["game_type"]
         var opponent_name = 'CPU'
-
+        
         const grassImages = [];
         const startX = 55; 
-        const startY = 250; 
+        const startY = 225; 
         const gapX = 35; 
         const gapY = 45;
   
@@ -43,94 +155,70 @@ export class Play extends Scene
           }
         }
 
-        this.tweens.add({
-            targets: grassImages,    
-            alpha: 1,               
-            duration: 2000,        
-            ease: 'Power2',    
-            onComplete: function() {
-            }
-        });
-
         // court
-        const graphic_box = this.add.graphics();
-        graphic_box.lineStyle(3, 0xffffff, 1);
-        graphic_box.moveTo(65, 250); 
-        graphic_box.lineTo(420, 250); //
-        graphic_box.lineTo(450, 675);
-        graphic_box.lineTo(45, 675);
-        graphic_box.lineTo(65, 250);  
-        graphic_box.strokePath();
-
-        const graphic_left = this.add.graphics();
-        graphic_left.lineStyle(3, 0xffffff, 1);
-        graphic_left.moveTo(100, 250); 
-        graphic_left.lineTo(90, 675); 
-        graphic_left.strokePath();
-
-        const graphic_right = this.add.graphics();
-        graphic_right.lineStyle(3, 0xffffff, 1);
-        graphic_right.moveTo(385, 250); 
-        graphic_right.lineTo(405, 675); 
-        graphic_right.strokePath();
-
-        const graphic_middle = this.add.graphics();
-        graphic_middle.lineStyle(3, 0xffffff, 1);
-        graphic_middle.moveTo(250, 375); 
-        graphic_middle.lineTo(250, 550); 
-        graphic_middle.strokePath();
-
-        const graphic_bottom_box = this.add.graphics();
-        graphic_bottom_box.lineStyle(3, 0xffffff, 1);
-        graphic_bottom_box.moveTo(93, 550); 
-        graphic_bottom_box.lineTo(400, 550); 
-        graphic_bottom_box.strokePath();
-
-        const graphic_top_box = this.add.graphics();
-        graphic_top_box.lineStyle(3, 0xffffff, 1);
-        graphic_top_box.moveTo(95, 375); 
-        graphic_top_box.lineTo(390, 375); 
-        graphic_top_box.strokePath();
-
-        // net        
-        const net = this.add.graphics();
-        net.lineStyle(3, 0x00000, 1);
-        net.moveTo(45, 415); 
-        net.lineTo(450, 415); 
-        net.moveTo(45, 425); 
-        net.lineTo(450, 425); 
-        net.moveTo(45, 435); 
-        net.lineTo(450, 435);
-        net.moveTo(45, 445); 
-        net.lineTo(450, 445);  
-        net.moveTo(45, 455); 
-        net.lineTo(450, 455);  
-        net.strokePath();
-
-        const net_col = this.add.graphics();
-        net_col.lineStyle(3, 0x00000, 1);
-        
-        for (let x = 440; x >= 50; x -= 10) {
-            net_col.moveTo(x, 415);
-            net_col.lineTo(x, 465);
+        function drawLine(graphics, startX, startY, endX, endY, lineWidth = 3, color = 0xffffff, alpha = 1) {
+            graphics.lineStyle(lineWidth, color, alpha);
+            graphics.moveTo(startX, startY);
+            graphics.lineTo(endX, endY);
+            graphics.strokePath();
         }
-        net_col.strokePath();
-
-
+        
+        // Function to create multiple horizontal lines for the net
+        function drawHorizontalNetLines(graphics, startX, endX, startY, lineSpacing, lineCount, lineWidth = 3, color = 0x000000, alpha = 1) {
+            for (let i = 0; i < lineCount; i++) {
+                drawLine(graphics, startX, startY + i * lineSpacing, endX, startY + i * lineSpacing, lineWidth, color, alpha);
+            }
+        }
+        
+        // Function to create multiple vertical lines for the net columns
+        function drawVerticalNetColumns(graphics, startX, endX, topY, bottomY, spacing, lineWidth = 3, color = 0x000000, alpha = 1) {
+            for (let x = endX; x >= startX; x -= spacing) {
+                drawLine(graphics, x, topY, x, bottomY, lineWidth, color, alpha);
+            }
+        }
+        
+        // Function to create the net frame
+        function drawNetFrame(graphics, leftX, rightX, topY, bottomY, lineWidth = 6, color = 0xffffff, alpha = 1) {
+            drawLine(graphics, leftX + 2, topY, leftX + 2, bottomY, lineWidth, color, alpha); // right frame
+            drawLine(graphics, leftX, topY, rightX, topY, lineWidth, color, alpha);           // top frame
+            drawLine(graphics, rightX - 3, topY, rightX - 3, bottomY, lineWidth, color, alpha); // left frame
+        }
+        
+        // Court
+        const graphic_box = this.add.graphics();
+        drawLine(graphic_box, 85, 270, 400, 270);
+        drawLine(graphic_box, 400, 270, 430, 655);
+        drawLine(graphic_box, 430, 655, 65, 655);
+        drawLine(graphic_box, 65, 655, 85, 270);
+        
+        const graphic_left = this.add.graphics();
+        drawLine(graphic_left, 115, 270, 105, 655);
+        
+        const graphic_right = this.add.graphics();
+        drawLine(graphic_right, 365, 270, 385, 655);
+        
+        const graphic_middle = this.add.graphics();
+        drawLine(graphic_middle, 240, 385, 240, 540);
+        
+        const graphic_bottom_box = this.add.graphics();
+        drawLine(graphic_bottom_box, 110, 540, 380, 540);
+        
+        const graphic_top_box = this.add.graphics();
+        drawLine(graphic_top_box, 112, 385, 370, 385);
+        
+        // Net horizontal lines
+        const net = this.add.graphics();
+        drawHorizontalNetLines(net, 65, 430, 425, 10, 5, 3, 0x000000);
+        
+        // Net vertical columns
+        const net_col = this.add.graphics();
+        drawVerticalNetColumns(net_col, 70, 420, 425, 475, 10, 3, 0x000000);
+        
+        // Net frame
         const net_frame = this.add.graphics();
-        net_frame.lineStyle(6, 0xffffff, 1);
+        drawNetFrame(net_frame, 65, 430, 425, 475);
+        
 
-        net_frame.moveTo(49, 415); 
-        net_frame.lineTo(49, 465); 
-
-
-        net_frame.moveTo(45, 415); 
-        net_frame.lineTo(450, 415); 
-
-        net_frame.moveTo(447, 415); 
-        net_frame.lineTo(447, 465); 
-
-        net_frame.strokePath();
  
        //  runVictory.call(this)
        // runDefeat.call(this)
@@ -247,19 +335,106 @@ export class Play extends Scene
             });
         }
 
-        if (gameData["game_type"] == "online_play"){
+        if (gameData["game_type"] == "online_play"){ // krishan need to work here
             opponent_name = 'jimmy'
         }
 
-        const oppenent_username = this.add.text(10, 100, 'OPPONENT: ' + opponent_name, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+        function createBotAnimation(scene, animationKey, frameKey, startFrame, endFrame, frameRate, x, y, tint, scale) {
+            // Create animation
+            scene.anims.create({
+                key: animationKey,
+                frames: scene.anims.generateFrameNumbers(frameKey, { start: startFrame, end: endFrame }),
+                frameRate: frameRate,
+                repeat: -1
+            });
+        
+            // Create sprite, set properties, and play animation
+            let botSprite = scene.add.sprite(x, y, frameKey)
+                .setAlpha(0)
+                .setTint(tint)
+                .setScale(scale);
+        
+            botSprite.play(animationKey);
+        
+            return botSprite;
+        }
+        
+        let player_sprite = createBotAnimation(this, "1_female_idle_left", "1_female_idle_left", 0, 3, 5, 340, 590, 0x00FF00, 0.45);
+        let opponent_sprite = createBotAnimation(this, "2_female_idle_left", "2_female_idle_left", 0, 3, 5, 140, 260, 0x00FF00, 0.4);
+        //opponent_sprite = createBotAnimation(this, "2_female_hit_left", "2_female_hit_left", 0, 3, 5, 140, 260, 0x00FF00, 0.3);
 
-        const username = this.add.text(10, 800, 'YOU: ' + playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+        // 1_female_hit_left
+        //player_sprite = createBotAnimation(this, "1_female_hit_right", "1_female_hit_right", 0, 3, 5, 340, 590, 0x00FF00, 0.35);
+
+        //2_female_idle_right
+       // opponent_sprite = createBotAnimation(this, "2_female_hit_left", "2_female_hit_left", 0, 3, 5, 140, 260, 0x00FF00, 0.3);
+        
+        this.tweens.add({
+            targets: [player_sprite, opponent_sprite],
+            alpha: 1,
+            duration: 2000,
+            ease: 'Power2',
+            onComplete: function() {
+            }
+        });
+        
+        this.tweens.add({
+            targets: grassImages,    
+            alpha: 1,               
+            duration: 2000,        
+            ease: 'Power2',    
+            onComplete: function() {
+            }
+        });
+
+        const oppenent_username = this.add.text(10, 125, opponent_name + ' : ' + '0', { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+
+        const left = this.add.text(340, 740, 'LEFT', { 
+            fill: '#0f0', 
+            fontSize: '30px', 
+            strokeThickness: 1, 
+            stroke: '#0f0', 
+            fontFamily: 'playwritereg', 
+            padding: { right: 35 }
+        })
+        .setInteractive()
+        .on('pointerdown', () => {
+            left.setStyle({ fill: '#ffff00' });
+            
+            // Set a short delay before returning to original color
+            this.time.delayedCall(200, () => {
+                left.setStyle({ fill: '#0f0' });
+            });
+        });
+        
+        const right = this.add.text(50, 740, 'RIGHT', { 
+            fill: '#0f0', 
+            fontSize: '30px', 
+            strokeThickness: 1, 
+            stroke: '#0f0', 
+            fontFamily: 'playwritereg', 
+            padding: { right: 35 }
+        })
+        .setInteractive()
+        .on('pointerdown', () => {
+            right.setStyle({ fill: '#ffff00' });
+            
+            // Set a short delay before returning to original color
+            this.time.delayedCall(200, () => {
+                right.setStyle({ fill: '#0f0' });
+            });
+        });
+        
+        
+        const timer = this.add.text(170, 150, 'TIMER:5', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+
+        const username = this.add.text(10, 150, playerName + ' : ' + '0', { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
 
         let lastClickTime = 0;
         let clickedOnce = false; // Track if clicked once
         let message; // To hold the temporary message
         
-        const backButton = this.add.text(320, 785, 'FORFEIT', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
+        const backButton = this.add.text(10, 100, 'FORFEIT', { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
             .setInteractive()
             .on('pointerdown', () => {
                 const currentTime = this.time.now;

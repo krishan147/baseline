@@ -61,10 +61,10 @@ export class Play extends Scene
 
         this.load.spritesheet({
             key: '1_female_hit_left',
-            url: 'spritesheet/Player_Female_A_T1_Hit_North_Left_strip3_scaled_14x_pngcrushed.png',
+            url: 'spritesheet/Player_Female_A_T1_Hit_North_Left_strip3_scaled_10x_pngcrushed.png',
             frameConfig: {
-                frameWidth: 336,
-                frameHeight: 336,
+                frameWidth: 240,
+                frameHeight: 240,
                 startFrame: 0,
                 endFrame: 3
             }
@@ -72,10 +72,10 @@ export class Play extends Scene
 
         this.load.spritesheet({
             key: '1_female_hit_right',
-            url: 'spritesheet/Player_Female_A_T1_Hit_North_Right_strip3_scaled_14x_pngcrushed.png',
+            url: 'spritesheet/Player_Female_A_T1_Hit_North_Right_strip3_scaled_10x_pngcrushed.png',
             frameConfig: {
-                frameWidth: 336,
-                frameHeight: 336,
+                frameWidth: 240,
+                frameHeight: 240,
                 startFrame: 0,
                 endFrame: 3
             }
@@ -217,6 +217,16 @@ export class Play extends Scene
         // Net frame
         const net_frame = this.add.graphics();
         drawNetFrame(net_frame, 65, 430, 425, 475);
+
+
+        this.tweens.add({
+            targets: grassImages,    
+            alpha: 1,               
+            duration: 2000,        
+            ease: 'Power2',    
+            onComplete: function() {
+            }
+        });
         
 
  
@@ -339,27 +349,36 @@ export class Play extends Scene
             opponent_name = 'jimmy'
         }
 
-        function createBotAnimation(scene, animationKey, frameKey, startFrame, endFrame, frameRate, x, y, tint, scale) {
-            // Create animation
+        function createBotAnimation(scene, animationKey, frameKey, startFrame, endFrame, frameRate, repeat) {
+            // Create animation (does not play immediately)
             scene.anims.create({
                 key: animationKey,
                 frames: scene.anims.generateFrameNumbers(frameKey, { start: startFrame, end: endFrame }),
                 frameRate: frameRate,
-                repeat: -1
+                repeat: repeat
             });
+        }
         
-            // Create sprite, set properties, and play animation
+        function createBotSprite(scene, frameKey, x, y, tint, scale) {
+            // Create sprite and set properties without playing any animation
             let botSprite = scene.add.sprite(x, y, frameKey)
-                .setAlpha(0)
                 .setTint(tint)
                 .setScale(scale);
-        
-            botSprite.play(animationKey);
-        
             return botSprite;
         }
         
-        let player_sprite = createBotAnimation(this, "1_female_idle_left", "1_female_idle_left", 0, 3, 5, 340, 590, 0x00FF00, 0.45);
+        createBotAnimation(this, "1_female_idle_left", "1_female_idle_left", 0, 3, 5, -1);
+        createBotAnimation(this, "1_female_run_left", "1_female_run_left", 0, 3, 5, -1);
+        createBotAnimation(this, "1_female_run_right", "1_female_run_right", 0, 3, 5, -1);
+        createBotAnimation(this, "1_female_idle_right", "1_female_idle_right", 0, 3, 5, -1);
+        createBotAnimation(this, "1_female_hit_right", "1_female_hit_right", 0, 2, 7, 0);
+        createBotAnimation(this, "1_female_hit_left", "1_female_hit_left", 0, 2, 7, 0);
+        
+
+        let player_sprite = createBotSprite(this, "1_female_idle_right", 340, 590, 0x00FF00, 0.45);
+        player_sprite.play("1_female_idle_right");
+
+
         let opponent_sprite = createBotAnimation(this, "2_female_idle_left", "2_female_idle_left", 0, 3, 5, 140, 260, 0x00FF00, 0.4);
         //opponent_sprite = createBotAnimation(this, "2_female_hit_left", "2_female_hit_left", 0, 3, 5, 140, 260, 0x00FF00, 0.3);
 
@@ -368,25 +387,11 @@ export class Play extends Scene
 
         //2_female_idle_right
        // opponent_sprite = createBotAnimation(this, "2_female_hit_left", "2_female_hit_left", 0, 3, 5, 140, 260, 0x00FF00, 0.3);
-        
-        this.tweens.add({
-            targets: [player_sprite, opponent_sprite],
-            alpha: 1,
-            duration: 2000,
-            ease: 'Power2',
-            onComplete: function() {
-            }
-        });
-        
-        this.tweens.add({
-            targets: grassImages,    
-            alpha: 1,               
-            duration: 2000,        
-            ease: 'Power2',    
-            onComplete: function() {
-            }
-        });
+       
 
+
+        
+       
         const oppenent_username = this.add.text(10, 125, opponent_name + ' : ' + '0', { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
 
         const left = this.add.text(340, 740, 'LEFT', { 
@@ -400,13 +405,30 @@ export class Play extends Scene
         .setInteractive()
         .on('pointerdown', () => {
             left.setStyle({ fill: '#ffff00' });
+            player_sprite.play("1_female_run_right")
             
-            // Set a short delay before returning to original color
+            this.tweens.add({
+                targets: player_sprite,
+                x: 340,            
+                duration: 1200,   
+                ease: 'Linear',
+                onComplete: () => {
+                    player_sprite.stop();
+                    player_sprite.play("1_female_hit_right"); 
+                } 
+            });
+
+            player_sprite.on('animationcomplete', (animation) => {
+                if (animation.key === '1_female_hit_right') {
+                    player_sprite.play("1_female_idle_right"); // Play idle animation after hit animation
+                }
+            });
+
             this.time.delayedCall(200, () => {
                 left.setStyle({ fill: '#0f0' });
             });
         });
-        
+
         const right = this.add.text(50, 740, 'RIGHT', { 
             fill: '#0f0', 
             fontSize: '30px', 
@@ -418,8 +440,25 @@ export class Play extends Scene
         .setInteractive()
         .on('pointerdown', () => {
             right.setStyle({ fill: '#ffff00' });
-            
-            // Set a short delay before returning to original color
+            player_sprite.play("1_female_run_left")
+        
+            this.tweens.add({
+                targets: player_sprite,
+                x: 160,            
+                duration: 1200,   
+                ease: 'Linear',
+                onComplete: () => {
+                    player_sprite.stop();
+                    player_sprite.play("1_female_hit_left"); 
+                }
+            });
+
+            player_sprite.on('animationcomplete', (animation) => {
+                if (animation.key === '1_female_hit_left') {
+                    player_sprite.play("1_female_idle_left"); // Play idle animation after hit animation
+                }
+            });
+        
             this.time.delayedCall(200, () => {
                 right.setStyle({ fill: '#0f0' });
             });

@@ -104,22 +104,44 @@ export class Play extends Scene
         });
 
         this.load.spritesheet({
-            key: '2_female_hit_left',
-            url: 'spritesheet/Player_Female_A_T1_Hit_South_Left_strip3_scaled_14x_pngcrushed.png',
+            key: '2_female_run_right',
+            url: 'spritesheet/Player_Female_A_T1_Run_South_Right_strip4_scaled_10x_pngcrushed.png',
             frameConfig: {
-                frameWidth: 336,
-                frameHeight: 336,
+                frameWidth: 240,
+                frameHeight: 240,
+                startFrame: 0,
+                endFrame: 4
+            }
+        });
+
+        this.load.spritesheet({
+            key: '2_female_run_left',
+            url: 'spritesheet/Player_Female_A_T1_Run_South_Left_strip4_scaled_10x_pngcrushed.png',
+            frameConfig: {
+                frameWidth: 240,
+                frameHeight: 240,
+                startFrame: 0,
+                endFrame: 4
+            }
+        });
+
+        this.load.spritesheet({
+            key: '2_female_hit_right',
+            url: 'spritesheet/Player_Female_A_T1_Hit_South_Right_strip3_scaled_10x_pngcrushed.png',
+            frameConfig: {
+                frameWidth: 240,
+                frameHeight: 240,
                 startFrame: 0,
                 endFrame: 3
             }
         });
 
         this.load.spritesheet({
-            key: '2_female_hit_right',
-            url: 'spritesheet/Player_Female_A_T1_Hit_South_Right_strip3_scaled_14x_pngcrushed.png',
+            key: '2_female_hit_left',
+            url: 'spritesheet/Player_Female_A_T1_Hit_South_Left_strip3_scaled_10x_pngcrushed.png',
             frameConfig: {
-                frameWidth: 336,
-                frameHeight: 336,
+                frameWidth: 240,
+                frameHeight: 240,
                 startFrame: 0,
                 endFrame: 3
             }
@@ -373,24 +395,67 @@ export class Play extends Scene
         createBotAnimation(this, "1_female_idle_right", "1_female_idle_right", 0, 3, 5, -1);
         createBotAnimation(this, "1_female_hit_right", "1_female_hit_right", 0, 2, 7, 0);
         createBotAnimation(this, "1_female_hit_left", "1_female_hit_left", 0, 2, 7, 0);
-        
 
+        createBotAnimation(this, "2_female_idle_right", "2_female_idle_right", 0, 3, 5, -1);
+        createBotAnimation(this, "2_female_idle_left", "2_female_idle_left", 0, 3, 5, -1);
+        createBotAnimation(this, "2_female_hit_left", "2_female_hit_left", 0, 2, 7, 0);
+        createBotAnimation(this, "2_female_hit_right", "2_female_hit_right", 0, 2, 7, 0);
+        createBotAnimation(this, "2_female_run_right", "2_female_run_right", 0, 3, 5, -1); 
+        createBotAnimation(this, "2_female_run_left", "2_female_run_left", 0, 3, 5, -1);
+
+        
         let player_sprite = createBotSprite(this, "1_female_idle_right", 340, 590, 0x00FF00, 0.45);
         player_sprite.play("1_female_idle_right");
 
+        let opponent_sprite = createBotSprite(this, "2_female_idle_right", 140, 260, 0x00FF00, 0.4);
+        opponent_sprite.play("2_female_idle_right");
 
-        let opponent_sprite = createBotAnimation(this, "2_female_idle_left", "2_female_idle_left", 0, 3, 5, 140, 260, 0x00FF00, 0.4);
-        //opponent_sprite = createBotAnimation(this, "2_female_hit_left", "2_female_hit_left", 0, 3, 5, 140, 260, 0x00FF00, 0.3);
+        opponent_goes_right(this)
 
-        // 1_female_hit_left
-        //player_sprite = createBotAnimation(this, "1_female_hit_right", "1_female_hit_right", 0, 3, 5, 340, 590, 0x00FF00, 0.35);
+        function opponent_goes_right(scene){
 
-        //2_female_idle_right
-       // opponent_sprite = createBotAnimation(this, "2_female_hit_left", "2_female_hit_left", 0, 3, 5, 140, 260, 0x00FF00, 0.3);
-       
+            opponent_sprite.play("2_female_run_right")
+            
+            scene.tweens.add({
+                targets: opponent_sprite,
+                x: 340,            
+                duration: 1200,   
+                ease: 'Linear',
+                onComplete: () => {
+                    opponent_sprite.stop();
+                    opponent_sprite.play("2_female_hit_right"); 
+                } 
+            });
 
+            opponent_sprite.on('animationcomplete', (animation) => {
+                if (animation.key === '2_female_hit_right') { 
+                    opponent_sprite.play("2_female_idle_right");
+                }
+            });
 
-        
+        }
+
+        function opponent_goes_left(scene){
+
+            opponent_sprite.play("2_female_run_left")
+            
+            scene.tweens.add({
+                targets: opponent_sprite,
+                x: 340,            
+                duration: 1200,   
+                ease: 'Linear',
+                onComplete: () => {
+                    opponent_sprite.stop();
+                    opponent_sprite.play("2_female_hit_left"); 
+                } 
+            });
+
+            opponent_sprite.on('animationcomplete', (animation) => {
+                if (animation.key === '2_female_hit_left') { 
+                    opponent_sprite.play("2_female_idle_left");
+                }
+            });
+        }
        
         const oppenent_username = this.add.text(10, 125, opponent_name + ' : ' + '0', { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
 
@@ -420,7 +485,7 @@ export class Play extends Scene
 
             player_sprite.on('animationcomplete', (animation) => {
                 if (animation.key === '1_female_hit_right') {
-                    player_sprite.play("1_female_idle_right"); // Play idle animation after hit animation
+                    player_sprite.play("1_female_idle_right");
                 }
             });
 
@@ -490,7 +555,7 @@ export class Play extends Scene
                         lastClickTime = currentTime;
         
                         // Display a temporary message to press again
-                        message = this.add.text(165, 755, 'PRESS AGAIN TO FORFEIT', { fill: 'yellow', fontSize: '20px', fontFamily: 'playwritereg', padding:{right:20}});
+                        message = this.add.text(165, 100, 'PRESS AGAIN TO FORFEIT', { fill: 'yellow', fontSize: '20px', fontFamily: 'playwritereg', padding:{right:20}});
         
                         // Hide the message after 2 seconds
                         this.time.delayedCall(2000, () => {

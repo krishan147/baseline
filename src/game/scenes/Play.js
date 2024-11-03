@@ -548,36 +548,113 @@ export class Play extends Scene
         const timer = this.add.text(170, 150, 'TIMER:5', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
 
         const username = this.add.text(10, 150, playerName + ' : ' + '0', { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
-
-
-        var ball_trail = this.add.particles(200, 200, "test_particle", {speed: 200, alpha: 0.5, quantity: 1, lifespan: 300,angle: { min: -450, max: -500 }});
-
         
-        var ball = this.add.sprite(150, 150); 
-        var ball_graphics = this.add.graphics();
-        ball_graphics.fillStyle(0xFFFF00, 1); 
-        ball_graphics.fillCircle(0, 0, 5); 
-        ball_graphics.setPosition(ball.x, ball.y); 
+        //movement top_left_bottom_right top_left_bottom_left top_right_bottom_right
+        var movement = "bottom_left_top_right"
+        ball_movement(this, movement, "yes")
 
-             
-        this.tweens.add({
-            targets: ball_graphics,
-            x: 380,
-            y: 620, 
-            ease: 'Sine.easeInOut',
-            duration: 1500, 
-            yoyo: false, 
-            repeat: 0,
-            onUpdate: function () {
-                ball_trail.x = ball_graphics.x;
-                ball_trail.y = ball_graphics.y;
-            },
-            onComplete: function () {
-                ball_trail.stop();
+        function ball_movement(scene, movement, past) {
+            // Define movement presets for different directions
+            const movements = {
+                top_left_bottom_right: {
+                    particle_trail: { x: -450, y: -500 },
+                    ball_start: { x: 150, y: 250 },
+                    ball_end: { x: 370, y: 560 }
+                },
+                top_left_bottom_left: {
+                    particle_trail: { x: -450, y: -500 },
+                    ball_start: { x: 150, y: 250 },
+                    ball_end: { x: 150, y: 560 }
+                },
+                top_right_bottom_right: {
+                    particle_trail: { x: -450, y: -500 },
+                    ball_start: { x: 370, y: 250 },
+                    ball_end: { x: 370, y: 560 }
+                },
+                top_right_bottom_left: {
+                    particle_trail: { x: -450, y: -500 },
+                    ball_start: { x: 370, y: 250 },
+                    ball_end: { x: 150, y: 560 }
+                },
+                bottom_left_top_right: {
+                    particle_trail: { x: 450, y: 500 },
+                    ball_start: { x: 150, y: 560 },
+                    ball_end: { x: 370, y: 250 }
+                },
+                bottom_left_top_left: {
+                    particle_trail: { x: 450, y: 500 },
+                    ball_start: { x: 150, y: 560 },
+                    ball_end: { x: 150, y: 250 }
+                },
+                bottom_right_top_right: {
+                    particle_trail: { x: 450, y: 500 },
+                    ball_start: { x: 370, y: 560 },
+                    ball_end: { x: 370, y: 250 }
+                },
+                bottom_right_top_left: {
+                    particle_trail: { x: 450, y: 500 },
+                    ball_start: { x: 370, y: 560 },
+                    ball_end: { x: 150, y: 250 }
+                }
+            };
+        
+            // Get the selected movement
+            const selectedMovement = movements[movement];
+        
+            if (!selectedMovement) {
+                console.error("Invalid movement direction");
+                return;
             }
-        });
-
-
+        
+            // Adjust the end position if `past` is "yes" to make the ball move further
+            const ballEnd = { ...selectedMovement.ball_end };
+            if (past === "yes") {
+                const dx = ballEnd.x - selectedMovement.ball_start.x;
+                const dy = ballEnd.y - selectedMovement.ball_start.y;
+                
+                // Extend the end point by an additional 50% in the same direction
+                ballEnd.x += dx * 0.5;
+                ballEnd.y += dy * 0.5;
+            }
+        
+            // Initialize particle trail and ball positions based on movement direction
+            const ball_trail = scene.add.particles(200, 200, "test_particle", {
+                speed: 200,
+                alpha: 0.5,
+                quantity: 1,
+                lifespan: 300,
+                angle: {
+                    min: selectedMovement.particle_trail.x,
+                    max: selectedMovement.particle_trail.y
+                }
+            });
+        
+            const ball = scene.add.sprite(selectedMovement.ball_start.x, selectedMovement.ball_start.y);
+            const ball_graphics = scene.add.graphics();
+            ball_graphics.fillStyle(0xFFFF00, 1);
+            ball_graphics.fillCircle(0, 0, 5);
+            ball_graphics.setPosition(ball.x, ball.y);
+        
+            // Add tween for ball movement
+            scene.tweens.add({
+                targets: ball_graphics,
+                x: ballEnd.x,
+                y: ballEnd.y,
+                ease: 'Sine.easeInOut',
+                duration: 1500,
+                yoyo: false,
+                repeat: 0,
+                onUpdate: function () {
+                    ball_trail.x = ball_graphics.x;
+                    ball_trail.y = ball_graphics.y;
+                },
+                onComplete: function () {
+                    ball_trail.stop();
+                }
+            });
+        }
+        
+        
 
 
         

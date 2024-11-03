@@ -147,6 +147,18 @@ export class Play extends Scene
             }
         });
 
+        this.load.spritesheet({
+            key: 'test_particle',
+            url: 'spritesheet/particle.png',
+            frameConfig: {
+                frameWidth: 240,
+                frameHeight: 240,
+                startFrame: 0,
+                endFrame: 3
+            }
+        });
+
+        this.load.image('racketcap','spritesheet/buttcap.png');
 
     }
 
@@ -159,6 +171,8 @@ export class Play extends Scene
         var str_coins = gameData["gold_cpu"]
         var game_type = gameData["game_type"]
         var opponent_name = 'CPU'
+
+
         
         const grassImages = [];
         const startX = 55; 
@@ -250,6 +264,7 @@ export class Play extends Scene
             }
         });
         
+
 
  
        //  runVictory.call(this)
@@ -533,6 +548,89 @@ export class Play extends Scene
         const timer = this.add.text(170, 150, 'TIMER:5', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
 
         const username = this.add.text(10, 150, playerName + ' : ' + '0', { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+
+
+        var ball_trail = this.add.particles(200, 200, "test_particle", {speed: 200, alpha: 0.5, quantity: 1, lifespan: 300,angle: { min: -450, max: -500 }});
+
+        
+        var ball = this.add.sprite(150, 150); 
+        var ball_graphics = this.add.graphics();
+        ball_graphics.fillStyle(0xFFFF00, 1); 
+        ball_graphics.fillCircle(0, 0, 5); 
+        ball_graphics.setPosition(ball.x, ball.y); 
+
+             
+        this.tweens.add({
+            targets: ball_graphics,
+            x: 380,
+            y: 620, 
+            ease: 'Sine.easeInOut',
+            duration: 1500, 
+            yoyo: false, 
+            repeat: 0,
+            onUpdate: function () {
+                ball_trail.x = ball_graphics.x;
+                ball_trail.y = ball_graphics.y;
+            },
+            onComplete: function () {
+                ball_trail.stop();
+            }
+        });
+
+
+
+
+        
+
+        
+
+        
+        
+        
+
+
+
+
+
+
+        var racketcap = this.add.image(250, 425, 'racketcap');
+        racketcap.scale = 0.25;
+        racketcap.alpha = 0;
+        racketcap.setTint(0x00FF00);
+
+       // spin_racket(this, "you");
+
+        function spin_racket(scene, who_goes_first) {
+            racketcap.alpha = 0.75;
+            var angle = 450;
+
+            if (who_goes_first == "opponent") {
+                angle = 270;
+            }
+
+            if (who_goes_first == "you") {
+                angle = 450;
+            }
+
+            scene.tweens.add({
+                targets: racketcap,
+                angle: angle * 3,
+                duration: 2000,
+                ease: 'Linear',
+                onComplete: () => {
+                    scene.time.delayedCall(2000, () => { 
+                        scene.tweens.add({
+                            targets: racketcap,
+                            alpha: 0, 
+                            duration: 1000, 
+                            ease: 'Linear'
+                        });
+                    });
+                }
+            });
+        }
+
+
 
         let lastClickTime = 0;
         let clickedOnce = false; // Track if clicked once

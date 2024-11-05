@@ -158,7 +158,7 @@ export class Play extends Scene
             }
         });
 
-        this.load.image('racketcap','spritesheet/buttcap.png');
+        this.load.image('racketcap','spritesheet/racketcap.png');
 
     }
 
@@ -425,7 +425,6 @@ export class Play extends Scene
         let opponent_sprite = createBotSprite(this, "2_female_idle_right", 140, 260, 0x00FF00, 0.4);
         opponent_sprite.play("2_female_idle_right");
 
-        opponent_goes_right(this)
 
         function opponent_goes_right(scene){
 
@@ -548,53 +547,50 @@ export class Play extends Scene
         const timer = this.add.text(170, 150, 'TIMER:5', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
 
         const username = this.add.text(10, 150, playerName + ' : ' + '0', { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
-        
-        //movement top_left_bottom_right top_left_bottom_left top_right_bottom_right
-        var movement = "bottom_left_top_right"
-        ball_movement(this, movement, "yes")
+        const ball_graphics = this.add.graphics();
 
         function ball_movement(scene, movement, past) {
             // Define movement presets for different directions
             const movements = {
                 top_left_bottom_right: {
                     particle_trail: { x: -450, y: -500 },
-                    ball_start: { x: 150, y: 250 },
+                    ball_start: { x: 170, y: 260 },
                     ball_end: { x: 370, y: 560 }
                 },
                 top_left_bottom_left: {
                     particle_trail: { x: -450, y: -500 },
-                    ball_start: { x: 150, y: 250 },
-                    ball_end: { x: 150, y: 560 }
+                    ball_start: { x: 170, y: 260 },
+                    ball_end: { x: 170, y: 560 }
                 },
                 top_right_bottom_right: {
                     particle_trail: { x: -450, y: -500 },
-                    ball_start: { x: 370, y: 250 },
+                    ball_start: { x: 370, y: 260 },
                     ball_end: { x: 370, y: 560 }
                 },
                 top_right_bottom_left: {
                     particle_trail: { x: -450, y: -500 },
-                    ball_start: { x: 370, y: 250 },
-                    ball_end: { x: 150, y: 560 }
+                    ball_start: { x: 370, y: 260 },
+                    ball_end: { x: 170, y: 560 }
                 },
                 bottom_left_top_right: {
                     particle_trail: { x: 450, y: 500 },
-                    ball_start: { x: 150, y: 560 },
-                    ball_end: { x: 370, y: 250 }
+                    ball_start: { x: 130, y: 560 },
+                    ball_end: { x: 370, y: 260 }
                 },
                 bottom_left_top_left: {
                     particle_trail: { x: 450, y: 500 },
-                    ball_start: { x: 150, y: 560 },
-                    ball_end: { x: 150, y: 250 }
+                    ball_start: { x: 130, y: 560 },
+                    ball_end: { x: 170, y: 260 }
                 },
                 bottom_right_top_right: {
                     particle_trail: { x: 450, y: 500 },
                     ball_start: { x: 370, y: 560 },
-                    ball_end: { x: 370, y: 250 }
+                    ball_end: { x: 370, y: 260 }
                 },
                 bottom_right_top_left: {
                     particle_trail: { x: 450, y: 500 },
                     ball_start: { x: 370, y: 560 },
-                    ball_end: { x: 150, y: 250 }
+                    ball_end: { x: 170, y: 260 }
                 }
             };
         
@@ -630,7 +626,6 @@ export class Play extends Scene
             });
         
             const ball = scene.add.sprite(selectedMovement.ball_start.x, selectedMovement.ball_start.y);
-            const ball_graphics = scene.add.graphics();
             ball_graphics.fillStyle(0xFFFF00, 1);
             ball_graphics.fillCircle(0, 0, 5);
             ball_graphics.setPosition(ball.x, ball.y);
@@ -653,31 +648,50 @@ export class Play extends Scene
                 }
             });
         }
-        
-        
 
+        function create_ball_starting_position(scene, who_goes_first, player_position){
+            var ball_x = 370
+            var ball_y = 560
+            if (who_goes_first === "you"){
+                if (player_position === "left"){
+                    ball_x = 130
+                    ball_y = 560
+                }
+                if (player_position === "right"){
+                    ball_x = 370
+                    ball_y = 560
+                }
+            }
 
-        
+            if (who_goes_first === "opponent"){
+                if (player_position === "left"){
+                    ball_x = 170
+                    ball_y = 260
+                }
+                if (player_position === "right"){
+                    ball_x = 370
+                    ball_y = 260
+                }
+            }
 
-        
+            const ball = scene.add.sprite(ball_x, ball_y);
+            ball_graphics.fillStyle(0xFFFF00, 1);
+            ball_graphics.fillCircle(0, 0, 5);
+            ball_graphics.setPosition(ball_x, ball_y);
+            ball_graphics.alpha = 0
 
-        
-        
-        
-
-
-
-
-
+        }
 
         var racketcap = this.add.image(250, 425, 'racketcap');
         racketcap.scale = 0.25;
         racketcap.alpha = 0;
-        racketcap.setTint(0x00FF00);
+        var who_goes_first
+      
+        function spin_racket(scene) {
+            var list_who_goes_first = ["you","opponent"];
+            var random =  Math.floor((Math.random() * list_who_goes_first.length));
+            who_goes_first = list_who_goes_first[random];
 
-       // spin_racket(this, "you");
-
-        function spin_racket(scene, who_goes_first) {
             racketcap.alpha = 0.75;
             var angle = 450;
 
@@ -695,6 +709,7 @@ export class Play extends Scene
                 duration: 2000,
                 ease: 'Linear',
                 onComplete: () => {
+                    ball_graphics.alpha = 1
                     scene.time.delayedCall(2000, () => { 
                         scene.tweens.add({
                             targets: racketcap,
@@ -705,7 +720,65 @@ export class Play extends Scene
                     });
                 }
             });
+
+            return who_goes_first
         }
+
+        game_loop_cpu_start(this)
+
+        function game_loop_cpu_start(scene){
+            var player_position = "left"
+            who_goes_first = spin_racket(scene)
+
+            if (who_goes_first === "you"){
+                player_position = "right"
+            } 
+
+            if (who_goes_first === "opponent"){
+                player_position = "left"
+            } 
+
+            create_ball_starting_position(scene, who_goes_first, player_position)
+            // opponent_goes_right(this)
+            // movement top_left_bottom_right top_left_bottom_left top_right_bottom_right
+            // var movement = "bottom_left_top_right"
+            // ball_movement(this, movement, "yes")
+            
+        }
+
+        countdown(this)
+
+        function countdown(scene) {
+            let countdownText = scene.add.text(
+                scene.cameras.main.centerX,
+                scene.cameras.main.centerY,
+                '',
+                { fontSize: '64px', fill: '#ffffff' }
+            );
+            countdownText.setOrigin(0.5, 0.5);
+        
+            let countdownNumbers = ['3', '2', '1', 'Play!', ''];
+            let currentIndex = 0;
+        
+            scene.time.addEvent({
+                delay: 1000,
+                repeat: countdownNumbers.length - 1,
+                callback: () => {
+                    countdownText.setText(countdownNumbers[currentIndex]);
+                    currentIndex++;
+                },
+                onComplete: () => {
+                    console.log("start game!")
+                    
+                }
+            });
+        }
+        
+        
+        
+        
+
+
 
 
 

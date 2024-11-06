@@ -473,42 +473,7 @@ export class Play extends Scene
        
         const oppenent_username = this.add.text(10, 125, opponent_name + ' : ' + '0', { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
 
-        const left = this.add.text(340, 740, 'LEFT', { 
-            fill: '#0f0', 
-            fontSize: '30px', 
-            strokeThickness: 1, 
-            stroke: '#0f0', 
-            fontFamily: 'playwritereg', 
-            padding: { right: 35 }
-        })
-        .setInteractive()
-        .on('pointerdown', () => {
-            left.setStyle({ fill: '#ffff00' });
-            player_sprite.play("1_female_run_right")
-            
-            this.tweens.add({
-                targets: player_sprite,
-                x: 340,            
-                duration: 1200,   
-                ease: 'Linear',
-                onComplete: () => {
-                    player_sprite.stop();
-                    player_sprite.play("1_female_hit_right"); 
-                } 
-            });
-
-            player_sprite.on('animationcomplete', (animation) => {
-                if (animation.key === '1_female_hit_right') {
-                    player_sprite.play("1_female_idle_right");
-                }
-            });
-
-            this.time.delayedCall(200, () => {
-                left.setStyle({ fill: '#0f0' });
-            });
-        });
-
-        const right = this.add.text(50, 740, 'RIGHT', { 
+        const right = this.add.text(340, 740, 'RIGHT', { 
             fill: '#0f0', 
             fontSize: '30px', 
             strokeThickness: 1, 
@@ -519,29 +484,123 @@ export class Play extends Scene
         .setInteractive()
         .on('pointerdown', () => {
             right.setStyle({ fill: '#ffff00' });
-            player_sprite.play("1_female_run_left")
-        
-            this.tweens.add({
-                targets: player_sprite,
-                x: 160,            
-                duration: 1200,   
-                ease: 'Linear',
-                onComplete: () => {
-                    player_sprite.stop();
-                    player_sprite.play("1_female_hit_left"); 
-                }
-            });
+          //  player_sprite.play("1_female_run_right")
+            player_action(who_goes_first, you_position, "right");
+            
+            // this.tweens.add({
+            //     targets: player_sprite,
+            //     x: 340,            
+            //     duration: 1200,   
+            //     ease: 'Linear',
+            //     onComplete: () => {
+            //         player_sprite.stop();
+            //       //  player_sprite.play("1_female_hit_right"); 
+                  
+            //     } 
+            // });
 
-            player_sprite.on('animationcomplete', (animation) => {
-                if (animation.key === '1_female_hit_left') {
-                    player_sprite.play("1_female_idle_left"); // Play idle animation after hit animation
-                }
-            });
-        
+            // player_sprite.on('animationcomplete', (animation) => {
+            //     if (animation.key === '1_female_hit_right') {
+            //         player_sprite.play("1_female_idle_right");
+            //     }
+            // });
+
             this.time.delayedCall(200, () => {
                 right.setStyle({ fill: '#0f0' });
             });
         });
+
+        const left = this.add.text(50, 740, 'LEFT', { 
+            fill: '#0f0', 
+            fontSize: '30px', 
+            strokeThickness: 1, 
+            stroke: '#0f0', 
+            fontFamily: 'playwritereg', 
+            padding: { right: 35 }
+        })
+        .setInteractive()
+        .on('pointerdown', () => {
+            left.setStyle({ fill: '#ffff00' });
+           // player_sprite.play("1_female_run_left")
+           player_action(who_goes_first, you_position, "left");
+        
+            // this.tweens.add({
+            //     targets: player_sprite,
+            //     x: 160,            
+            //     duration: 1200,   
+            //     ease: 'Linear',
+            //     onComplete: () => {
+            //         player_sprite.stop();
+            //       //  player_sprite.play("1_female_hit_left"); 
+                  
+            //     }
+            // });
+
+            // player_sprite.on('animationcomplete', (animation) => {
+            //     if (animation.key === '1_female_hit_left') {
+            //         player_sprite.play("1_female_idle_left"); // Play idle animation after hit animation
+            //     }
+            // });
+        
+            this.time.delayedCall(200, () => {
+                left.setStyle({ fill: '#0f0' });
+            });
+        });
+
+        var you_position = "right"
+        var who_goes_first = "you"
+
+        function player_action(who_goes_first, you_position, you_button){
+
+            console.log(you_position, you_button)
+
+            if (who_goes_first === "you"){
+
+                if (you_position === "left"){
+
+                    if (you_button === "left"){
+                        
+                        console.log("you left")
+
+                    }
+
+                    if (you_button === "right"){
+                        console.log("run right")
+                    }
+
+                }
+
+                if (you_position === "right"){
+
+                    if (you_button === "left"){
+
+                        player_sprite.play("1_female_hit_right"); 
+                        player_sprite.on('animationcomplete-1_female_hit_right', function () {
+                            player_sprite.play("1_female_idle_right");
+                        });
+                    }
+
+                    if (you_button === "right"){
+
+                        player_sprite.play("1_female_hit_right"); 
+                        player_sprite.on('animationcomplete-1_female_hit_right', function () {
+                            player_sprite.play("1_female_idle_right");
+                        });
+
+                    }
+                    
+                }
+            }
+
+            if (who_goes_first === "opponent"){
+                console.log("###")
+            }
+
+
+
+            console.log(who_goes_first, you_position)
+
+        }
         
         
         const timer = this.add.text(170, 150, 'TIMER:5', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
@@ -649,26 +708,26 @@ export class Play extends Scene
             });
         }
 
-        function create_ball_starting_position(scene, who_goes_first, player_position){
+        function create_ball_starting_position(scene, who_goes_first, you_position){
             var ball_x = 370
             var ball_y = 560
             if (who_goes_first === "you"){
-                if (player_position === "left"){
+                if (you_position === "left"){
                     ball_x = 130
                     ball_y = 560
                 }
-                if (player_position === "right"){
+                if (you_position === "right"){
                     ball_x = 370
                     ball_y = 560
                 }
             }
 
             if (who_goes_first === "opponent"){
-                if (player_position === "left"){
+                if (you_position === "left"){
                     ball_x = 170
                     ball_y = 260
                 }
-                if (player_position === "right"){
+                if (you_position === "right"){
                     ball_x = 370
                     ball_y = 260
                 }
@@ -679,18 +738,19 @@ export class Play extends Scene
             ball_graphics.fillCircle(0, 0, 5);
             ball_graphics.setPosition(ball_x, ball_y);
             ball_graphics.alpha = 0
-
         }
 
         var racketcap = this.add.image(250, 425, 'racketcap');
         racketcap.scale = 0.25;
         racketcap.alpha = 0;
-        var who_goes_first
+        
       
         function spin_racket(scene) {
             var list_who_goes_first = ["you","opponent"];
             var random =  Math.floor((Math.random() * list_who_goes_first.length));
             who_goes_first = list_who_goes_first[random];
+
+            who_goes_first = "you" //krishan delete this
 
             racketcap.alpha = 0.75;
             var angle = 450;
@@ -710,6 +770,7 @@ export class Play extends Scene
                 ease: 'Linear',
                 onComplete: () => {
                     ball_graphics.alpha = 1
+                    countdown(scene)
                     scene.time.delayedCall(2000, () => { 
                         scene.tweens.add({
                             targets: racketcap,
@@ -727,18 +788,18 @@ export class Play extends Scene
         game_loop_cpu_start(this)
 
         function game_loop_cpu_start(scene){
-            var player_position = "left"
+            var you_position = "left"
             who_goes_first = spin_racket(scene)
 
             if (who_goes_first === "you"){
-                player_position = "right"
+                you_position = "right"
             } 
 
             if (who_goes_first === "opponent"){
-                player_position = "left"
+                you_position = "left"
             } 
 
-            create_ball_starting_position(scene, who_goes_first, player_position)
+            create_ball_starting_position(scene, who_goes_first, you_position)
             // opponent_goes_right(this)
             // movement top_left_bottom_right top_left_bottom_left top_right_bottom_right
             // var movement = "bottom_left_top_right"
@@ -746,18 +807,16 @@ export class Play extends Scene
             
         }
 
-        countdown(this)
-
         function countdown(scene) {
             let countdownText = scene.add.text(
                 scene.cameras.main.centerX,
                 scene.cameras.main.centerY,
                 '',
-                { fontSize: '64px', fill: '#ffffff' }
+                { fontSize: '64px', fill: '#0f0', fontFamily: 'playwritereg', padding:{right:50},strokeThickness: 4, stroke: '#000000' }
             );
-            countdownText.setOrigin(0.5, 0.5);
+            countdownText.setOrigin(0.35, 0.5);
         
-            let countdownNumbers = ['3', '2', '1', 'Play!', ''];
+            let countdownNumbers = ['3', '2', '1', 'PLAY!', ''];
             let currentIndex = 0;
         
             scene.time.addEvent({
@@ -774,14 +833,6 @@ export class Play extends Scene
             });
         }
         
-        
-        
-        
-
-
-
-
-
         let lastClickTime = 0;
         let clickedOnce = false; // Track if clicked once
         let message; // To hold the temporary message

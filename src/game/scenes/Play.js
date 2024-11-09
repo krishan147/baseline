@@ -422,12 +422,13 @@ export class Play extends Scene
         let player_sprite = createBotSprite(this, "1_female_idle_right", 340, 590, 0x00FF00, 0.45);
         player_sprite.play("1_female_idle_right");
 
-        let opponent_sprite = createBotSprite(this, "2_female_idle_right", 140, 260, 0x00FF00, 0.4);
-        opponent_sprite.play("2_female_idle_right");
+        let opponent_sprite = createBotSprite(this, "2_female_idle_left", 140, 260, 0x00FF00, 0.4);
+        opponent_sprite.play("2_female_idle_left");
 
 
         function opponent_goes_right(scene){
 
+            opponent_position = "right"
             opponent_sprite.play("2_female_run_right")
             
             scene.tweens.add({
@@ -441,15 +442,14 @@ export class Play extends Scene
             });
 
             opponent_sprite.on('animationcomplete', (animation) => {
-                if (animation.key === '2_female_hit_right') { 
-                    opponent_sprite.play("2_female_idle_right");
-                }
+                opponent_sprite.play("2_female_idle_right");
             });
 
         }
 
         function opponent_goes_left(scene){
 
+            opponent_position = "left"
             opponent_sprite.play("2_female_run_left")
             
             scene.tweens.add({
@@ -463,9 +463,46 @@ export class Play extends Scene
             });
 
             opponent_sprite.on('animationcomplete', (animation) => {
-                if (animation.key === '2_female_hit_left') { 
-                    opponent_sprite.play("2_female_idle_left");
-                }
+                opponent_sprite.play("2_female_idle_left");
+            });
+        }
+
+        function player_goes_right(scene){
+            you_position = "right"
+            player_sprite.play("1_female_run_right")
+            
+            scene.tweens.add({
+                targets: player_sprite,
+                x: 340,            
+                duration: 1200,   
+                ease: 'Linear',
+                onComplete: () => {
+                    player_sprite.stop();
+                } 
+            });
+
+            player_sprite.on('animationcomplete', (animation) => {
+                player_sprite.play("1_female_idle_right");
+            });
+        }
+
+        function player_goes_left(scene){
+
+            you_position = "left"
+            player_sprite.play("1_female_run_left")
+            
+            scene.tweens.add({
+                targets: player_sprite,
+                x: 140,            
+                duration: 1200,   
+                ease: 'Linear',
+                onComplete: () => {
+                    player_sprite.stop();
+                } 
+            });
+
+            player_sprite.on('animationcomplete', (animation) => {
+                player_sprite.play("1_female_idle_left");
             });
         }
 
@@ -473,7 +510,6 @@ export class Play extends Scene
         })
         .setInteractive()
         .on('pointerdown', () => {
-            right.setStyle({ fill: '#ffff00' });
           //  player_action(this, who_goes_first, position, "right");
           player_action(this, "left", "right", ball_possession, "opponent");
         });
@@ -482,7 +518,6 @@ export class Play extends Scene
         })
         .setInteractive()
         .on('pointerdown', () => {
-            right.setStyle({ fill: '#ffff00' });
           //  player_action(this, who_goes_first, position, "right");
           player_action(this, "left", "left", ball_possession, "opponent");
         });
@@ -506,24 +541,6 @@ export class Play extends Scene
           //  player_sprite.play("1_female_run_right")
             player_action(this, position, "right", ball_possession, "you");
             
-            // this.tweens.add({
-            //     targets: player_sprite,
-            //     x: 340,            
-            //     duration: 1200,   
-            //     ease: 'Linear',
-            //     onComplete: () => {
-            //         player_sprite.stop();
-            //       //  player_sprite.play("1_female_hit_right"); 
-                  
-            //     } 
-            // });
-
-            // player_sprite.on('animationcomplete', (animation) => {
-            //     if (animation.key === '1_female_hit_right') {
-            //         player_sprite.play("1_female_idle_right");
-            //     }
-            // });
-
             this.time.delayedCall(200, () => {
                 right.setStyle({ fill: '#0f0' });
             });
@@ -542,25 +559,7 @@ export class Play extends Scene
             left.setStyle({ fill: '#ffff00' });
            // player_sprite.play("1_female_run_left")
            player_action(this, position, "left", ball_possession, "you");
-        
-            // this.tweens.add({
-            //     targets: player_sprite,
-            //     x: 160,            
-            //     duration: 1200,   
-            //     ease: 'Linear',
-            //     onComplete: () => {
-            //         player_sprite.stop();
-            //       //  player_sprite.play("1_female_hit_left"); 
-                  
-            //     }
-            // });
-
-            // player_sprite.on('animationcomplete', (animation) => {
-            //     if (animation.key === '1_female_hit_left') {
-            //         player_sprite.play("1_female_idle_left"); // Play idle animation after hit animation
-            //     }
-            // });
-        
+                
             this.time.delayedCall(200, () => {
                 left.setStyle({ fill: '#0f0' });
             });
@@ -569,28 +568,22 @@ export class Play extends Scene
         var position = "right"
         var who_goes_first = "you"
         var ball_possession = "you"
+        var you_position = "right" // got to make the positions variables? change to boolean?
+        var opponent_position = "left" // got to make the positions variables? change to boolean?
 
-        function player_action(scene, position, button, ball_possession, player_name){
+        function with_ball(scene, position, button, ball_possession, player_name){
 
             if (ball_possession === "you"){
 
                 if (position === "left"){
 
-                    player_sprite.play("1_female_hit_left"); 
-
                     if (button === "left" && player_name === "you"){
-                        
+                        player_sprite.play("1_female_hit_left"); 
                         ball_movement(scene, "bottom_left_top_left", "no")
                         player_sprite.on('animationcomplete-1_female_hit_left', function () {
                             player_sprite.play("1_female_idle_left");
                             
                         });
-
-                    }
-
-                    if (button === "left" && player_name === "opponent"){
-
-                        opponent_goes_left(scene)
 
                     }
 
@@ -601,12 +594,6 @@ export class Play extends Scene
                             player_sprite.play("1_female_idle_left");
                             
                         });
-                    }
-
-                    if (button === "right" && player_name === "opponent"){
-
-                        opponent_goes_right(scene)
-
                     }
 
                 }
@@ -638,44 +625,150 @@ export class Play extends Scene
 
             }
 
+            if (ball_possession === "opponent"){
+
+                if (position === "left"){
+
+                    if (button === "left" && player_name === "opponent"){
+                        opponent_sprite.play("2_female_hit_left"); 
+                        ball_movement(scene, "top_left_bottom_left", "no")
+                        opponent_sprite.on('animationcomplete-2_female_hit_left', function () {
+                            opponent_sprite.play("2_female_idle_left");
+                            
+                        });
+
+                    }
+
+                    if (button === "right" && player_name === "opponent"){
+                        
+                        opponent_sprite.play("2_female_hit_left"); 
+                        ball_movement(scene, "top_left_bottom_right", "no")
+                        opponent_sprite.on('animationcomplete-2_female_hit_left', function () {
+                            opponent_sprite.play("2_female_idle_left");
+                            
+                        });
+                    }
+
+                }
+
+                if (position === "right"){
+
+                    if (button === "left" && player_name === "opponent"){
+
+                        opponent_sprite.play("2_female_hit_right"); 
+                        ball_movement(scene, "top_right_bottom_left", "no")
+                        opponent_sprite.on('animationcomplete-2_female_hit_right', function () {
+                            opponent_sprite.play("2_female_idle_right");
+                            
+                        });
+                    }
+
+                    if (button === "right" && player_name === "opponent"){
+
+                        opponent_sprite.play("2_female_hit_right"); 
+                        ball_movement(scene, "top_right_bottom_right", "no")
+                        opponent_sprite.on('animationcomplete-2_female_hit_right', function () {
+                            opponent_sprite.play("2_female_idle_right");
+                            
+                        });
+
+                    }
+                    
+                }
+
+            }
+
+
+        }
+
+        function without_ball(scene, position, button, ball_possession, player_name){
+
+            if (player_name === "you"){
+                if (position == button){
+                    console.log("no movement")
+                }else {
+                    if (button === "left"){
+                        player_goes_left(scene)
+                    }
+                    if (button === "right"){
+                        player_goes_right(scene)
+                    }
+                }
+
+            }
+
+            if (player_name === "opponent"){
+                if (position == button){
+                    console.log("no movement")
+                }else {
+                    if (button === "left"){
+                        opponent_goes_left(scene)
+                    }
+                    if (button === "right"){
+                        opponent_goes_right(scene)
+                    }
+                }
+            }
+
+        }
+
+        function player_action(scene, position, button, ball_possession, player_name){
+
+            console.log(scene, position, button, ball_possession, player_name);
+
+            if (ball_possession === "you" && player_name === "you"){
+                with_ball(scene, position, button, ball_possession, player_name)
+            }
+
+            if (ball_possession === "opponent" && player_name === "opponent"){
+                with_ball(scene, position, button, ball_possession, player_name)
+            }
+
+
+            if (player_name === "you" && ball_possession !== "you"){
+                without_ball(scene, you_position, button, ball_possession, player_name)
+            }
+
+            if (player_name === "opponent" && ball_possession !== "opponent"){
+                without_ball(scene, opponent_position, button, ball_possession, player_name)
+            }
 
             
-
         }
 
 
     
-    let timer_text 
+        let timer_text 
 
-    start_match(this, true, false) // break variable needed whyen both players have entered a left or right?
+        start_match(this, true, false) // break variable needed whyen both players have entered a left or right?
 
-    function start_match(scene, you_decided, opponent_decided) {
-        let countdown = 10;
-        timer_text = 'TIMER:' + countdown.toString()
-    
-        const timerText = scene.add.text(170, 150, timer_text, { 
-            fill: '#0f0', 
-            fontSize: '30px', 
-            strokeThickness: 1, 
-            stroke: '#0f0', 
-            fontFamily: 'playwritereg', 
-            padding: { right: 35 }
-        });
-    
-        const timer = setInterval(() => {
-            timerText.setText('TIMER:' + countdown);
-    
-            console.log(countdown);
-    
-            if (countdown === 0) {
-                clearInterval(timer);
-                console.log("Timer ended. Taking opponent's last decision...");
-                // Add logic here to take the opponent's last decision
-            }
-    
-            countdown--;
-        }, 1000); 
-    }
+        function start_match(scene, you_decided, opponent_decided) {
+            let countdown = 10;
+            timer_text = 'TIMER:' + countdown.toString()
+        
+            const timerText = scene.add.text(170, 150, timer_text, { 
+                fill: '#0f0', 
+                fontSize: '30px', 
+                strokeThickness: 1, 
+                stroke: '#0f0', 
+                fontFamily: 'playwritereg', 
+                padding: { right: 35 }
+            });
+        
+            const timer = setInterval(() => {
+                timerText.setText('TIMER:' + countdown);
+        
+                console.log(countdown);
+        
+                if (countdown === 0) {
+                    clearInterval(timer);
+                    console.log("Timer ended. Taking opponent's last decision...");
+                    // Add logic here to take the opponent's last decision
+                }
+        
+                countdown--;
+            }, 1000); 
+        }
     
 
         function match_decider(you_decided, opponent_decided){
@@ -696,13 +789,13 @@ export class Play extends Scene
             const movements = {
                 top_left_bottom_right: {
                     particle_trail: { x: -450, y: -500 },
-                    ball_start: { x: 170, y: 260 },
+                    ball_start: { x: 120, y: 260 },
                     ball_end: { x: 370, y: 560 }
                 },
                 top_left_bottom_left: {
                     particle_trail: { x: -450, y: -500 },
-                    ball_start: { x: 170, y: 260 },
-                    ball_end: { x: 170, y: 560 }
+                    ball_start: { x: 120, y: 260 },
+                    ball_end: { x: 130, y: 560 }
                 },
                 top_right_bottom_right: {
                     particle_trail: { x: -450, y: -500 },
@@ -712,7 +805,7 @@ export class Play extends Scene
                 top_right_bottom_left: {
                     particle_trail: { x: -450, y: -500 },
                     ball_start: { x: 370, y: 260 },
-                    ball_end: { x: 170, y: 560 }
+                    ball_end: { x: 130, y: 560 }
                 },
                 bottom_left_top_right: {
                     particle_trail: { x: 450, y: 500 },
@@ -722,7 +815,7 @@ export class Play extends Scene
                 bottom_left_top_left: {
                     particle_trail: { x: 450, y: 500 },
                     ball_start: { x: 130, y: 560 },
-                    ball_end: { x: 170, y: 260 }
+                    ball_end: { x: 120, y: 260 }
                 },
                 bottom_right_top_right: {
                     particle_trail: { x: 450, y: 500 },
@@ -732,7 +825,7 @@ export class Play extends Scene
                 bottom_right_top_left: {
                     particle_trail: { x: 450, y: 500 },
                     ball_start: { x: 370, y: 560 },
-                    ball_end: { x: 170, y: 260 }
+                    ball_end: { x: 120, y: 260 }
                 }
             };
         
@@ -807,7 +900,7 @@ export class Play extends Scene
 
             if (who_goes_first === "opponent"){
                 if (position === "left"){
-                    ball_x = 170
+                    ball_x = 120
                     ball_y = 260
                 }
                 if (position === "right"){

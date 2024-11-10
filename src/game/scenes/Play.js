@@ -172,8 +172,6 @@ export class Play extends Scene
         var game_type = gameData["game_type"]
         var opponent_name = 'CPU'
 
-
-        
         const grassImages = [];
         const startX = 55; 
         const startY = 225; 
@@ -382,6 +380,22 @@ export class Play extends Scene
             });
         }
 
+        var dict_match = {
+            "id":12345,
+            "you":"name",
+            "opponent":"name",
+            "you_position":"right",
+            "opponent_position":"left",
+            "you_last_position": "right",
+            "opponent_last_position":"left",
+            "you_decided":false,
+            "opponent_decided":false,
+            "ball_possession":"you",
+            "you_score":0,
+            "opponent_score":0,
+            "end":false,
+        }
+
         if (gameData["game_type"] == "online_play"){ // krishan need to work here
             opponent_name = 'jimmy'
         }
@@ -425,6 +439,8 @@ export class Play extends Scene
         let opponent_sprite = createBotSprite(this, "2_female_idle_left", 140, 260, 0x00FF00, 0.4);
         opponent_sprite.play("2_female_idle_left");
 
+        var you_decided = false
+        var opponent_decided = false
 
         function opponent_goes_right(scene){
 
@@ -438,13 +454,9 @@ export class Play extends Scene
                 ease: 'Linear',
                 onComplete: () => {
                     opponent_sprite.stop();
+                    opponent_sprite.play("2_female_idle_right");
                 } 
             });
-
-            opponent_sprite.on('animationcomplete', (animation) => {
-                opponent_sprite.play("2_female_idle_right");
-            });
-
         }
 
         function opponent_goes_left(scene){
@@ -459,11 +471,8 @@ export class Play extends Scene
                 ease: 'Linear',
                 onComplete: () => {
                     opponent_sprite.stop();
+                    opponent_sprite.play("2_female_idle_left");
                 } 
-            });
-
-            opponent_sprite.on('animationcomplete', (animation) => {
-                opponent_sprite.play("2_female_idle_left");
             });
         }
 
@@ -478,11 +487,8 @@ export class Play extends Scene
                 ease: 'Linear',
                 onComplete: () => {
                     player_sprite.stop();
+                    player_sprite.play("1_female_idle_right");
                 } 
-            });
-
-            player_sprite.on('animationcomplete', (animation) => {
-                player_sprite.play("1_female_idle_right");
             });
         }
 
@@ -498,11 +504,8 @@ export class Play extends Scene
                 ease: 'Linear',
                 onComplete: () => {
                     player_sprite.stop();
+                    player_sprite.play("1_female_idle_left");
                 } 
-            });
-
-            player_sprite.on('animationcomplete', (animation) => {
-                player_sprite.play("1_female_idle_left");
             });
         }
 
@@ -510,22 +513,21 @@ export class Play extends Scene
         })
         .setInteractive()
         .on('pointerdown', () => {
-          //  player_action(this, who_goes_first, position, "right");
-          player_action(this, "left", "right", ball_possession, "opponent");
+          //player_action(this, "left", "right", ball_possession, "opponent", true);
+          decision_made(this, "opponent", true, "right")
+
         });
 
         const left_opponent = this.add.text(240, 140, 'LEFT', { 
         })
         .setInteractive()
         .on('pointerdown', () => {
-          //  player_action(this, who_goes_first, position, "right");
-          player_action(this, "left", "left", ball_possession, "opponent");
+          //player_action(this, "left", "left", ball_possession, "opponent", true);
+          decision_made(this, "opponent", true, "left")
         });
        
         const oppenent_username = this.add.text(10, 125, opponent_name + ' : ' + '0', { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
-        
-        var you_decided = false
-        var opponent_decided = false
+    
 
         const right = this.add.text(340, 740, 'RIGHT', { 
             fill: '#0f0', 
@@ -538,8 +540,8 @@ export class Play extends Scene
         .setInteractive()
         .on('pointerdown', () => {
             right.setStyle({ fill: '#ffff00' });
-          //  player_sprite.play("1_female_run_right")
-            player_action(this, position, "right", ball_possession, "you");
+          //  player_action(this, position, "right", ball_possession, "you", true);
+            decision_made(this, "you", true, "right")
             
             this.time.delayedCall(200, () => {
                 right.setStyle({ fill: '#0f0' });
@@ -557,13 +559,26 @@ export class Play extends Scene
         .setInteractive()
         .on('pointerdown', () => {
             left.setStyle({ fill: '#ffff00' });
-           // player_sprite.play("1_female_run_left")
-           player_action(this, position, "left", ball_possession, "you");
+           //player_action(this, position, "left", ball_possession, "you", true);
+           decision_made(this, "you", true, "left")
                 
             this.time.delayedCall(200, () => {
                 left.setStyle({ fill: '#0f0' });
             });
         });
+
+        function decision_made(scene, name, decided, position){
+
+            dict_match[name + "_last_position"] = dict_match[name + "_position"] 
+            dict_match[name + "_position"] = position
+            dict_match[name + "_decided"] = decided
+
+            if (dict_match["you_decided"] === true && dict_match["opponent_decided"] === true){
+                player_action(scene, dict_match["you_last_position"], dict_match["you_position"], dict_match["ball_possession"], "you");
+                player_action(scene, dict_match["opponent_last_position"], dict_match["opponent_position"], dict_match["ball_possession"], "opponent");
+            }
+
+        }
 
         var position = "right"
         var who_goes_first = "you"
@@ -736,13 +751,13 @@ export class Play extends Scene
             
         }
 
-
-    
         let timer_text 
 
-        start_match(this, true, false) // break variable needed whyen both players have entered a left or right?
+        start_match(this, you_decided, opponent_decided) // break variable needed whyen both players have entered a left or right?
 
         function start_match(scene, you_decided, opponent_decided) {
+            you_decided = false
+            opponent_decided = false
             let countdown = 10;
             timer_text = 'TIMER:' + countdown.toString()
         
@@ -770,16 +785,6 @@ export class Play extends Scene
             }, 1000); 
         }
     
-
-        function match_decider(you_decided, opponent_decided){
-
-            if (you_decided == "yes" && opponent_decided == "yes"){
-
-                console.log("yesyes")
-                
-            }
-
-        }
         
         const username = this.add.text(10, 150, playerName + ' : ' + '0', { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
         const ball_graphics = this.add.graphics();
@@ -795,7 +800,7 @@ export class Play extends Scene
                 top_left_bottom_left: {
                     particle_trail: { x: -450, y: -500 },
                     ball_start: { x: 120, y: 260 },
-                    ball_end: { x: 130, y: 560 }
+                    ball_end: { x: 120, y: 560 }
                 },
                 top_right_bottom_right: {
                     particle_trail: { x: -450, y: -500 },
@@ -929,6 +934,8 @@ export class Play extends Scene
             who_goes_first = "you" //krishan delete this
             ball_possession = "you" //krishan delete this
 
+            dict_match["ball_possession"] = ball_possession
+
             racketcap.alpha = 0.75;
             var angle = 450;
 
@@ -977,10 +984,6 @@ export class Play extends Scene
             } 
 
             create_ball_starting_position(scene, who_goes_first, position)
-            // opponent_goes_right(this)
-            // movement top_left_bottom_right top_left_bottom_left top_right_bottom_right
-            // var movement = "bottom_left_top_right"
-            // ball_movement(this, movement, "yes")
             
         }
 

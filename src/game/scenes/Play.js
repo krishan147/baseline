@@ -759,11 +759,16 @@ export class Play extends Scene
 
         let timer_text 
 
-        start_match(this, you_decided, opponent_decided) // break variable needed whyen both players have entered a left or right?
 
-        function start_match(scene, you_decided, opponent_decided) {
-            you_decided = false
-            opponent_decided = false
+
+
+        start_match(this, false, false)
+
+        function start_match(scene, you_decided, opponent_decided){
+            start_match_timer(scene, you_decided, opponent_decided) 
+        }
+
+        function start_match_timer(scene, you_decided, opponent_decided) {
             let countdown = 10;
             timer_text = 'TIMER:' + countdown.toString()
         
@@ -784,7 +789,7 @@ export class Play extends Scene
                 if (countdown === 0) {
                     clearInterval(timer);
                     console.log("Timer ended. Taking opponent's last decision...");
-                    // Add logic here to take the opponent's last decision
+                    // Add logic here to take the opponent's last decision if timer runs out krishan
                 }
         
                 countdown--;
@@ -847,8 +852,6 @@ export class Play extends Scene
                 console.error("Invalid movement direction");
                 return;
             }
-
-            console.log("go past?", past)
         
             // Adjust the end position if `past` is "yes" to make the ball move further
             const ballEnd = { ...selectedMovement.ball_end };
@@ -893,8 +896,30 @@ export class Play extends Scene
                 },
                 onComplete: function () {
                     ball_trail.stop();
+                    
+                    if (past === "yes"){
+                        match_end()
+                    }else{
+                        match_continue()
+                    }
+
                 }
             });
+        }
+
+
+        function match_end(){ 
+            dict_match["you_decided"] = false
+            dict_match["opponent_decided"] = false
+            // check if game has ended
+            // change scores
+            // some other stuff
+        }
+
+        function match_continue(){
+            dict_match["you_decided"] = false
+            dict_match["opponent_decided"] = false
+            dict_match["ball_possession"] = dict_match["ball_possession"] === "you" ? "opponent" : "you";
         }
 
         function create_ball_starting_position(scene, who_goes_first, position){

@@ -524,8 +524,7 @@ export class Play extends Scene
           decision_made(this, "opponent", true, "left")
         });
        
-        const oppenent_username = this.add.text(10, 125, opponent_name + ' : ' + '0', { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
-    
+
 
         const right = this.add.text(340, 740, 'RIGHT', { 
             fill: '#0f0', 
@@ -563,20 +562,39 @@ export class Play extends Scene
             });
         });
 
+        let score_username_fig = 0
+        let score_oppenent_fig = 0
+
         function decision_made(scene, name, decided, position){
 
             dict_match[name + "_last_position"] = dict_match[name + "_position"] 
             dict_match[name + "_position"] = position
             dict_match[name + "_decided"] = decided
 
+            console.log("ball_possession ",dict_match["ball_possession"]);
+
+
             var past = "no"
 
-            console.log(dict_match["you_decided"], dict_match["opponent_decided"])
+            console.log(dict_match["you_decided"], dict_match["opponent_decided"]) // krishan something is wrong with this as scores dont work properly
 
             if (dict_match["you_position"] === dict_match["opponent_position"]){
                 past = "no"
             } else {
                 past = "yes"
+
+                if (dict_match["ball_possession"] === "you"){
+                    score_username_fig = score_username_fig + 1;
+                    console.log(score_username_fig, "score_username_fig");
+                    updateScores.call(scene); 
+                }
+
+                if (dict_match["ball_possession"] === "opponent"){
+                    score_oppenent_fig = score_oppenent_fig + 1;
+                    console.log(score_oppenent_fig, "score_oppenent_fig");
+                    updateScores.call(scene); 
+                }
+
             }
 
             if (dict_match["you_decided"] === true && dict_match["opponent_decided"] === true){
@@ -797,7 +815,23 @@ export class Play extends Scene
         }
     
         
-        const username = this.add.text(10, 150, playerName + ' : ' + '0', { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+        this.score_username = this.add.text(
+            10, 150,
+            playerName + ' : ' + score_username_fig.toString(),
+            { fill: '#0f0', fontSize: '20px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding: { right: 35 } }
+        );
+        
+        this.score_oppenent = this.add.text(
+            10, 125,
+            opponent_name + ' : ' + score_oppenent_fig.toString(),
+            { fill: '#0f0', fontSize: '20px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding: { right: 35 } }
+        );
+
+        function updateScores() {
+            this.score_username.setText(playerName + ' : ' + score_username_fig.toString());
+            this.score_oppenent.setText(opponent_name + ' : ' + score_oppenent_fig.toString());
+        }
+        
         const ball_graphics = this.add.graphics();
 
         function ball_movement(scene, movement, past) {

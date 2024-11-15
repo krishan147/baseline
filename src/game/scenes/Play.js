@@ -394,6 +394,7 @@ export class Play extends Scene
             "you_score":0,
             "opponent_score":0,
             "end":false,
+            "round_ball_possession":"you"
         }
 
         if (gameData["game_type"] == "online_play"){ // krishan need to work here
@@ -570,34 +571,31 @@ export class Play extends Scene
             dict_match[name + "_last_position"] = dict_match[name + "_position"] 
             dict_match[name + "_position"] = position
             dict_match[name + "_decided"] = decided
-
-            console.log("ball_possession ",dict_match["ball_possession"]);
-
+            
 
             var past = "no"
 
-            console.log(dict_match["you_decided"], dict_match["opponent_decided"]) // krishan something is wrong with this as scores dont work properly
-
-            if (dict_match["you_position"] === dict_match["opponent_position"]){
-                past = "no"
-            } else {
-                past = "yes"
-
-                if (dict_match["ball_possession"] === "you"){
-                    score_username_fig = score_username_fig + 1;
-                    console.log(score_username_fig, "score_username_fig");
-                    updateScores.call(scene); 
-                }
-
-                if (dict_match["ball_possession"] === "opponent"){
-                    score_oppenent_fig = score_oppenent_fig + 1;
-                    console.log(score_oppenent_fig, "score_oppenent_fig");
-                    updateScores.call(scene); 
-                }
-
-            }
-
             if (dict_match["you_decided"] === true && dict_match["opponent_decided"] === true){
+
+                if (dict_match["you_position"] === dict_match["opponent_position"]){
+                    past = "no"
+                } else {
+                    past = "yes"
+    
+                    if (dict_match["ball_possession"] === "you"){
+                        score_username_fig = score_username_fig + 1;
+                        dict_match["you_score"] = score_username_fig
+                        updateScores.call(scene); 
+                    }
+    
+                    if (dict_match["ball_possession"] === "opponent"){
+                        score_oppenent_fig = score_oppenent_fig + 1;
+                        dict_match["opponent_score"] = score_oppenent_fig
+                        updateScores.call(scene); 
+                    }
+    
+                }
+
                 player_action(scene, dict_match["you_last_position"], dict_match["you_position"], dict_match["ball_possession"], "you", past);
                 player_action(scene, dict_match["opponent_last_position"], dict_match["opponent_position"], dict_match["ball_possession"], "opponent", past);
             }
@@ -724,7 +722,7 @@ export class Play extends Scene
 
             if (player_name === "you"){
                 if (position == button){
-                    console.log("no movement")
+                    var gfdgdfg // placeholder krishan
                 }else {
                     if (button === "left"){
                         player_goes_left(scene)
@@ -738,7 +736,7 @@ export class Play extends Scene
 
             if (player_name === "opponent"){
                 if (position == button){
-                    console.log("no movement")
+                    var gfddfggdfg // placeholder krishan
                 }else {
                     if (button === "left"){
                         opponent_goes_left(scene)
@@ -752,8 +750,6 @@ export class Play extends Scene
         }
 
         function player_action(scene, position, button, ball_possession, player_name, past){
-
-            console.log(scene, position, button, ball_possession, player_name);
 
             if (ball_possession === "you" && player_name === "you"){
                 with_ball(scene, position, button, ball_possession, player_name, past)
@@ -777,9 +773,6 @@ export class Play extends Scene
 
         let timer_text 
 
-
-
-
         start_match(this, false, false)
 
         function start_match(scene, you_decided, opponent_decided){
@@ -801,13 +794,10 @@ export class Play extends Scene
         
             const timer = setInterval(() => {
                 timerText.setText('TIMER:' + countdown);
-        
-                console.log(countdown);
-        
+                
                 if (countdown === 0) {
                     clearInterval(timer);
-                    console.log("Timer ended. Taking opponent's last decision...");
-                    // Add logic here to take the opponent's last decision if timer runs out krishan
+                  //  console.log("Timer ended. Taking opponent's last decision Add logic here to take the opponent's last decision if timer runs out krishan...");
                 }
         
                 countdown--;
@@ -932,7 +922,7 @@ export class Play extends Scene
                     ball_trail.stop();
                     
                     if (past === "yes"){
-                        match_end()
+                        match_end(scene)
                     }else{
                         match_continue()
                     }
@@ -942,9 +932,32 @@ export class Play extends Scene
         }
 
 
-        function match_end(){ 
+        function match_end(scene){ 
             dict_match["you_decided"] = false
             dict_match["opponent_decided"] = false
+            dict_match["round_ball_possession"] = dict_match["ball_possession"] === "you" ? "opponent" : "you";
+
+
+
+            if (dict_match["you_score"] >= 7  || dict_match["opponent_score"] >= 7){
+
+                if (Math.abs(dict_match["you_score"] - dict_match["opponent_score"]) >= 2) {
+                    if (dict_match["you_score"] > dict_match["opponent_score"]) {
+                        console.log("You are the winner!");
+                    } else {
+                        console.log("Your opponent is the winner!");
+                    }
+                }
+
+            }
+            
+            create_ball_starting_position(scene, dict_match["round_ball_possession"], "left")
+
+            player_sprite.x = 140;
+            player_sprite.play("1_female_idle_left");
+
+            opponent_sprite.x = 340
+            opponent_sprite.play("2_female_idle_right");
             // check if game has ended
             // change scores
             // some other stuff
@@ -954,6 +967,10 @@ export class Play extends Scene
             dict_match["you_decided"] = false
             dict_match["opponent_decided"] = false
             dict_match["ball_possession"] = dict_match["ball_possession"] === "you" ? "opponent" : "you";
+        }
+
+        function game_end(){
+
         }
 
         function create_ball_starting_position(scene, who_goes_first, position){
@@ -985,7 +1002,7 @@ export class Play extends Scene
             ball_graphics.fillStyle(0xFFFF00, 1);
             ball_graphics.fillCircle(0, 0, 5);
             ball_graphics.setPosition(ball_x, ball_y);
-            ball_graphics.alpha = 0
+            ball_graphics.alpha = 1
         }
 
         var racketcap = this.add.image(250, 425, 'racketcap');
@@ -994,6 +1011,7 @@ export class Play extends Scene
         
       
         function spin_racket(scene) {
+            var initial_ball_position = "left"
             var list_who_goes_first = ["you","opponent"];
             var random =  Math.floor((Math.random() * list_who_goes_first.length));
             who_goes_first = list_who_goes_first[random];
@@ -1002,6 +1020,17 @@ export class Play extends Scene
             ball_possession = "opponent" //krishan delete this
 
             dict_match["ball_possession"] = ball_possession
+
+
+            if (who_goes_first == "you"){
+                initial_ball_position = "right"
+            }
+
+            if (who_goes_first == "opponent"){
+                initial_ball_position = "left"
+            }
+
+            dict_match["round_ball_possession"] = ball_possession
 
             racketcap.alpha = 0.75;
             var angle = 450;
@@ -1020,7 +1049,7 @@ export class Play extends Scene
                 duration: 2000,
                 ease: 'Linear',
                 onComplete: () => {
-                    ball_graphics.alpha = 1
+                    create_ball_starting_position(scene, who_goes_first, initial_ball_position)
                     countdown(scene)
                     scene.time.delayedCall(2000, () => { 
                         scene.tweens.add({
@@ -1050,7 +1079,7 @@ export class Play extends Scene
                 position = "left"
             } 
 
-            create_ball_starting_position(scene, who_goes_first, position)
+            
             
         }
 
@@ -1074,7 +1103,7 @@ export class Play extends Scene
                     currentIndex++;
                 },
                 onComplete: () => {
-                    console.log("start game!")
+                    var esresrf //krishan this is a placeholder
                     
                 }
             });

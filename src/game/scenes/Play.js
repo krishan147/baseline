@@ -394,7 +394,8 @@ export class Play extends Scene
             "you_score":0,
             "opponent_score":0,
             "end":false,
-            "round_ball_possession":"you"
+            "match_ball_possession":"you",
+            "ball_position":"right"
         }
 
         if (gameData["game_type"] == "online_play"){ // krishan need to work here
@@ -445,8 +446,8 @@ export class Play extends Scene
 
         function opponent_goes_right(scene){
 
-            opponent_position = "right"
             opponent_sprite.play("2_female_run_right")
+            dict_match["opponent_position"] = "right"
             
             scene.tweens.add({
                 targets: opponent_sprite,
@@ -462,8 +463,8 @@ export class Play extends Scene
 
         function opponent_goes_left(scene){
 
-            opponent_position = "left"
             opponent_sprite.play("2_female_run_left")
+            dict_match["opponent_position"] = "left"
             
             scene.tweens.add({
                 targets: opponent_sprite,
@@ -478,8 +479,8 @@ export class Play extends Scene
         }
 
         function player_goes_right(scene){
-            you_position = "right"
             player_sprite.play("1_female_run_right")
+            dict_match["you_position"] = "right"
             
             scene.tweens.add({
                 targets: player_sprite,
@@ -495,8 +496,8 @@ export class Play extends Scene
 
         function player_goes_left(scene){
 
-            you_position = "left"
             player_sprite.play("1_female_run_left")
+            dict_match["you_position"] = "left"
             
             scene.tweens.add({
                 targets: player_sprite,
@@ -585,36 +586,38 @@ export class Play extends Scene
                     if (dict_match["ball_possession"] === "you"){
                         score_username_fig = score_username_fig + 1;
                         dict_match["you_score"] = score_username_fig
-                        updateScores.call(scene); 
+                        update_scores.call(scene); 
                     }
     
                     if (dict_match["ball_possession"] === "opponent"){
                         score_oppenent_fig = score_oppenent_fig + 1;
                         dict_match["opponent_score"] = score_oppenent_fig
-                        updateScores.call(scene); 
+                        update_scores.call(scene); 
                     }
     
                 }
 
-                player_action(scene, dict_match["you_last_position"], dict_match["you_position"], dict_match["ball_possession"], "you", past);
-                player_action(scene, dict_match["opponent_last_position"], dict_match["opponent_position"], dict_match["ball_possession"], "opponent", past);
+                player_action(scene, dict_match["ball_position"], dict_match["you_position"], dict_match["ball_possession"], "you", past);
+                player_action(scene, dict_match["ball_position"], dict_match["opponent_position"], dict_match["ball_possession"], "opponent", past);
             }
 
         }
 
-        var position = "right"
+        var ball_position
         var who_goes_first = "you"
         var ball_possession = "you"
-        var you_position = "right" // got to make the positions variables? change to boolean?
+        var you_position = "right" // got to make the positions variables?change to boolean?
         var opponent_position = "left" // got to make the positions variables? change to boolean?
 
-        function with_ball(scene, position, button, ball_possession, player_name, past){
+        function with_ball(scene, ball_position, button, ball_possession, player_name, past){
 
             if (ball_possession === "you"){
 
-                if (position === "left"){
+                if (ball_position === "left"){
 
                     if (button === "left" && player_name === "you"){
+
+                        dict_match["ball_position"] = "left"
                         player_sprite.play("1_female_hit_left"); 
                         ball_movement(scene, "bottom_left_top_left", past)
                         player_sprite.on('animationcomplete-1_female_hit_left', function () {
@@ -626,6 +629,7 @@ export class Play extends Scene
 
                     if (button === "right" && player_name === "you"){
 
+                        dict_match["ball_position"] = "right"
                         ball_movement(scene, "bottom_left_top_right", past)
                         player_sprite.on('animationcomplete-1_female_hit_left', function () {
                             player_sprite.play("1_female_idle_left");
@@ -635,10 +639,11 @@ export class Play extends Scene
 
                 }
 
-                if (position === "right"){
+                if (ball_position === "right"){
 
                     if (button === "left" && player_name === "you"){
 
+                        dict_match["ball_position"] = "left"
                         player_sprite.play("1_female_hit_right"); 
                         ball_movement(scene, "bottom_right_top_left", past)
                         player_sprite.on('animationcomplete-1_female_hit_right', function () {
@@ -648,7 +653,8 @@ export class Play extends Scene
                     }
 
                     if (button === "right" && player_name === "you"){
-
+                        
+                        dict_match["ball_position"] = "right"
                         player_sprite.play("1_female_hit_right"); 
                         ball_movement(scene, "bottom_right_top_right", past)
                         player_sprite.on('animationcomplete-1_female_hit_right', function () {
@@ -664,9 +670,11 @@ export class Play extends Scene
 
             if (ball_possession === "opponent"){
 
-                if (position === "left"){
+                if (ball_position === "left"){
 
                     if (button === "left" && player_name === "opponent"){
+
+                        dict_match["ball_position"] = "left"
                         opponent_sprite.play("2_female_hit_left"); 
                         ball_movement(scene, "top_left_bottom_left", past)
                         opponent_sprite.on('animationcomplete-2_female_hit_left', function () {
@@ -677,7 +685,8 @@ export class Play extends Scene
                     }
 
                     if (button === "right" && player_name === "opponent"){
-                        
+
+                        dict_match["ball_position"] = "right"
                         opponent_sprite.play("2_female_hit_left"); 
                         ball_movement(scene, "top_left_bottom_right", past)
                         opponent_sprite.on('animationcomplete-2_female_hit_left', function () {
@@ -688,10 +697,11 @@ export class Play extends Scene
 
                 }
 
-                if (position === "right"){
+                if (ball_position === "right"){
 
                     if (button === "left" && player_name === "opponent"){
 
+                        dict_match["ball_position"] = "left"
                         opponent_sprite.play("2_female_hit_right"); 
                         ball_movement(scene, "top_right_bottom_left", past)
                         opponent_sprite.on('animationcomplete-2_female_hit_right', function () {
@@ -701,7 +711,8 @@ export class Play extends Scene
                     }
 
                     if (button === "right" && player_name === "opponent"){
-
+                        
+                        dict_match["ball_position"] = "right"
                         opponent_sprite.play("2_female_hit_right"); 
                         ball_movement(scene, "top_right_bottom_right", past)
                         opponent_sprite.on('animationcomplete-2_female_hit_right', function () {
@@ -718,10 +729,10 @@ export class Play extends Scene
 
         }
 
-        function without_ball(scene, position, button, ball_possession, player_name){
+        function without_ball(scene, ball_position, button, ball_possession, player_name){
 
             if (player_name === "you"){
-                if (position == button){
+                if (ball_position == button){
                     var gfdgdfg // placeholder krishan
                 }else {
                     if (button === "left"){
@@ -735,7 +746,7 @@ export class Play extends Scene
             }
 
             if (player_name === "opponent"){
-                if (position == button){
+                if (ball_position == button){
                     var gfddfggdfg // placeholder krishan
                 }else {
                     if (button === "left"){
@@ -817,12 +828,12 @@ export class Play extends Scene
             { fill: '#0f0', fontSize: '20px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding: { right: 35 } }
         );
 
-        function updateScores() {
+        function update_scores() {
             this.score_username.setText(playerName + ' : ' + score_username_fig.toString());
             this.score_oppenent.setText(opponent_name + ' : ' + score_oppenent_fig.toString());
         }
         
-        const ball_graphics = this.add.graphics();
+        
 
         function ball_movement(scene, movement, past) {
             // Define movement presets for different directions
@@ -935,9 +946,8 @@ export class Play extends Scene
         function match_end(scene){ 
             dict_match["you_decided"] = false
             dict_match["opponent_decided"] = false
-            dict_match["round_ball_possession"] = dict_match["ball_possession"] === "you" ? "opponent" : "you";
-
-
+            dict_match["match_ball_possession"] = dict_match["match_ball_possession"] === "you" ? "opponent" : "you";
+            dict_match["ball_possession"] = dict_match["match_ball_possession"]
 
             if (dict_match["you_score"] >= 7  || dict_match["opponent_score"] >= 7){
 
@@ -950,17 +960,50 @@ export class Play extends Scene
                 }
 
             }
+
+            var ball_position
+
+            if (dict_match["match_ball_possession"] === "you"){
+                ball_position = "right"
+            }
+
+            if (dict_match["match_ball_possession"] === "opponent"){
+                ball_position = "left"
+            }
+
+
+            move_ball(dict_match["match_ball_possession"], ball_position)
+
+
+            if (dict_match["you_position"] != "right"){
+                player_goes_right(scene)
+                dict_match["you_position"] = "right"
+                dict_match["you_last_position"] = "right"
+            }
+
+            if (dict_match["opponent_position"] != "left"){
+                opponent_goes_left(scene)
+                dict_match["opponent_position"] = "left"
+                dict_match["opponent_last_position"] = "left"
+            }
+
             
-            create_ball_starting_position(scene, dict_match["round_ball_possession"], "left")
+            
 
-            player_sprite.x = 140;
-            player_sprite.play("1_female_idle_left");
+            console.log(dict_match);
 
-            opponent_sprite.x = 340
-            opponent_sprite.play("2_female_idle_right");
+          //  player_sprite.x = 140;
+          //  player_sprite.play("1_female_idle_left");
+
+           // opponent_sprite.x = 340
+            //opponent_sprite.play("2_female_idle_right");
             // check if game has ended
             // change scores
             // some other stuff
+        }
+
+        function move_sprites(){
+
         }
 
         function match_continue(){
@@ -973,12 +1016,12 @@ export class Play extends Scene
 
         }
 
-        function create_ball_starting_position(scene, who_goes_first, position){
+        function move_ball(player_name, position){
             var ball_x = 370
             var ball_y = 560
-            if (who_goes_first === "you"){
+            if (player_name === "you"){
                 if (position === "left"){
-                    ball_x = 130
+                    ball_x = 115
                     ball_y = 560
                 }
                 if (position === "right"){
@@ -987,7 +1030,7 @@ export class Play extends Scene
                 }
             }
 
-            if (who_goes_first === "opponent"){
+            if (player_name === "opponent"){
                 if (position === "left"){
                     ball_x = 120
                     ball_y = 260
@@ -998,11 +1041,11 @@ export class Play extends Scene
                 }
             }
 
-            const ball = scene.add.sprite(ball_x, ball_y);
-            ball_graphics.fillStyle(0xFFFF00, 1);
-            ball_graphics.fillCircle(0, 0, 5);
+            // const ball = scene.add.sprite(ball_x, ball_y);
+            // ball_graphics.fillStyle(0xFFFF00, 1);
+            // ball_graphics.fillCircle(0, 0, 5);
             ball_graphics.setPosition(ball_x, ball_y);
-            ball_graphics.alpha = 1
+            // ball_graphics.alpha = 1
         }
 
         var racketcap = this.add.image(250, 425, 'racketcap');
@@ -1011,26 +1054,23 @@ export class Play extends Scene
         
       
         function spin_racket(scene) {
-            var initial_ball_position = "left"
             var list_who_goes_first = ["you","opponent"];
             var random =  Math.floor((Math.random() * list_who_goes_first.length));
             who_goes_first = list_who_goes_first[random];
             ball_possession = list_who_goes_first[random];
             who_goes_first = "opponent" //krishan delete this
-            ball_possession = "opponent" //krishan delete this
+            ball_possession = who_goes_first 
 
             dict_match["ball_possession"] = ball_possession
-
+            dict_match["match_ball_possession"] = ball_possession
 
             if (who_goes_first == "you"){
-                initial_ball_position = "right"
+                dict_match["ball_position"] = "right"
             }
 
             if (who_goes_first == "opponent"){
-                initial_ball_position = "left"
+                dict_match["ball_position"] = "left"
             }
-
-            dict_match["round_ball_possession"] = ball_possession
 
             racketcap.alpha = 0.75;
             var angle = 450;
@@ -1049,7 +1089,8 @@ export class Play extends Scene
                 duration: 2000,
                 ease: 'Linear',
                 onComplete: () => {
-                    create_ball_starting_position(scene, who_goes_first, initial_ball_position)
+                    create_ball()
+                    move_ball(who_goes_first, dict_match["ball_position"])
                     countdown(scene)
                     scene.time.delayedCall(2000, () => { 
                         scene.tweens.add({
@@ -1140,6 +1181,18 @@ export class Play extends Scene
                     }
                 }
             });
+
+
+
+        const ball_graphics = this.add.graphics();
+
+        function create_ball(){
+        //    const ball = scene.add.sprite(ball_x, ball_y);
+            ball_graphics.fillStyle(0xFFFF00, 1);
+            ball_graphics.fillCircle(0, 0, 5);
+            //   ball_graphics.setPosition(ball_x, ball_y);
+            ball_graphics.alpha = 1
+        }
 
     
 

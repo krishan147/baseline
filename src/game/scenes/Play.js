@@ -303,7 +303,7 @@ export class Play extends Scene
           }, 3000);
 
 
-          const victory = this.add.text(100, 400, 'VICTORY', { fill: '#0f0', fontSize: '240px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
+          const victory = this.add.text(100, 400, 'VICTORY', { fill: '#0f0', fontSize: '240px' ,strokeThickness: 10, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
         
           const colors = [
             { r: 0, g: 0, b: 0 },   // Black
@@ -366,7 +366,7 @@ export class Play extends Scene
         }
 
         function runDefeat() {
-            const defeat = this.add.text(100, 400, 'DEFEAT', { fill: 'black', fontSize: '240px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
+            const defeat = this.add.text(100, 400, 'DEFEAT', { fill: 'black', fontSize: '240px' ,strokeThickness: 10, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
             
             this.tweens.add({
                 targets: defeat,
@@ -611,8 +611,6 @@ export class Play extends Scene
 
                 player_action(scene, dict_match["ball_position"], dict_match["ball_position_new"], dict_match["ball_possession"], ball_possession_name, past);
                 player_action(scene, dict_match["ball_position"], dict_match[no_ball_name + "_position"], dict_match["ball_possession"], no_ball_name, past);
-
-                
 
                 
             }
@@ -952,7 +950,7 @@ export class Play extends Scene
                     }else{
                         // continue exchange
                         dict_match["ball_possession"] = dict_match["ball_possession"] === "you" ? "opponent" : "you";
-                        console.log("end of exchange dict", dict_match);
+                        console.log("end of exchange", dict_match);
                     }
 
                 }
@@ -966,13 +964,15 @@ export class Play extends Scene
             dict_match["opponent_last_position"] = "left"
             dict_match["you_last_position"] = "right"
 
-            if (dict_match["you_score"] >= 7  || dict_match["opponent_score"] >= 7){
+            if (dict_match["you_score"] >= 1  || dict_match["opponent_score"] >= 1){ //change to 5
 
                 if (Math.abs(dict_match["you_score"] - dict_match["opponent_score"]) >= 2) {
                     if (dict_match["you_score"] > dict_match["opponent_score"]) {
                         console.log("You are the winner!");
+                        runVictory.call(scene)
                     } else {
                         console.log("Your opponent is the winner!");
+                        runDefeat.call(scene)
                     }
                 }
 
@@ -988,16 +988,17 @@ export class Play extends Scene
             }
 
 
-            
-
-
             if (dict_match["you_position"] != "right"){
                 player_goes_right(scene)
+                dict_match["you_position"] = "right"
             }
 
             if (dict_match["opponent_position"] != "left"){
                 opponent_goes_left(scene)
+                dict_match["opponent_position"] = "left"
             }
+
+            console.log("end of match dict", dict_match);
 
             
 

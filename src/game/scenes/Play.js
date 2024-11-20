@@ -793,37 +793,52 @@ export class Play extends Scene
 
 
         let timer_text 
+        const timerText = this.add.text(170, 150, timer_text, { 
+            fill: '#0f0', 
+            fontSize: '30px', 
+            strokeThickness: 1, 
+            stroke: '#0f0', 
+            fontFamily: 'playwritereg', 
+            padding: { right: 35 }
+        });
 
-        start_match(this, false, false)
 
-        function start_match(scene, you_decided, opponent_decided){
-            start_match_timer(scene, you_decided, opponent_decided) 
-        }
+
+        let matchTimer = null; 
 
         function start_match_timer(scene, you_decided, opponent_decided) {
             let countdown = 10;
-            timer_text = 'TIMER:' + countdown.toString()
         
-            const timerText = scene.add.text(170, 150, timer_text, { 
-                fill: '#0f0', 
-                fontSize: '30px', 
-                strokeThickness: 1, 
-                stroke: '#0f0', 
-                fontFamily: 'playwritereg', 
-                padding: { right: 35 }
-            });
+
+            if (matchTimer !== null) {
+                clearInterval(matchTimer);
+                matchTimer = null; 
+            }
         
-            const timer = setInterval(() => {
+            if (typeof timerText !== 'undefined') {
                 timerText.setText('TIMER:' + countdown);
-                
-                if (countdown === 0) {
-                    clearInterval(timer);
-                  //  console.log("Timer ended. Taking opponent's last decision Add logic here to take the opponent's last decision if timer runs out krishan...");
+            } else {
+                console.log('TIMER:' + countdown); 
+            }
+        
+            matchTimer = setInterval(() => {
+                countdown--;
+        
+                if (typeof timerText !== 'undefined') {
+                    timerText.setText('TIMER:' + countdown);
+                } else {
+                    console.log('TIMER:' + countdown); 
                 }
         
-                countdown--;
-            }, 1000); 
+                if (countdown === 0) {
+                    clearInterval(matchTimer);
+                    matchTimer = null; 
+                    console.log("Timer finished, take last decision");
+                    // decision_made(this, "you", true, "left");
+                }
+            }, 1000);
         }
+        
     
         
         this.score_username = this.add.text(
@@ -951,6 +966,7 @@ export class Play extends Scene
                         // continue exchange
                         dict_match["ball_possession"] = dict_match["ball_possession"] === "you" ? "opponent" : "you";
                         console.log("end of exchange", dict_match);
+                        start_match_timer(scene, false, false) 
                     }
 
                 }
@@ -1148,10 +1164,15 @@ export class Play extends Scene
                 callback: () => {
                     countdownText.setText(countdownNumbers[currentIndex]);
                     currentIndex++;
+
+                    if (countdownNumbers[currentIndex] == ''){
+                        console.log("heer")
+                        start_match_timer(scene, false, false) 
+                    }
+
                 },
                 onComplete: () => {
-                    var esresrf //krishan this is a placeholder
-                    
+
                 }
             });
         }

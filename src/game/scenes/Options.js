@@ -69,6 +69,7 @@ export class Options extends Scene
     async create ()
     {
         var gameData = await readLocally()
+
         var volume = gameData["volume"]
         var isChecked = gameData["mute"]
         var playerName = gameData["playerName"]
@@ -332,8 +333,12 @@ export class Options extends Scene
 }
 
 
-export function audioButton(isChecked){
-
-    if (isChecked == false)
-        audio_button.play()
+export async function audioButton(isChecked) {
+    try {
+        if (isChecked === false) {
+            await audio_button.play();
+        }
+    } catch (error) {
+        console.error("Audio playback failed:", error);
+    }
 }

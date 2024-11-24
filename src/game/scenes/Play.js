@@ -262,13 +262,6 @@ export class Play extends Scene
             }
         });
         
-
-
- 
-       //  runVictory.call(this)
-       // runDefeat.call(this)
-
-
         function runVictory() {
         
         const particles_obj = this.add.particles('particle');
@@ -371,9 +364,6 @@ export class Play extends Scene
 
 
         }
-
-
-
 
 
         function runDefeat() {
@@ -545,6 +535,9 @@ export class Play extends Scene
         // });
 
         var use_controls = false
+
+
+
        
         const right = this.add.text(340, 740, 'RIGHT', { 
             fill: '#0f0', 
@@ -557,13 +550,19 @@ export class Play extends Scene
         .setInteractive()
         .on('pointerdown', () => {
             if (use_controls) { 
-                right.setStyle({ fill: '#ffff00' });
-                decision_made(this, "you", true, "right");
-                cpu_decision(this);
-                
-                this.time.delayedCall(200, () => {
-                    right.setStyle({ fill: '#0f0' });
-                });
+
+
+                if (dict_match["you_decided"] == false){
+
+                    right.setStyle({ fill: '#ffff00' });
+                    decision_made(this, "you", true, "right");
+                    cpu_decision(this);
+
+                }
+
+            //    this.time.delayedCall(200, () => {
+            //        right.setStyle({ fill: '#0f0' });
+            //    });
             }
         });
         
@@ -579,15 +578,27 @@ export class Play extends Scene
         .setInteractive()
         .on('pointerdown', () => {
             if (use_controls) { 
-                left.setStyle({ fill: '#ffff00' });
-                decision_made(this, "you", true, "left");
-                cpu_decision(this);
+
+                if (dict_match["you_decided"] == false){
+
+                    left.setStyle({ fill: '#ffff00' });
+                    decision_made(this, "you", true, "left");
+                    cpu_decision(this);
+
+                }
+
                 
-                this.time.delayedCall(200, () => {
-                    left.setStyle({ fill: '#0f0' });
-                });
+                // this.time.delayedCall(200, () => {
+                //     left.setStyle({ fill: '#0f0' });  //'#0f0'
+                // });
             }
         });
+
+
+
+    
+
+
         
 
         function cpu_decision(scene){
@@ -641,6 +652,26 @@ export class Play extends Scene
                     }
     
                 }
+
+                if (dict_match["cpu"] == true){
+
+                    scene.time.delayedCall(200, () => {
+                        right.setStyle({ fill: '#0f0' });
+                    });
+    
+                    scene.time.delayedCall(200, () => {
+                        left.setStyle({ fill: '#0f0' });  //'#0f0'
+                    });
+
+                } else {
+
+                    left.setStyle({ fill: '#0f0' });
+                    right.setStyle({ fill: '#0f0' });
+
+                }
+
+
+
 
                 player_action(scene, dict_match["ball_position"], dict_match["ball_position_new"], dict_match["ball_possession"], ball_possession_name, past);
                 player_action(scene, dict_match["ball_position"], dict_match[no_ball_name + "_position"], dict_match["ball_possession"], no_ball_name, past);
@@ -874,7 +905,14 @@ export class Play extends Scene
                     }
 
                     if (dict_match["opponent_decided"] == false){
-                        decision_made(scene, "opponent", true, dict_match["opponent_last_position"])
+
+
+                        if (dict_match["cpu"] == true){
+                            cpu_decision(scene);
+                        } else {
+                            decision_made(scene, "opponent", true, dict_match["opponent_last_position"])
+                        }
+                        
                     }
 
                 }

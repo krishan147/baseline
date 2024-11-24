@@ -12,7 +12,6 @@ const originalGameData = {
     gold_multi_date_issue: 1720683935,
     gold_cpu: 1000,
     gold_multi: 1000,
-    gold_multi_real: 1000,
     email: "test@gmail.com",
     online_bet:0,
     offline_bet:0,

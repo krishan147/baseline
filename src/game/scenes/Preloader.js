@@ -64,7 +64,8 @@ export class Preloader extends Scene
         else if (token_check.valid == true){
 
             var gameData = await readLocally()
-            const email = gameData["email"]
+
+            var email = gameData["email"]
             var data = await getPlayerWithEmail(email)
 
             await writeLocally(data);

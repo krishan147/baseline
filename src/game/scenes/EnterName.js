@@ -67,6 +67,10 @@ export class EnterName extends Scene {
 
         var volume = 100;
         var isChecked = 0;
+
+        var gameData_test = await readLocally()
+
+        console.log("nothing found", gameData_test)
         
     //     try {
     //         var gameData = await readLocally()
@@ -748,23 +752,6 @@ export class EnterName extends Scene {
             });
         }
 
-        // // Adding event listeners for focus and blur to the input field
-        // inputText.node.addEventListener('focus', handleFocus);
-        // inputText.node.addEventListener('blur', handleBlur);
-
-        // function handleFocus() {
-        //     // Prevent body scrolling
-        //     document.body.style.overflow = 'hidden';
-        //     // Prevent Phaser container from scrolling
-        //     // this.scale.parent.style.overflow = 'hidden';
-        // }
-
-        // function handleBlur() {
-        //     // Allow body scrolling
-        //     document.body.style.overflow = 'auto';
-        //     // Allow Phaser container scrolling if needed
-        //     this.scale.parent.style.overflow = 'auto';
-        // }
     }
 
     update() {}

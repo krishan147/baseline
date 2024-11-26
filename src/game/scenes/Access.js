@@ -25,7 +25,13 @@ export async function getToken() {
         const decodedToken = jwtDecode(idToken);
         const email = decodedToken.email;
 
+        console.log(session)
+        console.log(idToken)
+        console.log(email)
+
+
         var gameData = await readLocally();
+
         gameData['email'] = email;
 
         var gameDataString = JSON.stringify(gameData);
@@ -42,17 +48,17 @@ export async function getToken() {
 
 export async function readLocally() {
     let gameDataString = localStorage.getItem('gameData');
+
     if (gameDataString) {
         try {
             var gameData = JSON.parse(gameDataString);
             writeLocally(gameData);
             return gameData;
         } catch (error) {
-            console.error("Error parsing gameData from localStorage:", error);
             return originalGameData;
         }
     } else {
-        resetGameLocally();
+        var originalGameData = resetGameLocally();
         return originalGameData;
     }
 }
@@ -106,6 +112,8 @@ export async function getPlayer(playerName){
 
     const { idToken } = await getToken()
 
+    console.log("token herer", idToken)
+
     const headers = {
         'Content-Type': 'application/json',
         "Authorization": `Bearer ${idToken}`
@@ -149,7 +157,8 @@ export async function getPlayerWithEmail(email){
         });
 
         if (!response.ok) {
-            return "no data found";
+           // return "no data found";
+           return readLocally();
         }
 
         const data = await response.json();

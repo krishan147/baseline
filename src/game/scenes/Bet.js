@@ -2,7 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import Phaser from 'phaser';
-import { readLocally, writeLocally } from './Access.js'
+import { readLocally, writeLocally, patchPlayer } from './Access.js'
 import { looking_for_game } from './Access.js'
 
 export class Bet extends Scene
@@ -143,7 +143,7 @@ export class Bet extends Scene
                 padding: { right: 35 }
             })
             .setInteractive()
-            .on('pointerdown', () => {
+            .on('pointerdown', async () => {
                 if (currentBet) {
                     currentBet.setStyle({ fill: '#0f0' }); // Reset previous button color to green
                 }
@@ -158,9 +158,19 @@ export class Bet extends Scene
 
                 bet_to_execute = parseInt(bet_to_execute);
 
-                writeLocally["online_bet"] = bet_to_execute
+                console.log("bet_to_execute", bet_to_execute)
 
-                console.log(gameData)
+                if (gameData["game_type"] == "offline_play"){
+                    gameData["offline_bet"] = bet_to_execute
+                }
+
+                if (gameData["game_type"] == "online_play"){
+                    gameData["online_bet"] = bet_to_execute
+                }
+
+                
+                writeLocally(gameData)
+                gameData = await readLocally()
         
                 audioButton(isChecked);
                 betEffect.call(this, button.frequency, button.bet_x, button.bet_y);
@@ -185,12 +195,20 @@ export class Bet extends Scene
 
             var game_type = gameData["game_type"]
 
+            if (gameData["game_type"] == "offline_play"){
+                patchPlayer(gameData["playerId"], "offline_bet", gameData["offline_bet"])
+            }
+
+            if (gameData["game_type"] == "online_play"){
+                patchPlayer(gameData["playerId"], "online_bet", gameData["online_bet"])
+            }
+
             if (game_type == "online_play"){
                 this.scene.start('Wait');
             }
 
             if (game_type == "offline_play"){
-                gameData["gold_cpu_bet"] = 
+
                 this.scene.start('Play');
             }
 

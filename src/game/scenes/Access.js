@@ -25,11 +25,6 @@ export async function getToken() {
         const decodedToken = jwtDecode(idToken);
         const email = decodedToken.email;
 
-        console.log(session)
-        console.log(idToken)
-        console.log(email)
-
-
         var gameData = await readLocally();
 
         gameData['email'] = email;
@@ -65,6 +60,7 @@ export async function readLocally() {
 
 
 export async function writeLocally(new_data){
+
     var gameDataString = JSON.stringify(new_data);
     localStorage.setItem('gameData', gameDataString);
 }

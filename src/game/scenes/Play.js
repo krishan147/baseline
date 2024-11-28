@@ -296,8 +296,8 @@ export class Play extends Scene
           }, 3000);
 
 
-          const victory = this.add.text(100, 400, 'VICTORY', { fill: '#0f0', fontSize: '240px' ,strokeThickness: 10, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
-        
+          const victory = this.add.text(100, 200, 'VICTORY', { fill: '#0f0', fontSize: '240px' ,strokeThickness: 10, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
+          
           const colors = [
             { r: 0, g: 0, b: 0 },   // Black
               { r: 255, g: 0, b: 0 },   // Red
@@ -348,6 +348,7 @@ export class Play extends Scene
                   );
           
                   victory.setStyle({ fill: colorString, stroke: colorString });
+                  points.setStyle({ fill: colorString, stroke: colorString });
           
                   if (value === 100) {
                       colorIndex = nextColorIndex;
@@ -367,7 +368,7 @@ export class Play extends Scene
 
 
         function runDefeat() {
-            const defeat = this.add.text(100, 400, 'DEFEAT', { fill: 'black', fontSize: '240px' ,strokeThickness: 10, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
+            const defeat = this.add.text(100, 200, 'DEFEAT', { fill: 'black', fontSize: '240px' ,strokeThickness: 10, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
             
             this.tweens.add({
                 targets: defeat,
@@ -857,9 +858,9 @@ export class Play extends Scene
 
 
         let timer_text 
-        const timerText = this.add.text(170, 150, timer_text, { 
+        const timerText = this.add.text(350, 150, timer_text, { 
             fill: '#0f0', 
-            fontSize: '30px', 
+            fontSize: '20px', 
             strokeThickness: 1, 
             stroke: '#0f0', 
             fontFamily: 'playwritereg', 
@@ -1080,13 +1081,17 @@ export class Play extends Scene
             dict_match["opponent_last_position"] = "left"
             dict_match["you_last_position"] = "right"
 
-            if (dict_match["you_score"] >= 5  || dict_match["opponent_score"] >= 5){ 
+            if (dict_match["you_score"] >= 0  || dict_match["opponent_score"] >= 0){ //change back to 5
 
                 if (Math.abs(dict_match["you_score"] - dict_match["opponent_score"]) >= 2) {
                     if (dict_match["you_score"] > dict_match["opponent_score"]) {
+                        gameData["gold_cpu"] = gameData["gold_cpu"] + gameData["offline_bet"]
+                        show_points(scene, 'WON', gameData["offline_bet"])
                         console.log("You are the winner!");
                         runVictory.call(scene)
                     } else {
+                        gameData["gold_cpu"] = gameData["gold_cpu"] - gameData["offline_bet"]
+                        show_points(scene, 'LOST', gameData["offline_bet"])
                         console.log("Your opponent is the winner!");
                         runDefeat.call(scene)
                     }
@@ -1120,25 +1125,41 @@ export class Play extends Scene
 
             start_match_timer(scene, false, false) 
 
-            
-
-            
-
-
-            // check if game has ended
-            // change scores
-            // some other stuff
         }
+        var points
+        
 
-        function move_sprites(){
-
-        }
-
+        function show_points(scene, gold_state, gold) {
+            let currentGold = 0; 
 
 
-        function game_end(){
+            points = scene.add.text(75, 300, 'GOLD ' + gold_state + ':\n' + currentGold.toString(), { 
+                fill: 'black', 
+                fontSize: '45px', 
+                strokeThickness: 2, 
+                stroke: '#0f0', 
+                fontFamily: 'playwritereg', 
+                padding: { right: 50, left: 10, top: 10, bottom: 10 }
+            })
 
-        }
+            const duration = 2000; 
+            const interval = 50; 
+            const step = gold / (duration / interval); 
+
+            const timer = scene.time.addEvent({
+                delay: interval,
+                callback: () => {
+                    currentGold += step; 
+                    if (currentGold >= gold) {
+                        currentGold = gold; 
+                        timer.remove(); 
+                    }
+                    points.setText('GOLD ' + gold_state + ':\n' + Math.floor(currentGold).toString());
+                },
+                loop: true
+            });
+    }
+    
 
         function move_ball(player_name, position){
 

@@ -73,7 +73,7 @@ export class Preloader extends Scene
             if (data["playerName"] === "Player1" || data["playerName"] === undefined) {
                 this.scene.start('EnterName');
             }else {
-                this.scene.start('Menu');          //Menu      
+                this.scene.start('Play');          //Menu      
             }
 
         }

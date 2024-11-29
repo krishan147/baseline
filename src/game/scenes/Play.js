@@ -168,7 +168,7 @@ export class Play extends Scene
         var volume = gameData["volume"]
         var isChecked = gameData["mute"]
         var playerName = gameData["playerName"]
-        var str_coins = gameData["gold_cpu"]
+        var str_coins = gameData["coins_cpu"]
         var game_type = gameData["game_type"]
         var opponent_name = 'CPU'
 
@@ -261,113 +261,125 @@ export class Play extends Scene
             onComplete: function() {
             }
         });
-        
-        function runVictory() {
-        
-        const particles_obj = this.add.particles('particle');
-        const emitters = [];
 
-        const dict_colors = [
-            { tint: 0xFF49F7, gravityY: 125, xloc: 0, yloc: -25 },
-            { tint: 0x00FF00, gravityY: 125, xloc: 70, yloc: -25 },
-            { tint: 0xFFFFFF, gravityY: 125, xloc: 140, yloc: -25 },
-            { tint: 0xFFFF00, gravityY: 125, xloc: 210, yloc: -25 },
-            { tint: 0x992C94, gravityY: 125, xloc: 280, yloc: -25 },
-            { tint: 0xFF0000, gravityY: 125, xloc: 350, yloc: -25 },
-            { tint: 0xFF7F27, gravityY: 125, xloc: 420, yloc: -25 },
-            { tint: 0x0000FF, gravityY: 125, xloc: 500, yloc: -25 },
-          ];
-          
-          dict_colors.forEach(color => {
-            const emitter = this.add.particles(color.xloc, color.yloc, "particle", {
-              lifespan: 5000,
-              angle: { min: 0, max: 180 },
-              speed: 250,
-              frequency: 10,
-              scale: { start: 1, end: 1 },
-              gravityY: color.gravityY,
-              tint: color.tint,
+        let color_tween 
+
+        let coins_txt = this.add.text(75, 300, 'COINS ', { 
+            fill: 'black', 
+            fontSize: '45px', 
+            strokeThickness: 2, 
+            stroke: '#0f0', 
+            fontFamily: 'playwritereg', 
+            padding: { right: 50, left: 10, top: 10, bottom: 10 }
+        }).setAlpha(0);
+
+
+        
+        function run_victory() {
+        
+            const particles_obj = this.add.particles('particle');
+            const emitters = [];
+
+            const dict_colors = [
+                { tint: 0xFF49F7, gravityY: 125, xloc: 0, yloc: -25 },
+                { tint: 0x00FF00, gravityY: 125, xloc: 70, yloc: -25 },
+                { tint: 0xFFFFFF, gravityY: 125, xloc: 140, yloc: -25 },
+                { tint: 0xFFFF00, gravityY: 125, xloc: 210, yloc: -25 },
+                { tint: 0x992C94, gravityY: 125, xloc: 280, yloc: -25 },
+                { tint: 0xFF0000, gravityY: 125, xloc: 350, yloc: -25 },
+                { tint: 0xFF7F27, gravityY: 125, xloc: 420, yloc: -25 },
+                { tint: 0x0000FF, gravityY: 125, xloc: 500, yloc: -25 },
+            ];
+            
+            dict_colors.forEach(color => {
+                const emitter = this.add.particles(color.xloc, color.yloc, "particle", {
+                lifespan: 5000,
+                angle: { min: 0, max: 180 },
+                speed: 250,
+                frequency: 10,
+                scale: { start: 1, end: 1 },
+                gravityY: color.gravityY,
+                tint: color.tint,
+                });
+                emitters.push(emitter);
             });
-            emitters.push(emitter);
-          });
-          
-          setTimeout(() => {
-            emitters.forEach(emitter => emitter.stop());
-          }, 3000);
+            
+            setTimeout(() => {
+                emitters.forEach(emitter => emitter.stop());
+            }, 3000);
 
 
-          const victory = this.add.text(100, 200, 'VICTORY', { fill: '#0f0', fontSize: '240px' ,strokeThickness: 10, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
-          
-          const colors = [
-            { r: 0, g: 0, b: 0 },   // Black
-              { r: 255, g: 0, b: 0 },   // Red
-              { r: 0, g: 255, b: 0 },   // Green
-              { r: 0, g: 0, b: 255 },   // Blue
-              { r: 255, g: 255, b: 0 },   // Yellow
-              { r: 0, g: 255, b: 255 },   // Cyan
-              { r: 255, g: 0, b: 255 },   // Magenta
-              { r: 255, g: 165, b: 0 },   // Orange
-          ];
-          
-          let colorIndex = 0;
-  
-          this.tweens.add({
-              targets: victory,
-              scaleX: 0.25, 
-              scaleY: 0.25, 
-              ease: 'Power2', 
-              duration: 2000,
-              onComplete: () => {
-                  victory.setFontSize('240px'); 
-              }
-          });
-  
-  
-          this.tweens.addCounter({
-              from: 0,
-              to: 100,
-              duration: 3000,    // Duration of the tween in milliseconds
-              repeat: -1,        // Repeat indefinitely
-              yoyo: true,        // Reverse direction each time the tween completes
-              onUpdate: tween => {
-                  const value = tween.getValue();
-                  const nextColorIndex = (colorIndex + 1) % colors.length;
-                  const color = Phaser.Display.Color.Interpolate.ColorWithColor(
-                      colors[colorIndex],
-                      colors[nextColorIndex],
-                      100,
-                      value
-                  );
-          
-                  const colorString = Phaser.Display.Color.RGBToString(
-                      color.r,
-                      color.g,
-                      color.b,
-                      0,
-                      '#'
-                  );
-          
-                  victory.setStyle({ fill: colorString, stroke: colorString });
-                  points.setStyle({ fill: colorString, stroke: colorString });
-          
-                  if (value === 100) {
-                      colorIndex = nextColorIndex;
-                  }
-              }
-          });
+            const victory = this.add.text(100, 200, 'VICTORY', { fill: '#0f0', fontSize: '240px' ,strokeThickness: 10, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
+            
+            const colors = [
+                { r: 0, g: 0, b: 0 },   // Black
+                { r: 255, g: 0, b: 0 },   // Red
+                { r: 0, g: 255, b: 0 },   // Green
+                { r: 0, g: 0, b: 255 },   // Blue
+                { r: 255, g: 255, b: 0 },   // Yellow
+                { r: 0, g: 255, b: 255 },   // Cyan
+                { r: 255, g: 0, b: 255 },   // Magenta
+                { r: 255, g: 165, b: 0 },   // Orange
+            ];
+            
+            let colorIndex = 0;
+    
+            this.tweens.add({
+                targets: victory,
+                scaleX: 0.25, 
+                scaleY: 0.25, 
+                ease: 'Power2', 
+                duration: 2000,
+                onComplete: () => {
+                    victory.setFontSize('240px'); 
+                }
+            });
+    
+    
+            color_tween = this.tweens.addCounter({
+                from: 0,
+                to: 100,
+                duration: 3000,    // Duration of the tween in milliseconds
+                repeat: -1,        // Repeat indefinitely
+                yoyo: true,        // Reverse direction each time the tween completes
+                onUpdate: tween => {
+                    const value = tween.getValue();
+                    const nextColorIndex = (colorIndex + 1) % colors.length;
+                    const color = Phaser.Display.Color.Interpolate.ColorWithColor(
+                        colors[colorIndex],
+                        colors[nextColorIndex],
+                        100,
+                        value
+                    );
+            
+                    const colorString = Phaser.Display.Color.RGBToString(
+                        color.r,
+                        color.g,
+                        color.b,
+                        0,
+                        '#'
+                    );
+            
+                    victory.setStyle({ fill: colorString, stroke: colorString });
+                    coins_txt.setStyle({ fill: colorString, stroke: colorString });
+            
+                    if (value === 100) {
+                        colorIndex = nextColorIndex;
+                    }
+                }
+            });
 
 
-          setTimeout(() => {
-            use_controls = false; 
-            stop_match_timer()
-            console.log("start points screen")
-        }, 3000);
+            setTimeout(() => {
+                use_controls = false; 
+                stop_match_timer()
+            }, 3000);
 
-
+            color_tween.play();
         }
 
 
-        function runDefeat() {
+        function run_defeat() {
             const defeat = this.add.text(100, 200, 'DEFEAT', { fill: 'black', fontSize: '240px' ,strokeThickness: 10, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
             
             this.tweens.add({
@@ -384,8 +396,48 @@ export class Play extends Scene
             setTimeout(() => {
                 use_controls = false; 
                 stop_match_timer()
-                console.log("start points screen")
             }, 3000);
+        }
+
+
+        function show_coins(scene, coins_state, coins) {
+            let currentcoins = 0; 
+            
+            coins_txt = scene.add.text(75, 300, 'COINS ' + coins_state + ':\n' + currentcoins.toString(), { 
+                fill: 'black', 
+                fontSize: '45px', 
+                strokeThickness: 2, 
+                stroke: '#0f0', 
+                fontFamily: 'playwritereg', 
+                padding: { right: 50, left: 10, top: 10, bottom: 10 }
+            }).setAlpha(1);
+        
+            const duration = 2000; 
+            const interval = 50; 
+            const step = coins / (duration / interval); 
+        
+            const timer = scene.time.addEvent({
+                delay: interval,
+                callback: () => {
+                    currentcoins += step; 
+                    if (currentcoins >= coins) {
+                        currentcoins = coins; 
+                        timer.remove(); 
+                    }
+                    coins_txt.setText('COINS ' + coins_state + ':\n' + Math.floor(currentcoins).toString());
+                },
+                loop: true
+            });
+        
+            setTimeout(() => {
+               // if (color_tween) color_tween.stop();
+                coins_txt.destroy();
+                scene.scene.start('Menu');
+            }, 6000);
+
+
+            return coins_txt
+
         }
 
         let dict_match = {
@@ -1085,15 +1137,14 @@ export class Play extends Scene
 
                 if (Math.abs(dict_match["you_score"] - dict_match["opponent_score"]) >= 2) {
                     if (dict_match["you_score"] > dict_match["opponent_score"]) {
-                        gameData["gold_cpu"] = gameData["gold_cpu"] + gameData["offline_bet"]
-                        show_points(scene, 'WON', gameData["offline_bet"])
-                        console.log("You are the winner!");
-                        runVictory.call(scene)
+                        gameData["coins_cpu"] = gameData["coins_cpu"] + gameData["offline_bet"]
+                        show_coins(scene, 'WON', gameData["offline_bet"])
+                        run_victory.call(scene)
+                        
                     } else {
-                        gameData["gold_cpu"] = gameData["gold_cpu"] - gameData["offline_bet"]
-                        show_points(scene, 'LOST', gameData["offline_bet"])
-                        console.log("Your opponent is the winner!");
-                        runDefeat.call(scene)
+                        gameData["coins_cpu"] = gameData["coins_cpu"] - gameData["offline_bet"]
+                        show_coins(scene, 'LOST', gameData["offline_bet"])
+                        run_defeat.call(scene)
                     }
                 }
 
@@ -1126,39 +1177,13 @@ export class Play extends Scene
             start_match_timer(scene, false, false) 
 
         }
-        var points
+        
+        
+        
         
 
-        function show_points(scene, gold_state, gold) {
-            let currentGold = 0; 
-
-
-            points = scene.add.text(75, 300, 'GOLD ' + gold_state + ':\n' + currentGold.toString(), { 
-                fill: 'black', 
-                fontSize: '45px', 
-                strokeThickness: 2, 
-                stroke: '#0f0', 
-                fontFamily: 'playwritereg', 
-                padding: { right: 50, left: 10, top: 10, bottom: 10 }
-            })
-
-            const duration = 2000; 
-            const interval = 50; 
-            const step = gold / (duration / interval); 
-
-            const timer = scene.time.addEvent({
-                delay: interval,
-                callback: () => {
-                    currentGold += step; 
-                    if (currentGold >= gold) {
-                        currentGold = gold; 
-                        timer.remove(); 
-                    }
-                    points.setText('GOLD ' + gold_state + ':\n' + Math.floor(currentGold).toString());
-                },
-                loop: true
-            });
-    }
+       
+        
     
 
         function move_ball(player_name, position){

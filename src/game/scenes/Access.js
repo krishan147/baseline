@@ -263,22 +263,31 @@ export async function looking_for_game(playerDataPromise, bet) {
             'Authorization': `Bearer ${idToken}`
         };
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(playerData)
+        // Create a timeout promise
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Request timed out after 60 seconds')), 60000);
         });
+
+        // Race the fetch call with the timeout promise
+        const response = await Promise.race([
+            fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(playerData)
+            }),
+            timeoutPromise
+        ]);
 
         const responseData = await response.json();
 
         if (!response.ok) {
-            return 'Error here:', response.statusText;
+            return `Error here: ${response.statusText}`;
         }
 
         return responseData;
 
     } catch (error) {
         console.error('Error here:', error);
-        return 'Error here:', error;
+        return `Error here: ${error.message}`;
     }
 }

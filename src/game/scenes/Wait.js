@@ -20,17 +20,17 @@ export class Wait extends Scene {
 
         this.cameras.main.setBackgroundColor(0x000000);
 
-        const richTitle = this.add.text(150, 400, 'FINDING MATCH...', { 
+        const match_txt = this.add.text(75, 400, 'FINDING MATCH...', { 
             fill: '#0f0', 
             fontSize: '30px', 
             strokeThickness: 1, 
             stroke: '#0f0', 
             fontFamily: 'playwritereg', 
-            padding: { right: 55 } 
+            padding: { right: 65 } 
         });
 
         this.tweens.add({
-            targets: richTitle,
+            targets: match_txt,
             alpha: 0.25,                 
             duration: 750,             
             ease: 'Power2',
@@ -62,21 +62,27 @@ export class Wait extends Scene {
     
     
         try {
+            var response = await looking_for_game(gameData, gameData["online_bet"]);
+        
+            if (response?.Item?.data === "No match found") {
 
-            var response = await looking_for_game(gameData, gameData["online_bet"])
-            console.log("hello run play")
-            this.scene.start('Play');
-            console.log("heyheyhey")
+                match_txt.setText("NO MATCH FOUND.\n TRY AGAIN IN 1 MIN.")
 
+                setTimeout(() => {
+                    this.scene.start('Menu');
+                }, 3000);
+
+
+            } else if (response?.Item?.data === "Match Found") {
+                console.log("Match Found, redirecting to PlayOnline...");
+                this.scene.start('PlayOnline');
+            } else {
+                console.error("Unexpected response data:", response);
+            }
         } catch (error) {
-
-            console.log("nomatch", error)
-            this.scene.start('Nomatch');
+            console.error("Error occurred while looking for a game:", error);
         }
-
-
-
-
+        
     }
 
 }

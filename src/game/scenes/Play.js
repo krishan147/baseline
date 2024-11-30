@@ -2,7 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import Phaser from 'phaser';
-import { readLocally } from './Access.js'
+import { readLocally, patchPlayer, writeLocally } from './Access.js'
 
 export class Play extends Scene
 {
@@ -1137,12 +1137,16 @@ export class Play extends Scene
 
                 if (Math.abs(dict_match["you_score"] - dict_match["opponent_score"]) >= 2) {
                     if (dict_match["you_score"] > dict_match["opponent_score"]) {
-                        gameData["coins_cpu"] = gameData["coins_cpu"] + gameData["offline_bet"]
+                        gameData["gold_cpu"] = gameData["gold_cpu"] + gameData["offline_bet"]
+                        patchPlayer(gameData["playerId"], "gold_cpu", gameData["gold_cpu"])
+                        writeLocally(gameData)
                         show_coins(scene, 'WON', gameData["offline_bet"])
                         run_victory.call(scene)
                         
                     } else {
-                        gameData["coins_cpu"] = gameData["coins_cpu"] - gameData["offline_bet"]
+                        gameData["gold_cpu"] = gameData["gold_cpu"] - gameData["offline_bet"]
+                        patchPlayer(gameData["playerId"], "gold_cpu", gameData["gold_cpu"])
+                        writeLocally(gameData)
                         show_coins(scene, 'LOST', gameData["offline_bet"])
                         run_defeat.call(scene)
                     }

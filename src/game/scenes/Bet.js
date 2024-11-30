@@ -158,8 +158,6 @@ export class Bet extends Scene
 
                 bet_to_execute = parseInt(bet_to_execute);
 
-                console.log("bet_to_execute", bet_to_execute)
-
                 if (gameData["game_type"] == "offline_play"){
                     gameData["offline_bet"] = bet_to_execute
                 }

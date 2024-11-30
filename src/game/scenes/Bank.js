@@ -19,9 +19,17 @@ export class Bank extends Scene {
 
         this.cameras.main.setBackgroundColor(0x000000);
 
-        const title = this.add.text(50, 110, 'BANK', { fill: '#0f0', fontSize: '60px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0);
+        const title = this.add.text(50, 110, 'BANK DETAILS', { fill: '#0f0', fontSize: '40px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0);
 
-        const richTitle = this.add.text(150, 400, 'BANK', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg' });
+        const name_txt = this.add.text(50, 200, 'NAME:', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}});
+        const name = this.add.text(50, 250, gameData["playerName"], { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}});
+        const email_txt = this.add.text(50, 320, 'EMAIL:', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}});
+        const email = this.add.text(50, 370, gameData["email"], { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}});
+        const online_total_txt = this.add.text(50, 440, 'TOTAL ONLINE COINS:', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}});
+        const online_total = this.add.text(50, 500, gameData["gold_multi"], { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}});
+        const offline_total_txt = this.add.text(50, 570, 'TOTAL OFFLINE COINS:', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}});
+        const offline_total = this.add.text(50, 620, gameData["gold_cpu"], { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}});
+
 
         const backButton = this.add.text(350, 785, 'BACK', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
         .setInteractive()

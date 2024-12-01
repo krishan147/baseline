@@ -2,7 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import { readLocally } from './Access.js'
-import { looking_for_game } from './Access.js'
+import { look_for_game, does_game_exist } from './Access.js'
 
 
 export class Wait extends Scene {
@@ -59,29 +59,60 @@ export class Wait extends Scene {
             cancelButton.setStyle({ fill: '#0f0' });
         });
 
-    
-    
+
         try {
-            var response = await looking_for_game(gameData, gameData["online_bet"]);
-        
-            if (response?.Item?.data === "No match found") {
 
-                match_txt.setText("NO MATCH FOUND.\n TRY AGAIN IN 1 MIN.")
+            var response = await look_for_game(gameData, gameData["online_bet"]);
 
-                setTimeout(() => {
-                    this.scene.start('Menu');
-                }, 3000);
+            if (response?.Item?.data === "Finding match") {
+                var game_exist = does_game_exist()
 
-
-            } else if (response?.Item?.data === "Match Found") {
-                console.log("Match Found, redirecting to PlayOnline...");
-                this.scene.start('PlayOnline');
-            } else {
-                console.error("Unexpected response data:", response);
+                if (game_exist == 'true'){
+                    console.log("game does exist. we have a match")
+                } else {
+                    finding_game_failed(this)
+                }
+                
+            } else{
+                finding_game_failed(this)
             }
+
         } catch (error) {
-            console.error("Error occurred while looking for a game:", error);
+            finding_game_failed(this)
         }
+
+
+        function finding_game_failed(scene){
+            match_txt.setText("NO MATCH FOUND.\n TRY AGAIN IN 1 MIN.")
+
+            setTimeout(() => {
+                scene.scene.start('Menu');
+            }, 3000);
+        }
+
+    
+    
+        // try {
+        //     var response = await look_for_game(gameData, gameData["online_bet"]);
+        
+        //     if (response?.Item?.data === "No match found") {
+
+        //         match_txt.setText("NO MATCH FOUND.\n TRY AGAIN IN 1 MIN.")
+
+        //         setTimeout(() => {
+        //             this.scene.start('Menu');
+        //         }, 3000);
+
+
+        //     } else if (response?.Item?.data === "Match Found") {
+        //         console.log("Match Found, redirecting to PlayOnline...");
+        //         this.scene.start('PlayOnline');
+        //     } else {
+        //         console.error("Unexpected response data:", response);
+        //     }
+        // } catch (error) {
+        //     console.error("Error occurred while looking for a game:", error);
+        // }
         
     }
 

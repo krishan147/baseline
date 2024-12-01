@@ -244,7 +244,7 @@ function create_unique_id() {
     return Math.random().toString().slice(2) + Date.now().toString() + Math.random().toString().slice(2);
 }
 
-export async function looking_for_game(playerDataPromise, bet) {
+export async function look_for_game(playerDataPromise, bet) {
     try {
         const playerData = await playerDataPromise;
         const { idToken } = await getToken();
@@ -263,12 +263,10 @@ export async function looking_for_game(playerDataPromise, bet) {
             'Authorization': `Bearer ${idToken}`
         };
 
-        // Create a timeout promise
         const timeoutPromise = new Promise((_, reject) => {
             setTimeout(() => reject(new Error('Request timed out after 60 seconds')), 60000);
         });
 
-        // Race the fetch call with the timeout promise
         const response = await Promise.race([
             fetch(url, {
                 method: 'POST',
@@ -290,4 +288,11 @@ export async function looking_for_game(playerDataPromise, bet) {
         console.error('Error here:', error);
         return `Error here: ${error.message}`;
     }
+}
+
+
+export async function does_game_exist(){
+
+    console.log("running does game exist")
+
 }

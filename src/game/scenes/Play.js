@@ -2,7 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import Phaser from 'phaser';
-import { readLocally, patchPlayer, writeLocally } from './Access.js'
+import { readLocally, patch_player, writeLocally } from './Access.js'
 
 export class Play extends Scene
 {
@@ -500,7 +500,7 @@ export class Play extends Scene
         let player_sprite = createBotSprite(this, "1_female_idle_right", 340, 590, 0x00FF00, 0.45);
         player_sprite.play("1_female_idle_right");
 
-        let opponent_sprite = createBotSprite(this, "2_female_idle_left", 140, 260, 0x00FF00, 0.4);
+        let opponent_sprite = createBotSprite(this, "2_female_idle_left", 140, 260, 0xFF5C5C, 0.4);
         opponent_sprite.play("2_female_idle_left");
 
         function opponent_goes_right(scene){
@@ -1138,14 +1138,14 @@ export class Play extends Scene
                 if (Math.abs(dict_match["you_score"] - dict_match["opponent_score"]) >= 2) {
                     if (dict_match["you_score"] > dict_match["opponent_score"]) {
                         gameData["gold_cpu"] = gameData["gold_cpu"] + gameData["offline_bet"]
-                        patchPlayer(gameData["playerId"], "gold_cpu", gameData["gold_cpu"])
+                        patch_player(gameData["playerId"], "gold_cpu", gameData["gold_cpu"])
                         writeLocally(gameData)
                         show_coins(scene, 'WON', gameData["offline_bet"])
                         run_victory.call(scene)
                         
                     } else {
                         gameData["gold_cpu"] = gameData["gold_cpu"] - gameData["offline_bet"]
-                        patchPlayer(gameData["playerId"], "gold_cpu", gameData["gold_cpu"])
+                        patch_player(gameData["playerId"], "gold_cpu", gameData["gold_cpu"])
                         writeLocally(gameData)
                         show_coins(scene, 'LOST', gameData["offline_bet"])
                         run_defeat.call(scene)

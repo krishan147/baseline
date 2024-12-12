@@ -207,7 +207,7 @@ export async function postPlayer(playerDataPromise) {
 }
 
 
-export async function patchPlayer(playerId, updateKey, updateValue) {
+export async function patch_player(playerId, updateKey, updateValue) {
 
     const { idToken } = await getToken()
 
@@ -244,18 +244,25 @@ function create_unique_id() {
     return Math.random().toString().slice(2) + Date.now().toString() + Math.random().toString().slice(2);
 }
 
-export async function look_for_game(playerDataPromise, bet) {
+let multiplayer_player_id
+let playerData
+let tries = 0
+
+export async function post_game(playerDataPromise, bet) {
     try {
-        const playerData = await playerDataPromise;
+        playerData = await playerDataPromise;
         const { idToken } = await getToken();
 
-        playerData["id"] = create_unique_id();
+        multiplayer_player_id = create_unique_id();
+
+        playerData["id"] = multiplayer_player_id;
         playerData["bet"] = bet;
         playerData["game"] = "finding_game";
         playerData["datetime"] = new Date().toISOString();
         playerData["against_player_name"] = "";
         playerData["against_player_id"] = "";
         playerData["session_id"] = "";
+        playerData["tries"] = 0;
 
         const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame';
         const headers = {
@@ -290,6 +297,45 @@ export async function look_for_game(playerDataPromise, bet) {
     }
 }
 
+
+export async function get_game(){
+
+    const { idToken } = await getToken()
+    
+    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame?multiplayer_player_id=' + playerData['id'];
+
+    const headers = {
+        'Content-Type': 'application/json',
+        "Authorization": `Bearer ${idToken}`
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: headers
+        });
+
+
+        console.log(response);
+
+        if (!response.ok) {
+           return "no data found";
+        }
+
+        const data = await response.json();
+    
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+    
+}
+
+
+export async function put_game(){
+    
+}
 
 export async function does_game_exist(){
 

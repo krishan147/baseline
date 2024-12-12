@@ -2,8 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import Phaser from 'phaser';
-import { readLocally, writeLocally, patchPlayer } from './Access.js'
-import { looking_for_game } from './Access.js'
+import { readLocally, writeLocally, patch_player } from './Access.js'
 
 export class Bet extends Scene
 {
@@ -194,11 +193,12 @@ export class Bet extends Scene
             var game_type = gameData["game_type"]
 
             if (gameData["game_type"] == "offline_play"){
-                patchPlayer(gameData["playerId"], "offline_bet", gameData["offline_bet"])
+                
+                patch_player(gameData["playerId"], "offline_bet", gameData["offline_bet"])
             }
 
             if (gameData["game_type"] == "online_play"){
-                patchPlayer(gameData["playerId"], "online_bet", gameData["online_bet"])
+                patch_player(gameData["playerId"], "online_bet", gameData["online_bet"])
             }
 
             if (game_type == "online_play"){

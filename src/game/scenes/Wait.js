@@ -2,7 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import { readLocally } from './Access.js'
-import { look_for_game, does_game_exist } from './Access.js'
+import { post_game, does_game_exist, get_game } from './Access.js'
 
 
 export class Wait extends Scene {
@@ -61,21 +61,33 @@ export class Wait extends Scene {
 
 
         try {
-
-            var response = await look_for_game(gameData, gameData["online_bet"]);
-
-            if (response?.Item?.data === "Finding match") {
-                var game_exist = does_game_exist()
-
-                if (game_exist == 'true'){
-                    console.log("game does exist. we have a match")
-                } else {
-                    finding_game_failed(this)
-                }
+            const response = await post_game(gameData, gameData["online_bet"]);
+            for (let attempt = 0; attempt < 3; attempt++) {
                 
-            } else{
-                finding_game_failed(this)
+                if (response?.Item?.data === "Finding game") {
+                    const game_data = await get_game();
+        
+                    if (game_data["game"] === "found_game") {
+                        console.log("Game found:", game_data);
+                        this.scene.start('PlayOnline');
+                        return game_data; 
+                    } else {
+                        console.log("No game found, retrying...");
+                    }
+                } else {
+                    console.log("Response did not indicate 'Finding game'.");
+                    finding_game_failed(this)
+                    break;
+                }
+        
+                if (attempt < 2) {
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                }
             }
+            
+            console.log("Game not found after 3 attempts.");
+            finding_game_failed(this)
+            return null;
 
         } catch (error) {
             finding_game_failed(this)
@@ -89,30 +101,6 @@ export class Wait extends Scene {
                 scene.scene.start('Menu');
             }, 3000);
         }
-
-    
-    
-        // try {
-        //     var response = await look_for_game(gameData, gameData["online_bet"]);
-        
-        //     if (response?.Item?.data === "No match found") {
-
-        //         match_txt.setText("NO MATCH FOUND.\n TRY AGAIN IN 1 MIN.")
-
-        //         setTimeout(() => {
-        //             this.scene.start('Menu');
-        //         }, 3000);
-
-
-        //     } else if (response?.Item?.data === "Match Found") {
-        //         console.log("Match Found, redirecting to PlayOnline...");
-        //         this.scene.start('PlayOnline');
-        //     } else {
-        //         console.error("Unexpected response data:", response);
-        //     }
-        // } catch (error) {
-        //     console.error("Error occurred while looking for a game:", error);
-        // }
         
     }
 

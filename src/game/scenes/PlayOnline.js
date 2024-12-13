@@ -2,7 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import Phaser from 'phaser';
-import { readLocally, patch_player, writeLocally } from './Access.js'
+import { readLocally, patch_player, writeLocally, get_game_w_session_id} from './Access.js'
 
 export class PlayOnline extends Scene
 {
@@ -1227,9 +1227,22 @@ export class PlayOnline extends Scene
         var racketcap = this.add.image(250, 425, 'racketcap');
         racketcap.scale = 0.25;
         racketcap.alpha = 0;
+
+        let multiplayer_data
+        let session_id
         
       
-        function spin_racket(scene) {
+        async function spin_racket(scene) {
+
+            multiplayer_data = await get_game_w_session_id()
+
+            let playerDataString = localStorage.getItem('playerData');
+            let playerData = JSON.parse(playerDataString);
+
+            console.log("playerData", playerData)
+            console.log("session_id is here", playerData["session_id"])
+
+
             var list_who_goes_first = ["you","opponent"];
             var random =  Math.floor((Math.random() * list_who_goes_first.length));
             who_goes_first = list_who_goes_first[random];

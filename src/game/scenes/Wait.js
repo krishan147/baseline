@@ -2,7 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import { readLocally } from './Access.js'
-import { post_game, does_game_exist, get_game } from './Access.js'
+import { post_game, get_game } from './Access.js'
 
 
 export class Wait extends Scene {

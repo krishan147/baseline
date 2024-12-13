@@ -263,6 +263,7 @@ export async function post_game(playerDataPromise, bet) {
         playerData["against_player_id"] = "";
         playerData["session_id"] = "";
         playerData["tries"] = 0;
+        playerData["entered_game"] = 0;
 
         const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame';
         const headers = {
@@ -301,6 +302,8 @@ export async function post_game(playerDataPromise, bet) {
 export async function get_game(){
 
     const { idToken } = await getToken()
+
+    console.log(playerData)
     
     const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame?multiplayer_player_id=' + playerData['id'];
 
@@ -323,13 +326,51 @@ export async function get_game(){
         }
 
         const data = await response.json();
+
+        let playerData_string = JSON.stringify(data);
+        localStorage.setItem('playerData', playerData_string);
     
         return data;
     } catch (error) {
         console.error('Error:', error);
         throw error;
-    }
+    } 
+}
+
+let session_id
+
+export async function get_game_w_session_id(){
+
+    const { idToken } = await getToken()
+
+    console.log("playerData", playerData)
+
+    session_id = playerData['session_id']
     
+    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame?session_id=' + session_id;
+
+    const headers = {
+        'Content-Type': 'application/json',
+        "Authorization": `Bearer ${idToken}`
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: headers
+        });
+
+        if (!response.ok) {
+           return "no data found";
+        }
+
+        const data = await response.json();
+    
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    } 
 }
 
 

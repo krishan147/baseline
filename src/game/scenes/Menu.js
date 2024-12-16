@@ -1,7 +1,7 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
-import { readLocally, writeLocally } from './Access.js'
+import { readLocally, writeLocally, get_game_w_session_id } from './Access.js'
 
 var game_version = 'v0.112'
 

@@ -1227,26 +1227,12 @@ export class PlayOnline extends Scene
         var racketcap = this.add.image(250, 425, 'racketcap');
         racketcap.scale = 0.25;
         racketcap.alpha = 0;
-
-        let multiplayer_data
-        let session_id
-        
       
         async function spin_racket(scene) {
-
-            multiplayer_data = await get_game_w_session_id()
-
-            let playerDataString = localStorage.getItem('playerData');
-            let playerData = JSON.parse(playerDataString);
-
-            console.log("playerData", playerData)
-            console.log("session_id is here", playerData["session_id"])
-
 
             var list_who_goes_first = ["you","opponent"];
             var random =  Math.floor((Math.random() * list_who_goes_first.length));
             who_goes_first = list_who_goes_first[random];
-            ball_possession = list_who_goes_first[random];
             ball_possession = who_goes_first 
 
             dict_match["ball_possession"] = ball_possession
@@ -1294,7 +1280,26 @@ export class PlayOnline extends Scene
             return who_goes_first
         }
 
-        start_game(this)
+        check_both_players_in_game(this)
+
+        async function check_both_players_in_game(scene) {
+            for (let i = 0; i < 5; i++) {
+                let multiplayer_data = await get_game_w_session_id();
+                
+                if (multiplayer_data.length === 2) {
+                    start_game(scene);
+                    return;
+                }
+        
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        
+            console.log("Both players did not join within the time limit.");
+            scene.scene.start('Menu');
+        }
+        
+
+        
 
         function start_game(scene){
             who_goes_first = spin_racket(scene)            

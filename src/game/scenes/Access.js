@@ -108,8 +108,6 @@ export async function getPlayer(playerName){
 
     const { idToken } = await getToken()
 
-    console.log("token herer", idToken)
-
     const headers = {
         'Content-Type': 'application/json',
         "Authorization": `Bearer ${idToken}`
@@ -302,8 +300,6 @@ export async function post_game(playerDataPromise, bet) {
 export async function get_game(){
 
     const { idToken } = await getToken()
-
-    console.log(playerData)
     
     const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame?multiplayer_player_id=' + playerData['id'];
 
@@ -317,9 +313,6 @@ export async function get_game(){
             method: 'GET',
             headers: headers
         });
-
-
-        console.log(response);
 
         if (!response.ok) {
            return "no data found";
@@ -343,11 +336,12 @@ export async function get_game_w_session_id(){
 
     const { idToken } = await getToken()
 
-    console.log("playerData", playerData)
+    playerData = localStorage.getItem('playerData');
+    playerData = JSON.parse(playerData);
 
-    session_id = playerData['session_id']
+    session_id = playerData['session_id'] // krishan change this back after testing
     
-    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame?session_id=' + session_id;
+    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame?session_id=' + session_id //session_id; Cwi9dDmzyrkrishan change this back after testing
 
     const headers = {
         'Content-Type': 'application/json',
@@ -365,7 +359,7 @@ export async function get_game_w_session_id(){
         }
 
         const data = await response.json();
-    
+
         return data;
     } catch (error) {
         console.error('Error:', error);

@@ -81,7 +81,7 @@ export class Wait extends Scene {
                 }
         
                 if (attempt < 2) {
-                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    await new Promise(resolve => setTimeout(resolve, 2000)); // perhaps lowering seconds will help match krishan
                 }
             }
             

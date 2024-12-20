@@ -339,9 +339,9 @@ export async function get_game_w_session_id(){
     playerData = localStorage.getItem('playerData');
     playerData = JSON.parse(playerData);
 
-    session_id = playerData['session_id'] // krishan change this back after testing
+    session_id = playerData['session_id']
     
-    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame?session_id=' + session_id //session_id; Cwi9dDmzyrkrishan change this back after testing
+    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame?session_id=' + session_id
 
     const headers = {
         'Content-Type': 'application/json',
@@ -368,8 +368,81 @@ export async function get_game_w_session_id(){
 }
 
 
-export async function put_game(){
+export async function get_play(session_id){
+
+    const { idToken } = await getToken()
+
+    playerData = localStorage.getItem('playerData');
+    playerData = JSON.parse(playerData);
+
+    session_id = playerData['session_id']
     
+    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame?type=play&session_id=' + session_id;
+
+    const headers = {
+        'Content-Type': 'application/json',
+        "Authorization": `Bearer ${idToken}`
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: headers
+        });
+
+        if (!response.ok) {
+           return "no data found";
+        }
+
+        const data = await response.json();
+
+        console.log(data);
+
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    } 
+}
+
+export async function post_play(dict_match){
+    try {
+
+        const { idToken } = await getToken();
+
+        const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/lookingforgame?type=play';
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+        };
+
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Request timed out after 60 seconds')), 60000);
+        });
+
+        const response = await Promise.race([
+            fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(dict_match)
+            }),
+            timeoutPromise
+        ]);
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+            return `Error here: ${response.statusText}`;
+        }
+
+        console.log(responseData);
+
+        return responseData;
+
+    } catch (error) {
+        console.error('Error here:', error);
+        return `Error here: ${error.message}`;
+    }
 }
 
 export async function does_game_exist(){

@@ -457,7 +457,11 @@ export class PlayOnline extends Scene
             "match_ball_possession":"you",
             "ball_position":"right",
             "ball_position_new":"right",
-            "cpu":true
+            "cpu":true,
+            "winner":null,
+            "loser":null,
+            "forfeit":null,
+            "session_id":null
         }
 
         if (gameData["game_type"] == "online_play"){ // krishan need to work here
@@ -1282,12 +1286,20 @@ export class PlayOnline extends Scene
 
         check_both_players_in_game(this)
 
-        async function check_both_players_in_game(scene) {
+        async function check_both_players_in_game(scene) { // krishan youre working here
             for (let i = 0; i < 5; i++) {
                 let multiplayer_data = await get_game_w_session_id();
+
+                console.log("multiplayer_data", multiplayer_data)
                 
                 if (multiplayer_data.length === 2) {
-                    start_game(scene);
+
+                    //post_play(dict_match)
+                    //get_play(session_id) hook up these two tables
+
+                    // now we pull PLAY TABLE DATA
+
+                  //  start_game(scene);
                     return;
                 }
         

@@ -239,11 +239,11 @@ export class Menu extends Scene
     }
 
     //testing button
-    const testButton = this.add.text(300, 720, 'TEST', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
-    .setInteractive()
-    .on('pointerdown', () => {
-        post_play(dict_match)
-    });
+    // const testButton = this.add.text(300, 720, 'TEST', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+    // .setInteractive()
+    // .on('pointerdown', () => {
+    //     post_play(dict_match)
+    // });
 
     
 

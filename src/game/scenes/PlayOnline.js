@@ -2,7 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import Phaser from 'phaser';
-import { readLocally, patch_player, writeLocally, get_game_w_session_id} from './Access.js'
+import { readLocally, patch_player, writeLocally, get_game_w_session_id, get_play} from './Access.js'
 
 export class PlayOnline extends Scene
 {
@@ -441,9 +441,11 @@ export class PlayOnline extends Scene
         }
 
         let dict_match = {
-            "id":12345,
+            "id":"12345",
             "you":"name",
             "opponent":"name",
+            "you_id":"name",
+            "opponent_id":"name",
             "you_position":"right",
             "opponent_position":"left",
             "you_last_position": "right",
@@ -1290,14 +1292,27 @@ export class PlayOnline extends Scene
             for (let i = 0; i < 5; i++) {
                 let multiplayer_data = await get_game_w_session_id();
 
-                console.log("multiplayer_data", multiplayer_data)
+                
                 
                 if (multiplayer_data.length === 2) {
+                    
+
+
+
+
+                    let session_id = multiplayer_data[0]["session_id"]
+                    let play_data = await get_play(session_id)
+
+                    console.log("play_data", play_data)
+
+                    // next we need to get the play data and decide who is you and who is opponent?
 
                     //post_play(dict_match)
                     //get_play(session_id) hook up these two tables
 
-                    // now we pull PLAY TABLE DATA
+                    // now we pull PLAY TABLE DATA 
+
+                  
 
                   //  start_game(scene);
                     return;

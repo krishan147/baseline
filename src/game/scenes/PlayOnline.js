@@ -762,7 +762,7 @@ export class PlayOnline extends Scene
         }
 
         var who_goes_first
-        var ball_possession
+        let ball_possession
 
         function with_ball(scene, ball_position, button, ball_possession, player_name, past){
 
@@ -1234,12 +1234,10 @@ export class PlayOnline extends Scene
         racketcap.scale = 0.25;
         racketcap.alpha = 0;
       
-        async function spin_racket(scene) {
+        async function spin_racket(scene, ball_possession) { // depending on who "you" is , arrow points down or up. need a new variable
 
-            var list_who_goes_first = ["you","opponent"];
-            var random =  Math.floor((Math.random() * list_who_goes_first.length));
-            who_goes_first = list_who_goes_first[random];
-            ball_possession = who_goes_first 
+            who_goes_first = ball_possession;
+            ball_possession = who_goes_first; 
 
             dict_match["ball_possession"] = ball_possession
             dict_match["match_ball_possession"] = ball_possession
@@ -1292,18 +1290,13 @@ export class PlayOnline extends Scene
             for (let i = 0; i < 5; i++) {
                 let multiplayer_data = await get_game_w_session_id();
 
-                
-                
                 if (multiplayer_data.length === 2) {
                     
-
-
-
-
                     let session_id = multiplayer_data[0]["session_id"]
                     let play_data = await get_play(session_id)
 
                     console.log("play_data", play_data)
+                    ball_possession = play_data["ball_possession"]
 
                     // next we need to get the play data and decide who is you and who is opponent?
 
@@ -1312,9 +1305,7 @@ export class PlayOnline extends Scene
 
                     // now we pull PLAY TABLE DATA 
 
-                  
-
-                  //  start_game(scene);
+                    start_game(scene, ball_possession);
                     return;
                 }
         
@@ -1328,8 +1319,8 @@ export class PlayOnline extends Scene
 
         
 
-        function start_game(scene){
-            who_goes_first = spin_racket(scene)            
+        function start_game(scene, ball_possession){ 
+            who_goes_first = spin_racket(scene, ball_possession)            
         }
 
         function countdown(scene) {

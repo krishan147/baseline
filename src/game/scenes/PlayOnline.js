@@ -1188,15 +1188,11 @@ export class PlayOnline extends Scene
 
         }
         
-        
-        
-        
-
-       
-        
-    
-
         function move_ball(player_name, position){
+
+
+            console.log("player_name", player_name)
+            console.log("position", position)
 
             dict_match["ball_position"] = position
             var ball_x
@@ -1233,11 +1229,24 @@ export class PlayOnline extends Scene
         var racketcap = this.add.image(250, 425, 'racketcap');
         racketcap.scale = 0.25;
         racketcap.alpha = 0;
+        let racket_cap
+        let player_name
+        let play_data_ball_possession_name //ridiculous
       
-        async function spin_racket(scene, ball_possession) { // depending on who "you" is , arrow points down or up. need a new variable
+        async function spin_racket(scene, play_data) { // depending on who "you" is , arrow points down or up. need a new variable
+
+            player_name = gameData["playerName"]
+            play_data_ball_possession_name = play_data[0][play_data[0]["ball_possession"]]
+
+            if (player_name === play_data_ball_possession_name){
+                ball_possession = "you"
+            }else {
+                ball_possession = "opponent"
+            }
+
+            console.log("ball_possession", ball_possession)
 
             who_goes_first = ball_possession;
-            ball_possession = who_goes_first; 
 
             dict_match["ball_possession"] = ball_possession
             dict_match["match_ball_possession"] = ball_possession
@@ -1268,7 +1277,7 @@ export class PlayOnline extends Scene
                 ease: 'Linear',
                 onComplete: () => {
                     create_ball()
-                    move_ball(who_goes_first, dict_match["ball_position"])
+                    move_ball(ball_possession, dict_match["ball_position"])
                     countdown(scene)
                     scene.time.delayedCall(2000, () => { 
                         scene.tweens.add({
@@ -1295,7 +1304,6 @@ export class PlayOnline extends Scene
                     let session_id = multiplayer_data[0]["session_id"]
                     let play_data = await get_play(session_id)
 
-                    console.log("play_data", play_data)
                     ball_possession = play_data["ball_possession"]
 
                     // next we need to get the play data and decide who is you and who is opponent?
@@ -1305,7 +1313,7 @@ export class PlayOnline extends Scene
 
                     // now we pull PLAY TABLE DATA 
 
-                    start_game(scene, ball_possession);
+                    start_game(scene, play_data);
                     return;
                 }
         
@@ -1319,8 +1327,8 @@ export class PlayOnline extends Scene
 
         
 
-        function start_game(scene, ball_possession){ 
-            who_goes_first = spin_racket(scene, ball_possession)            
+        function start_game(scene, play_data){ 
+            who_goes_first = spin_racket(scene, play_data)            
         }
 
         function countdown(scene) {
@@ -1394,7 +1402,7 @@ export class PlayOnline extends Scene
         //    const ball = scene.add.sprite(ball_x, ball_y);
             ball_graphics.fillStyle(0xFFFF00, 1);
             ball_graphics.fillCircle(0, 0, 5);
-            //   ball_graphics.setPosition(ball_x, ball_y);
+            ball_graphics.setPosition(-50, -50); // krishan you just added this
             ball_graphics.alpha = 1
         }
 

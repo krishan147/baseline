@@ -417,7 +417,7 @@ export async function post_play(dict_match){
         };
 
         const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Request timed out after 60 seconds')), 60000);
+            setTimeout(() => reject(new Error('Request timed out after 20 seconds')), 20000);
         });
 
         const response = await Promise.race([
@@ -435,7 +435,7 @@ export async function post_play(dict_match){
             return `Error here: ${response.statusText}`;
         }
 
-        console.log(responseData);
+        console.log("access.js responseData", responseData);
 
         return responseData;
 

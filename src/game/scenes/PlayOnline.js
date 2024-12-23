@@ -2,7 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import Phaser from 'phaser';
-import { readLocally, patch_player, writeLocally, get_game_w_session_id, get_play} from './Access.js'
+import { readLocally, patch_player, writeLocally, get_game_w_session_id, get_play, post_play} from './Access.js'
 
 export class PlayOnline extends Scene
 {
@@ -171,6 +171,7 @@ export class PlayOnline extends Scene
         var str_coins = gameData["coins_cpu"]
         var game_type = gameData["game_type"]
         var opponent_name = 'CPU'
+        let session_id
 
         const grassImages = [];
         const startX = 55; 
@@ -578,26 +579,10 @@ export class PlayOnline extends Scene
 
         }
 
-        // const right_opponent = this.add.text(340, 140, 'RIGHT', { 
-        // })
-        // .setInteractive()
-        // .on('pointerdown', () => {
-        //   decision_made(this, "opponent", true, "right")
-
-        // });
-
-        // const left_opponent = this.add.text(240, 140, 'LEFT', { 
-        // })
-        // .setInteractive()
-        // .on('pointerdown', () => {
-        //   decision_made(this, "opponent", true, "left")
-        // });
-
         var use_controls = false
+        let play_data
+        let multiplayer_data
 
-
-
-       
         const right = this.add.text(340, 740, 'RIGHT', { 
             fill: '#0f0', 
             fontSize: '30px', 
@@ -607,7 +592,7 @@ export class PlayOnline extends Scene
             padding: { right: 35 }
         })
         .setInteractive()
-        .on('pointerdown', () => {
+        .on('pointerdown', async () => {
             if (use_controls) { 
 
 
@@ -615,13 +600,15 @@ export class PlayOnline extends Scene
 
                     right.setStyle({ fill: '#ffff00' });
                     decision_made(this, "you", true, "right");
-                    cpu_decision(this);
+
+                    dict_match = edit_dict_match_opponent(dict_match)
+
+                    console.log("right dict_match", dict_match)
+
+                    await post_play(dict_match)
+                    check_opponent_decision(this)
 
                 }
-
-            //    this.time.delayedCall(200, () => {
-            //        right.setStyle({ fill: '#0f0' });
-            //    });
             }
         });
         
@@ -635,36 +622,44 @@ export class PlayOnline extends Scene
             padding: { right: 35 }
         })
         .setInteractive()
-        .on('pointerdown', () => {
+        .on('pointerdown', async () => {
             if (use_controls) { 
 
                 if (dict_match["you_decided"] == false){
 
                     left.setStyle({ fill: '#ffff00' });
                     decision_made(this, "you", true, "left");
-                    cpu_decision(this);
+
+                    dict_match = edit_dict_match_opponent(dict_match)
+
+                    console.log("left dict_match", dict_match)
+
+                    await post_play(dict_match)
+                    check_opponent_decision(this);
 
                 }
-
-                
-                // this.time.delayedCall(200, () => {
-                //     left.setStyle({ fill: '#0f0' });  //'#0f0'
-                // });
             }
         });
 
+        function edit_dict_match_opponent(dict_match){ //krishan here
 
+            const play_data_earliest_row = play_data.reduce((earliest, current) => {
+                return new Date(current.datetime) < new Date(earliest.datetime) ? current : earliest;
+            });
 
-    
+            dict_match["opponent"] = play_data_earliest_row["against_player_name"]
+            dict_match["opponent_id"] = play_data_earliest_row["against_player_id"]
 
+            return dict_match
+        }
 
-        
+        async function check_opponent_decision(scene){
 
-        function cpu_decision(scene){
-            if (dict_match["cpu"] == true){
-                let random_direction = Math.random() < 0.5 ? "left" : "right";
-                decision_made(scene, "opponent", true, random_direction)
-            }
+            session_id = multiplayer_data[0]["session_id"]
+            play_data = await get_play(session_id)
+
+         //   decision_made(scene, "opponent", true, random_direction)
+
         }
 
         let score_username_fig = 0
@@ -712,25 +707,8 @@ export class PlayOnline extends Scene
     
                 }
 
-                if (dict_match["cpu"] == true){
-
-                    scene.time.delayedCall(200, () => {
-                        right.setStyle({ fill: '#0f0' });
-                    });
-    
-                    scene.time.delayedCall(200, () => {
-                        left.setStyle({ fill: '#0f0' });  //'#0f0'
-                    });
-
-                } else {
-
-                    left.setStyle({ fill: '#0f0' });
-                    right.setStyle({ fill: '#0f0' });
-
-                }
-
-
-
+                left.setStyle({ fill: '#0f0' });
+                right.setStyle({ fill: '#0f0' });
 
                 player_action(scene, dict_match["ball_position"], dict_match["ball_position_new"], dict_match["ball_possession"], ball_possession_name, past);
                 player_action(scene, dict_match["ball_position"], dict_match[no_ball_name + "_position"], dict_match["ball_possession"], no_ball_name, past);
@@ -965,12 +943,7 @@ export class PlayOnline extends Scene
 
                     if (dict_match["opponent_decided"] == false){
 
-
-                        if (dict_match["cpu"] == true){
-                            cpu_decision(scene);
-                        } else {
-                            decision_made(scene, "opponent", true, dict_match["opponent_last_position"])
-                        }
+                        check_opponent_decision(scene)
                         
                     }
 
@@ -1190,10 +1163,6 @@ export class PlayOnline extends Scene
         
         function move_ball(player_name, position){
 
-
-            console.log("player_name", player_name)
-            console.log("position", position)
-
             dict_match["ball_position"] = position
             var ball_x
             var ball_y
@@ -1233,18 +1202,16 @@ export class PlayOnline extends Scene
         let player_name
         let play_data_ball_possession_name //ridiculous
       
-        async function spin_racket(scene, play_data) { // depending on who "you" is , arrow points down or up. need a new variable
+        async function spin_racket(scene, dict_match) { // depending on who "you" is , arrow points down or up. need a new variable
 
             player_name = gameData["playerName"]
-            play_data_ball_possession_name = play_data[0][play_data[0]["ball_possession"]]
+            play_data_ball_possession_name = dict_match[dict_match["ball_possession"]]
 
             if (player_name === play_data_ball_possession_name){
                 ball_possession = "you"
             }else {
                 ball_possession = "opponent"
             }
-
-            console.log("ball_possession", ball_possession)
 
             who_goes_first = ball_possession;
 
@@ -1294,17 +1261,23 @@ export class PlayOnline extends Scene
         }
 
         check_both_players_in_game(this)
+        
 
-        async function check_both_players_in_game(scene) { // krishan youre working here
+        async function check_both_players_in_game(scene) { 
             for (let i = 0; i < 5; i++) {
-                let multiplayer_data = await get_game_w_session_id();
+                multiplayer_data = await get_game_w_session_id();
 
                 if (multiplayer_data.length === 2) {
                     
-                    let session_id = multiplayer_data[0]["session_id"]
-                    let play_data = await get_play(session_id)
+                    session_id = multiplayer_data[0]["session_id"]
+                    play_data = await get_play(session_id)
+                    dict_match = play_data.reduce((latest, current) => {
+                        return new Date(current.datetime) > new Date(latest.datetime) ? current : latest;
+                    });
 
-                    ball_possession = play_data["ball_possession"]
+
+
+                  //  ball_possession = play_data["ball_possession"]
 
                     // next we need to get the play data and decide who is you and who is opponent?
 
@@ -1313,7 +1286,7 @@ export class PlayOnline extends Scene
 
                     // now we pull PLAY TABLE DATA 
 
-                    start_game(scene, play_data);
+                    start_game(scene, dict_match);
                     return;
                 }
         
@@ -1327,8 +1300,8 @@ export class PlayOnline extends Scene
 
         
 
-        function start_game(scene, play_data){ 
-            who_goes_first = spin_racket(scene, play_data)            
+        function start_game(scene, dict_match){ 
+            who_goes_first = spin_racket(scene, dict_match)            
         }
 
         function countdown(scene) {
@@ -1402,7 +1375,7 @@ export class PlayOnline extends Scene
         //    const ball = scene.add.sprite(ball_x, ball_y);
             ball_graphics.fillStyle(0xFFFF00, 1);
             ball_graphics.fillCircle(0, 0, 5);
-            ball_graphics.setPosition(-50, -50); // krishan you just added this
+            ball_graphics.setPosition(-50, -50); 
             ball_graphics.alpha = 1
         }
 

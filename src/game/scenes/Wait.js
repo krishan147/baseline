@@ -68,7 +68,6 @@ export class Wait extends Scene {
                     const game_data = await get_game();
         
                     if (game_data["game"] === "found_game") {
-                        console.log("Game found:", game_data);
                         this.scene.start('PlayOnline');
                         return game_data; 
                     } else {
@@ -81,7 +80,7 @@ export class Wait extends Scene {
                 }
         
                 if (attempt < 2) {
-                    await new Promise(resolve => setTimeout(resolve, 2000)); // perhaps lowering seconds will help match krishan
+                    await new Promise(resolve => setTimeout(resolve, 2000)); 
                 }
             }
             

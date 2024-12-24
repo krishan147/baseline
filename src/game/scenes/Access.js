@@ -396,8 +396,6 @@ export async function get_play(session_id){
 
         const data = await response.json();
 
-        console.log(data);
-
         return data;
     } catch (error) {
         console.error('Error:', error);
@@ -407,6 +405,12 @@ export async function get_play(session_id){
 
 export async function post_play(dict_match){
     try {
+
+        console.log("making the post play request")
+
+        const id_play = generateRandomId();
+
+        dict_match["id"] = id_play
 
         const { idToken } = await getToken();
 
@@ -435,8 +439,6 @@ export async function post_play(dict_match){
             return `Error here: ${response.statusText}`;
         }
 
-        console.log("access.js responseData", responseData);
-
         return responseData;
 
     } catch (error) {
@@ -449,4 +451,13 @@ export async function does_game_exist(){
 
     console.log("running does game exist")
 
+}
+
+function generateRandomId() {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let idPlay = '';
+    for (let i = 0; i < 10; i++) {
+        idPlay += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return idPlay;
 }

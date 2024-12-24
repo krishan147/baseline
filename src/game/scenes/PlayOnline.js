@@ -601,12 +601,12 @@ export class PlayOnline extends Scene
                     right.setStyle({ fill: '#ffff00' });
                     decision_made(this, "you", true, "right");
 
-                    dict_match = edit_dict_match_opponent(dict_match)
+                 //   dict_match = edit_dict_match_opponent(dict_match)
 
                     console.log("right dict_match", dict_match)
 
-                    await post_play(dict_match)
-                    check_opponent_decision(this)
+                    await post_play(dict_match) // krishan something wrong here
+                  //  check_opponent_decision(this)
 
                 }
             }
@@ -630,12 +630,12 @@ export class PlayOnline extends Scene
                     left.setStyle({ fill: '#ffff00' });
                     decision_made(this, "you", true, "left");
 
-                    dict_match = edit_dict_match_opponent(dict_match)
+                  //  dict_match = edit_dict_match_opponent(dict_match)
 
-                    console.log("left dict_match", dict_match)
+                    console.log("left dict_match", dict_match) // krishan something wrong here
 
                     await post_play(dict_match)
-                    check_opponent_decision(this);
+                  //  check_opponent_decision(this);
 
                 }
             }
@@ -910,7 +910,7 @@ export class PlayOnline extends Scene
 
 
 
-        function start_match_timer(scene, you_decided, opponent_decided) {
+        function start_match_timer(scene) {
             let countdown = 10;
 
             if (matchTimer !== null) {
@@ -942,8 +942,9 @@ export class PlayOnline extends Scene
                     }
 
                     if (dict_match["opponent_decided"] == false){
-
-                        check_opponent_decision(scene)
+                        
+                        console.log("check_opponent_decision(scene) commented on")
+                        //check_opponent_decision(scene)
                         
                     }
 
@@ -1080,7 +1081,7 @@ export class PlayOnline extends Scene
                         match_end(scene)
                     }else{
                         dict_match["ball_possession"] = dict_match["ball_possession"] === "you" ? "opponent" : "you";
-                        start_match_timer(scene, false, false) 
+                        start_match_timer(scene) 
                     }
 
                 }
@@ -1157,7 +1158,7 @@ export class PlayOnline extends Scene
                 dict_match["opponent_position"] = "left"
             }
 
-            start_match_timer(scene, false, false) 
+            start_match_timer(scene) 
 
         }
         
@@ -1188,11 +1189,7 @@ export class PlayOnline extends Scene
                 }
             }
 
-            // const ball = scene.add.sprite(ball_x, ball_y);
-            // ball_graphics.fillStyle(0xFFFF00, 1);
-            // ball_graphics.fillCircle(0, 0, 5);
             ball_graphics.setPosition(ball_x, ball_y);
-            // ball_graphics.alpha = 1
         }
 
         var racketcap = this.add.image(250, 425, 'racketcap');
@@ -1271,23 +1268,17 @@ export class PlayOnline extends Scene
                     
                     session_id = multiplayer_data[0]["session_id"]
                     play_data = await get_play(session_id)
-                    dict_match = play_data.reduce((latest, current) => {
-                        return new Date(current.datetime) > new Date(latest.datetime) ? current : latest;
-                    });
 
+                    console.log("play_data", play_data)
 
+                     dict_match = play_data.reduce((earliest, current) => {
+                         return new Date(current.datetime) < new Date(earliest.datetime) ? current : earliest;
+                     });
 
-                  //  ball_possession = play_data["ball_possession"]
+                    console.log("check_both_players_in_game", dict_match)
 
-                    // next we need to get the play data and decide who is you and who is opponent?
-
-                    //post_play(dict_match)
-                    //get_play(session_id) hook up these two tables
-
-                    // now we pull PLAY TABLE DATA 
-
-                    start_game(scene, dict_match);
-                    return;
+                    who_goes_first = spin_racket(scene, dict_match)
+                    return dict_match;
                 }
         
                 await new Promise(resolve => setTimeout(resolve, 1000));
@@ -1297,12 +1288,6 @@ export class PlayOnline extends Scene
             scene.scene.start('Menu');
         }
         
-
-        
-
-        function start_game(scene, dict_match){ 
-            who_goes_first = spin_racket(scene, dict_match)            
-        }
 
         function countdown(scene) {
             let countdownText = scene.add.text(
@@ -1324,7 +1309,7 @@ export class PlayOnline extends Scene
                     currentIndex++;
 
                     if (countdownNumbers[currentIndex] == ''){
-                        start_match_timer(scene, false, false)
+                        start_match_timer(scene)
                         use_controls = true; 
                     }
 

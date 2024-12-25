@@ -15,7 +15,11 @@ const originalGameData = {
     email: "test@gmail.com",
     online_bet:0,
     offline_bet:0,
-    game_type:"offline play"
+    game_type:"offline play",
+    you:"name",
+    you_id:"id",
+    opponent:"name",
+    opponent_id:"id"
 };
 
 export async function getToken() {

@@ -464,7 +464,9 @@ export class PlayOnline extends Scene
             "winner":null,
             "loser":null,
             "forfeit":null,
-            "session_id":null
+            "session_id":null,
+            "a_rally":0,
+            "a_uploader":"name"
         }
 
         if (gameData["game_type"] == "online_play"){ // krishan need to work here
@@ -581,7 +583,7 @@ export class PlayOnline extends Scene
 
         var use_controls = false
         let play_data
-        let multiplayer_data
+        let multiplayer_game_data
 
         const right = this.add.text(340, 740, 'RIGHT', { 
             fill: '#0f0', 
@@ -601,12 +603,13 @@ export class PlayOnline extends Scene
                     right.setStyle({ fill: '#ffff00' });
                     decision_made(this, "you", true, "right");
 
-                 //   dict_match = edit_dict_match_opponent(dict_match)
+                    dict_match["a_rally"] += 1; 
+                    dict_match["a_uploader"] = gameData["playerName"]
+                    dict_match = edit_dict_match_opponent(dict_match)
+                    await post_play(dict_match) 
 
-                    console.log("right dict_match", dict_match)
-
-                    await post_play(dict_match) // krishan something wrong here
-                  //  check_opponent_decision(this)
+                    dict_match = edit_dict_match_opponent(dict_match) // krishan working here
+                    check_opponent_decision(this, session_id)
 
                 }
             }
@@ -629,38 +632,65 @@ export class PlayOnline extends Scene
 
                     left.setStyle({ fill: '#ffff00' });
                     decision_made(this, "you", true, "left");
-
-                  //  dict_match = edit_dict_match_opponent(dict_match)
-
-                    console.log("left dict_match", dict_match) // krishan something wrong here
-
+                    dict_match["a_rally"] += 1; 
+                    dict_match["a_uploader"] = gameData["playerName"]
                     await post_play(dict_match)
-                  //  check_opponent_decision(this);
+
+                    dict_match = edit_dict_match_opponent(dict_match)
+                    check_opponent_decision(this, session_id);
 
                 }
             }
         });
 
-        function edit_dict_match_opponent(dict_match){ //krishan here
+        async function edit_dict_match_opponent(dict_match){ // need to edit dict_match so code can run how it did when it was playoffline
+            gameData = await readLocally()
 
-            const play_data_earliest_row = play_data.reduce((earliest, current) => {
-                return new Date(current.datetime) < new Date(earliest.datetime) ? current : earliest;
-            });
+            console.log("gameData", gameData);
 
-            dict_match["opponent"] = play_data_earliest_row["against_player_name"]
-            dict_match["opponent_id"] = play_data_earliest_row["against_player_id"]
+            dict_match["opponent"] = gameData["opponent"]
+            dict_match["opponent_id"] = gameData["opponent_id"]
+
+            console.log("edited dict_match", dict_match)
 
             return dict_match
         }
 
-        async function check_opponent_decision(scene){
-
-            session_id = multiplayer_data[0]["session_id"]
-            play_data = await get_play(session_id)
-
-         //   decision_made(scene, "opponent", true, random_direction)
-
+        async function check_opponent_decision(scene, session_id) {
+            let ball_possession_name = dict_match["ball_possession"];
+            let no_ball_name = (ball_possession_name === "you") ? "opponent" : "you";
+            let past = "no";
+        
+            let requestCount = 0;
+        
+            const interval = setInterval(async () => {
+                if (requestCount >= 10) {
+                    console.log("Failed to get request");
+                    clearInterval(interval);
+                    return;
+                }
+        
+                try {
+                    requestCount++; // Increment the request counter
+                    const play_data = await get_play(session_id);
+        
+                    const matching_rows = play_data.filter(row => row.session_id === session_id && row.a_rally === dict_match["a_rally"]);
+        
+                    if (matching_rows.length === 2) {
+                        console.log(matching_rows);
+                        console.log("Conditions met, stopping execution.");
+        
+                        player_action(scene, dict_match["ball_position"], dict_match["ball_position_new"], dict_match["ball_possession"], ball_possession_name, past);
+                        player_action(scene, dict_match["ball_position"], dict_match[no_ball_name + "_position"], dict_match["ball_possession"], no_ball_name, past);
+        
+                        clearInterval(interval);
+                    }
+                } catch (error) {
+                    console.error("Error fetching play data:", error);
+                }
+            }, 1000);
         }
+        
 
         let score_username_fig = 0
         let score_oppenent_fig = 0
@@ -1262,14 +1292,18 @@ export class PlayOnline extends Scene
 
         async function check_both_players_in_game(scene) { 
             for (let i = 0; i < 5; i++) {
-                multiplayer_data = await get_game_w_session_id();
+                multiplayer_game_data = await get_game_w_session_id();
 
-                if (multiplayer_data.length === 2) {
+                if (multiplayer_game_data.length === 2) {
                     
-                    session_id = multiplayer_data[0]["session_id"]
+                    session_id = multiplayer_game_data[0]["session_id"]
                     play_data = await get_play(session_id)
 
                     console.log("play_data", play_data)
+
+                    gameData["opponent"] = play_data[0]["opponent"]
+                    gameData["opponent_id"] = play_data[0]["opponent_id"]
+                    writeLocally(gameData)
 
                      dict_match = play_data.reduce((earliest, current) => {
                          return new Date(current.datetime) < new Date(earliest.datetime) ? current : earliest;

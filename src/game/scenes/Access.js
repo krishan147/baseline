@@ -19,8 +19,38 @@ const originalGameData = {
     you:"name",
     you_id:"id",
     opponent:"name",
-    opponent_id:"id"
+    opponent_id:"id",
+    session_id:"id"
 };
+
+
+const originalPlayData = {
+        "id":"12345",
+        "you":"name",
+        "opponent":"name",
+        "you_id":"name",
+        "opponent_id":"name",
+        "you_position":"right",
+        "opponent_position":"left",
+        "you_last_position": "right",
+        "opponent_last_position":"left",
+        "you_decided":false,
+        "opponent_decided":false,
+        "ball_possession":"you",
+        "you_score":0,
+        "opponent_score":0,
+        "end":false,
+        "match_ball_possession":"you",
+        "ball_position":"right",
+        "ball_position_new":"right",
+        "cpu":true,
+        "winner":null,
+        "loser":null,
+        "forfeit":null,
+        "session_id":null,
+        "a_rally":0,
+        "a_uploader":"name"
+    };
 
 export async function getToken() {
     try {
@@ -464,4 +494,39 @@ function generateRandomId() {
         idPlay += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return idPlay;
+}
+
+
+
+
+export async function readPlayLocally() {
+    let gameDataString = localStorage.getItem('playData');
+
+    if (gameDataString) {
+        try {
+            var gameData = JSON.parse(gameDataString);
+            writeLocally(gameData);
+            return gameData;
+        } catch (error) {
+            return originalPlayData;
+        }
+    } else {
+        var originalPlayData = resetPlayLocally();
+        return originalPlayData;
+    }
+}
+
+
+export async function writePlayLocally(new_data){
+    var gameDataString = JSON.stringify(new_data);
+    localStorage.setItem('playData', gameDataString);
+}
+
+
+export async function resetPlayLocally() {
+    localStorage.removeItem('playData');
+    let gameDataString = JSON.stringify(originalPlayData);
+    localStorage.setItem('playData', gameDataString);
+
+    return originalPlayData;
 }

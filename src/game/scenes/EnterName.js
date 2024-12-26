@@ -3,8 +3,6 @@ import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import { getPlayer } from './Access.js'
 import { postPlayer } from './Access.js'
-// import { getToken } from './Access.js'
-// import { getPlayerWithEmail } from './Access.js'
 import { writeLocally } from './Access.js'
 import { readLocally } from './Access.js'
 
@@ -65,29 +63,7 @@ export class EnterName extends Scene {
 
     async create() {
 
-        var volume = 100;
         var isChecked = 0;
-
-        var gameData_test = await readLocally()
-
-        console.log("nothing found", gameData_test)
-        
-    //     try {
-    //         var gameData = await readLocally()
-    //         var volume = gameData["volume"];
-    //         var isChecked = gameData["mute"];
-
-    //         if (gameData["playerName"] === "Player1" || gameData["playerName"] === undefined) {
-    //             var data = getPlayerWithEmail()
-    //             console.log("EnterName.js, locally name is Player1/undefined")
-    //         }else {
-    //             this.scene.start('Menu');
-    //         }
-    // } catch(error){
-    //     volume = 100;
-    //     isChecked = 0;
-    //     console.log(error)
-    // }
 
         this.cameras.main.setBackgroundColor(0x000000);
 

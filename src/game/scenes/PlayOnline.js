@@ -2,7 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import Phaser from 'phaser';
-import { readLocally, patch_player, writeLocally, get_game_w_session_id, get_play, post_play} from './Access.js'
+import { readLocally, patch_player, writeLocally, get_game_w_session_id, get_play, post_play, readPlayLocally, writePlayLocally} from './Access.js'
 
 export class PlayOnline extends Scene
 {
@@ -171,7 +171,8 @@ export class PlayOnline extends Scene
         var str_coins = gameData["coins_cpu"]
         var game_type = gameData["game_type"]
         var opponent_name = 'CPU'
-        let session_id
+
+        let play_data = await readPlayLocally()
 
         const grassImages = [];
         const startX = 55; 
@@ -582,7 +583,6 @@ export class PlayOnline extends Scene
         }
 
         var use_controls = false
-        let play_data
         let multiplayer_game_data
 
         const right = this.add.text(340, 740, 'RIGHT', { 
@@ -605,11 +605,10 @@ export class PlayOnline extends Scene
 
                     dict_match["a_rally"] += 1; 
                     dict_match["a_uploader"] = gameData["playerName"]
-                    dict_match = edit_dict_match_opponent(dict_match)
+                   // dict_match = edit_dict_match_opponent(dict_match)
                     await post_play(dict_match) 
 
-                    dict_match = edit_dict_match_opponent(dict_match) // krishan working here
-                    check_opponent_decision(this, session_id)
+                    check_opponent_decision(this)
 
                 }
             }
@@ -634,16 +633,16 @@ export class PlayOnline extends Scene
                     decision_made(this, "you", true, "left");
                     dict_match["a_rally"] += 1; 
                     dict_match["a_uploader"] = gameData["playerName"]
+                    // dict_match = edit_dict_match_opponent(dict_match)
                     await post_play(dict_match)
 
-                    dict_match = edit_dict_match_opponent(dict_match)
-                    check_opponent_decision(this, session_id);
+                    check_opponent_decision(this);
 
                 }
             }
         });
 
-        async function edit_dict_match_opponent(dict_match){ // need to edit dict_match so code can run how it did when it was playoffline
+        async function edit_dict_match_opponent(dict_match){
             gameData = await readLocally()
 
             console.log("gameData", gameData);
@@ -656,10 +655,12 @@ export class PlayOnline extends Scene
             return dict_match
         }
 
-        async function check_opponent_decision(scene, session_id) {
+        async function check_opponent_decision(scene) { // krishan working here
             let ball_possession_name = dict_match["ball_possession"];
             let no_ball_name = (ball_possession_name === "you") ? "opponent" : "you";
             let past = "no";
+            let session_id = gameData["session_id"]
+            let a_rally = Math.trunc(dict_match["a_rally"])
         
             let requestCount = 0;
         
@@ -672,12 +673,21 @@ export class PlayOnline extends Scene
         
                 try {
                     requestCount++; // Increment the request counter
-                    const play_data = await get_play(session_id);
+                    
+                    play_data = await get_play(session_id);
+                    writePlayLocally(play_data)
+
+                    const play_data_latest_row = play_data.reduce((latest, current) => {
+                        return new Date(current.datetime) > new Date(latest.datetime) ? current : latest;
+                    }, play_data[0]);
+
+                    a_rally = play_data_latest_row["a_rally"]
         
-                    const matching_rows = play_data.filter(row => row.session_id === session_id && row.a_rally === dict_match["a_rally"]);
+                    const matching_rows = play_data.filter(row => row.session_id === session_id && row.a_rally === a_rally);
+
+                    console.log(matching_rows);
         
                     if (matching_rows.length === 2) {
-                        console.log(matching_rows);
                         console.log("Conditions met, stopping execution.");
         
                         player_action(scene, dict_match["ball_position"], dict_match["ball_position_new"], dict_match["ball_possession"], ball_possession_name, past);
@@ -688,7 +698,7 @@ export class PlayOnline extends Scene
                 } catch (error) {
                     console.error("Error fetching play data:", error);
                 }
-            }, 1000);
+            }, 3000);
         }
         
 
@@ -1296,20 +1306,18 @@ export class PlayOnline extends Scene
 
                 if (multiplayer_game_data.length === 2) {
                     
-                    session_id = multiplayer_game_data[0]["session_id"]
+                    let session_id = multiplayer_game_data[0]["session_id"]
                     play_data = await get_play(session_id)
-
-                    console.log("play_data", play_data)
 
                     gameData["opponent"] = play_data[0]["opponent"]
                     gameData["opponent_id"] = play_data[0]["opponent_id"]
+                    gameData["session_id"] = session_id
                     writeLocally(gameData)
+                    writePlayLocally(play_data)
 
                      dict_match = play_data.reduce((earliest, current) => {
                          return new Date(current.datetime) < new Date(earliest.datetime) ? current : earliest;
                      });
-
-                    console.log("check_both_players_in_game", dict_match)
 
                     who_goes_first = spin_racket(scene, dict_match)
                     return dict_match;

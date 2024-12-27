@@ -684,11 +684,21 @@ export class PlayOnline extends Scene
                     a_rally = play_data_latest_row["a_rally"]
         
                     const matching_rows = play_data.filter(row => row.session_id === session_id && row.a_rally === a_rally);
+
+                    let ball_possession_name = matching_rows[0]["ball_possession"];
+                    let no_ball_name = (ball_possession_name === "you") ? "opponent" : "you";
+
+
+                    if (ball_possession_name == "you"){
+                        // krishan you were writing here when it comes to merging the dictionaries
+                    }
         
                     if (matching_rows.length === 2) {
 
                         left.setStyle({ fill: '#0f0' });
                         right.setStyle({ fill: '#0f0' });
+
+
 
                         for (let i = 0; i < matching_rows.length; i++) {
                             const row = matching_rows[i];
@@ -713,23 +723,21 @@ export class PlayOnline extends Scene
 
                             if (playerName === row["opponent"] && playerName === row["a_uploader"]){
 
-                                let row_swapped = { ...row };
-                                [row_swapped.you_id, row_swapped.opponent_id] = [row.opponent_id, row.you_id];
-                                [row_swapped.you, row_swapped.opponent] = [row.opponent, row.you];
+                                // let row_swapped = { ...row };
+                                // [row_swapped.you_id, row_swapped.opponent_id] = [row.opponent_id, row.you_id];
+                                // [row_swapped.you, row_swapped.opponent] = [row.opponent, row.you];
 
-                                console.log(row) // figure out this next. how do opponent make moves
-
-                                console.log("changed to")
-
-                                console.log(row_swapped)
+                                // console.log(row) // figure out this next. how do opponent make moves
+                                // console.log("changed to")
+                                // console.log(row_swapped)
 
                                 if (row["ball_possession"] === "opponent"){
 
-                                    player_action(scene, row_swapped["ball_position"], row_swapped["ball_position_new"], row_swapped["ball_possession"], ball_possession_name, past);
+                                    player_action(scene, row["ball_position"], row["ball_position_new"], row["ball_possession"], ball_possession_name, past);
 
                                 } else {
 
-                                    player_action(scene, row_swapped["ball_position"], row_swapped[no_ball_name + "_position"], row_swapped["ball_possession"], no_ball_name, past);
+                                    player_action(scene, row["ball_position"], row[no_ball_name + "_position"], row["ball_possession"], no_ball_name, past);
 
                                 }
                             }

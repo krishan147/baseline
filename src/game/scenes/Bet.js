@@ -184,7 +184,7 @@ export class Bet extends Scene
             });
         });
         
-        const confirm = this.add.text(50, 690, 'START GAME', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding: { right: 35 } })
+        const confirm = this.add.text(50, 690, 'START TIEBREAK TO 7', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding: { right: 35 } })
         .setInteractive()
         .on('pointerdown', async () => {
             confirm.setStyle({ fill: '#ffff00' });

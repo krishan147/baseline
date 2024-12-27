@@ -723,6 +723,8 @@ export class Play extends Scene
 
                 }
 
+                console.log(dict_match)
+
 
 
 
@@ -1133,7 +1135,7 @@ export class Play extends Scene
             dict_match["opponent_last_position"] = "left"
             dict_match["you_last_position"] = "right"
 
-            if (dict_match["you_score"] >= 0  || dict_match["opponent_score"] >= 0){ //change back to 5
+            if (dict_match["you_score"] >= 5  || dict_match["opponent_score"] >= 5){ //change back to 5
 
                 if (Math.abs(dict_match["you_score"] - dict_match["opponent_score"]) >= 2) {
                     if (dict_match["you_score"] > dict_match["opponent_score"]) {

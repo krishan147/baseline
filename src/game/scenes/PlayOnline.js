@@ -601,14 +601,14 @@ export class PlayOnline extends Scene
                 if (dict_match["you_decided"] == false){
 
                     right.setStyle({ fill: '#ffff00' });
-                    decision_made(this, "you", true, "right");
+                    dict_match = decision_made(this, "you", true, "right");
 
                     dict_match["a_rally"] += 1; 
                     dict_match["a_uploader"] = gameData["playerName"]
                    // dict_match = edit_dict_match_opponent(dict_match)
                     await post_play(dict_match) 
 
-                    check_opponent_decision(this)
+                    check_opponent_decision(this, dict_match)
 
                 }
             }
@@ -630,13 +630,13 @@ export class PlayOnline extends Scene
                 if (dict_match["you_decided"] == false){
 
                     left.setStyle({ fill: '#ffff00' });
-                    decision_made(this, "you", true, "left");
+                    dict_match = decision_made(this, "you", true, "left");
                     dict_match["a_rally"] += 1; 
                     dict_match["a_uploader"] = gameData["playerName"]
                     // dict_match = edit_dict_match_opponent(dict_match)
                     await post_play(dict_match)
 
-                    check_opponent_decision(this);
+                    check_opponent_decision(this, dict_match);
 
                 }
             }
@@ -655,7 +655,7 @@ export class PlayOnline extends Scene
             return dict_match
         }
 
-        async function check_opponent_decision(scene) { // krishan working here
+        async function check_opponent_decision(scene, dict_match) { // krishan working here
             let ball_possession_name = dict_match["ball_possession"];
             let no_ball_name = (ball_possession_name === "you") ? "opponent" : "you";
             let past = "no";
@@ -684,14 +684,68 @@ export class PlayOnline extends Scene
                     a_rally = play_data_latest_row["a_rally"]
         
                     const matching_rows = play_data.filter(row => row.session_id === session_id && row.a_rally === a_rally);
-
-                    console.log(matching_rows);
         
                     if (matching_rows.length === 2) {
-                        console.log("Conditions met, stopping execution.");
-        
-                        player_action(scene, dict_match["ball_position"], dict_match["ball_position_new"], dict_match["ball_possession"], ball_possession_name, past);
-                        player_action(scene, dict_match["ball_position"], dict_match[no_ball_name + "_position"], dict_match["ball_possession"], no_ball_name, past);
+
+                        left.setStyle({ fill: '#0f0' });
+                        right.setStyle({ fill: '#0f0' });
+
+                        for (let i = 0; i < matching_rows.length; i++) {
+                            const row = matching_rows[i];
+
+                            console.log(row)
+
+
+
+                            if (playerName === row["you"] && playerName === row["a_uploader"]){
+
+                                if (row["ball_possession"] === "you"){
+
+                                    player_action(scene, row["ball_position"], row["ball_position_new"], row["ball_possession"], ball_possession_name, past);
+
+                                } else {
+
+                                    player_action(scene, row["ball_position"], row[no_ball_name + "_position"], row["ball_possession"], no_ball_name, past);
+
+                                }
+                            }
+
+
+                            if (playerName === row["opponent"] && playerName === row["a_uploader"]){
+
+                                let row_swapped = { ...row };
+                                [row_swapped.you_id, row_swapped.opponent_id] = [row.opponent_id, row.you_id];
+                                [row_swapped.you, row_swapped.opponent] = [row.opponent, row.you];
+
+                                console.log(row) // figure out this next. how do opponent make moves
+
+                                console.log("changed to")
+
+                                console.log(row_swapped)
+
+                                if (row["ball_possession"] === "opponent"){
+
+                                    player_action(scene, row_swapped["ball_position"], row_swapped["ball_position_new"], row_swapped["ball_possession"], ball_possession_name, past);
+
+                                } else {
+
+                                    player_action(scene, row_swapped["ball_position"], row_swapped[no_ball_name + "_position"], row_swapped["ball_possession"], no_ball_name, past);
+
+                                }
+                            }
+
+                            
+
+
+            
+                            
+                        
+
+
+                          }
+
+
+                        
         
                         clearInterval(interval);
                     }
@@ -747,14 +801,12 @@ export class PlayOnline extends Scene
     
                 }
 
-                left.setStyle({ fill: '#0f0' });
-                right.setStyle({ fill: '#0f0' });
 
-                player_action(scene, dict_match["ball_position"], dict_match["ball_position_new"], dict_match["ball_possession"], ball_possession_name, past);
-                player_action(scene, dict_match["ball_position"], dict_match[no_ball_name + "_position"], dict_match["ball_possession"], no_ball_name, past);
 
                 
             }
+
+        return dict_match 
 
         }
 
@@ -960,18 +1012,14 @@ export class PlayOnline extends Scene
         
             if (typeof timerText !== 'undefined') {
                 timerText.setText('TIMER:' + countdown);
-            } else {
-                console.log('TIMER:' + countdown); 
-            }
+            } 
         
             matchTimer = setInterval(() => {
                 countdown--;
         
                 if (typeof timerText !== 'undefined') {
                     timerText.setText('TIMER:' + countdown);
-                } else {
-                    console.log('TIMER:' + countdown); 
-                }
+                } 
         
                 if (countdown === 0) {
                     clearInterval(matchTimer);
@@ -983,7 +1031,7 @@ export class PlayOnline extends Scene
 
                     if (dict_match["opponent_decided"] == false){
                         
-                        console.log("check_opponent_decision(scene) commented on")
+                        console.log("start_match_timer end")
                         //check_opponent_decision(scene)
                         
                     }
@@ -1308,6 +1356,9 @@ export class PlayOnline extends Scene
                     
                     let session_id = multiplayer_game_data[0]["session_id"]
                     play_data = await get_play(session_id)
+
+                    console.log("you is ", play_data[0]["you"], "opponent is ", play_data[0]["opponent"])
+                    console.log("ball possessed by ", play_data[0]["ball_possession"])
 
                     gameData["opponent"] = play_data[0]["opponent"]
                     gameData["opponent_id"] = play_data[0]["opponent_id"]

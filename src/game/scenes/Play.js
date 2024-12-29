@@ -666,6 +666,8 @@ export class Play extends Scene
 
         function decision_made(scene, name, decided, button){ // start again sort of and change position to button? perhaps we need ball_next_position, ball_current_position?
 
+
+
             let ball_possession_name = dict_match["ball_possession"];
             let no_ball_name = (ball_possession_name === "you") ? "opponent" : "you";
             var past = "no"
@@ -723,7 +725,7 @@ export class Play extends Scene
 
                 }
 
-                console.log(dict_match)
+                console.log(dict_match) // it's what your about to execute after both players have entered their choice
 
 
 
@@ -929,7 +931,7 @@ export class Play extends Scene
 
 
         function start_match_timer(scene, you_decided, opponent_decided) {
-            let countdown = 10;
+            let countdown = 100; // krishan change this back to ten
 
             if (matchTimer !== null) {
                 clearInterval(matchTimer);

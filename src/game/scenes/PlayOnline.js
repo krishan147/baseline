@@ -171,6 +171,9 @@ export class PlayOnline extends Scene
         var str_coins = gameData["coins_cpu"]
         var game_type = gameData["game_type"]
         var opponent_name = 'CPU'
+        var who_goes_first
+        let ball_possession
+        let you_name
 
         let play_data = await readPlayLocally()
 
@@ -598,19 +601,28 @@ export class PlayOnline extends Scene
             if (use_controls) { 
 
 
-                if (dict_match["you_decided"] == false){
+                
 
-                    right.setStyle({ fill: '#ffff00' });
-                    dict_match = decision_made(this, "you", true, "right");
+                right.setStyle({ fill: '#ffff00' });
+                dict_match = decision_made("you", true, "right");
 
-                    dict_match["a_rally"] += 1; 
-                    dict_match["a_uploader"] = gameData["playerName"]
-                   // dict_match = edit_dict_match_opponent(dict_match)
-                    await post_play(dict_match) 
+                dict_match["a_rally"] += 1; 
+                dict_match["a_uploader"] = gameData["playerName"]
 
-                    check_opponent_decision(this, dict_match)
-
+                if (playerName === you_name){
+                    dict_match["a_you_pressed"] = "right"
                 }
+
+                if (playerName === opponent_name){ // only if you have the ball
+                    dict_match["ball_position_new"] = "right"
+                }
+
+                await post_play(dict_match) 
+
+                check_opponent_decision(this, dict_match)
+
+                
+
             }
         });
         
@@ -627,18 +639,25 @@ export class PlayOnline extends Scene
         .on('pointerdown', async () => {
             if (use_controls) { 
 
-                if (dict_match["you_decided"] == false){
+                left.setStyle({ fill: '#ffff00' });
+                dict_match = decision_made("you", true, "left");
+                dict_match["a_rally"] += 1; 
+                dict_match["a_uploader"] = gameData["playerName"]
+                // dict_match = edit_dict_match_opponent(dict_match)
 
-                    left.setStyle({ fill: '#ffff00' });
-                    dict_match = decision_made(this, "you", true, "left");
-                    dict_match["a_rally"] += 1; 
-                    dict_match["a_uploader"] = gameData["playerName"]
-                    // dict_match = edit_dict_match_opponent(dict_match)
-                    await post_play(dict_match)
-
-                    check_opponent_decision(this, dict_match);
-
+                if (playerName === you_name){
+                    dict_match["a_you_pressed"] = "left"
                 }
+
+                if (playerName === opponent_name){
+                    dict_match["ball_position_new"] = "left"
+                }
+
+                await post_play(dict_match)
+
+                check_opponent_decision(this, dict_match);
+
+                
             }
         });
 
@@ -656,8 +675,6 @@ export class PlayOnline extends Scene
         }
 
         async function check_opponent_decision(scene, dict_match) { // krishan working here
-            let ball_possession_name = dict_match["ball_possession"];
-            let no_ball_name = (ball_possession_name === "you") ? "opponent" : "you";
             let past = "no";
             let session_id = gameData["session_id"]
             let a_rally = Math.trunc(dict_match["a_rally"])
@@ -685,76 +702,52 @@ export class PlayOnline extends Scene
         
                     const matching_rows = play_data.filter(row => row.session_id === session_id && row.a_rally === a_rally);
 
+                    console.log(matching_rows);
+
                     let ball_possession_name = matching_rows[0]["ball_possession"];
                     let no_ball_name = (ball_possession_name === "you") ? "opponent" : "you";
-
-
-                    if (ball_possession_name == "you"){
-                        // krishan you were writing here when it comes to merging the dictionaries
-                    }
         
                     if (matching_rows.length === 2) {
 
                         left.setStyle({ fill: '#0f0' });
                         right.setStyle({ fill: '#0f0' });
 
-
-
                         for (let i = 0; i < matching_rows.length; i++) {
                             const row = matching_rows[i];
 
-                            console.log(row)
-
-
-
                             if (playerName === row["you"] && playerName === row["a_uploader"]){
+
+                                
 
                                 if (row["ball_possession"] === "you"){
 
-                                    player_action(scene, row["ball_position"], row["ball_position_new"], row["ball_possession"], ball_possession_name, past);
+                                    player_action(scene, row["ball_position"], row["ball_position_new"], row["ball_possession"], row["ball_possession"], past);
 
                                 } else {
 
-                                    player_action(scene, row["ball_position"], row[no_ball_name + "_position"], row["ball_possession"], no_ball_name, past);
+                                    player_action(scene, row["ball_position"], row["you_position"], row["ball_possession"], "you", past); // flipped
 
                                 }
                             }
-
 
                             if (playerName === row["opponent"] && playerName === row["a_uploader"]){
 
-                                // let row_swapped = { ...row };
-                                // [row_swapped.you_id, row_swapped.opponent_id] = [row.opponent_id, row.you_id];
-                                // [row_swapped.you, row_swapped.opponent] = [row.opponent, row.you];
 
-                                // console.log(row) // figure out this next. how do opponent make moves
-                                // console.log("changed to")
-                                // console.log(row_swapped)
+                                console.log("run ", row["ball_position"], row["you_position"], row["ball_possession"], "you", past, no_ball_name)
 
-                                if (row["ball_possession"] === "opponent"){
+                                if (row["ball_possession"] === "you"){ //flipped
 
-                                    player_action(scene, row["ball_position"], row["ball_position_new"], row["ball_possession"], ball_possession_name, past);
+                                    player_action(scene, row["ball_position"], row["ball_position_new"], "you", "you", past); //flipped
 
                                 } else {
 
-                                    player_action(scene, row["ball_position"], row[no_ball_name + "_position"], row["ball_possession"], no_ball_name, past);
+                                    // player_action(scene, row["ball_position"], row[no_ball_name + "_position"], row["ball_possession"], no_ball_name, past);
+                                    player_action(scene, row["ball_position"], row["you_position"], "opponent", "you", past); //flipped
 
                                 }
                             }
-
-                            
-
-
-            
-                            
-                        
-
-
                           }
 
-
-                        
-        
                         clearInterval(interval);
                     }
                 } catch (error) {
@@ -767,52 +760,47 @@ export class PlayOnline extends Scene
         let score_username_fig = 0
         let score_oppenent_fig = 0
 
-        function decision_made(scene, name, decided, button){ // start again sort of and change position to button? perhaps we need ball_next_position, ball_current_position?
+        function decision_made(name, decided, button){ 
 
             let ball_possession_name = dict_match["ball_possession"];
             let no_ball_name = (ball_possession_name === "you") ? "opponent" : "you";
-            var past = "no"
+        //    var past = "no" // whether the ball has come past needs to be worked out somewhere later when we have both dictionaries
 
-            if (dict_match[name + "_decided"] == false){
-
-                if (ball_possession_name == name){
-                    dict_match["ball_position_new"] = button
-                    dict_match[name + "_last_position"] = dict_match[name + "_position"]
-                } 
-                
-                if (no_ball_name == name){
-                    dict_match[name + "_last_position"] = dict_match[name + "_position"]
-                    dict_match[name + "_position"] = button
-                }
-
-                dict_match[name + "_decided"] = decided
+            
+            if (ball_possession_name == name){ // if you have ball
+                dict_match["ball_position_new"] = button
+                dict_match[name + "_last_position"] = dict_match[name + "_position"]
+            } 
+            
+            if (no_ball_name == name){ // if you dont have ball
+                dict_match[name + "_last_position"] = dict_match[name + "_position"]
+                dict_match[name + "_position"] = button
             }
+
+            dict_match[name + "_decided"] = decided
+            
            
-            if (dict_match["you_decided"] == true && dict_match["opponent_decided"] == true){
+            // if (dict_match["you_decided"] == true && dict_match["opponent_decided"] == true){
 
-                if (dict_match[no_ball_name + "_position"] == dict_match["ball_position_new"]){
-                    past = "no"
-                } else {
-                    past = "yes"
+            //     if (dict_match[no_ball_name + "_position"] == dict_match["ball_position_new"]){
+            //         past = "no"
+            //     } else {
+            //         past = "yes"
     
-                    if (dict_match["ball_possession"] === "you"){
-                        score_username_fig = score_username_fig + 1;
-                        dict_match["you_score"] = score_username_fig
-                        update_scores.call(scene); 
-                    }
+            //         if (dict_match["ball_possession"] === "you"){
+            //             score_username_fig = score_username_fig + 1;
+            //             dict_match["you_score"] = score_username_fig
+            //          //   update_scores.call(scene); 
+            //         }
     
-                    if (dict_match["ball_possession"] === "opponent"){
-                        score_oppenent_fig = score_oppenent_fig + 1;
-                        dict_match["opponent_score"] = score_oppenent_fig
-                        update_scores.call(scene); 
-                    }
+            //         if (dict_match["ball_possession"] === "opponent"){
+            //             score_oppenent_fig = score_oppenent_fig + 1;
+            //             dict_match["opponent_score"] = score_oppenent_fig
+            //          //   update_scores.call(scene); 
+            //         }
     
-                }
-
-
-
-                
-            }
+            //     }
+            // }
 
         return dict_match 
 
@@ -830,17 +818,16 @@ export class PlayOnline extends Scene
             }
 
             if (player_name === "you" && ball_possession !== "you"){
-                without_ball(scene, ball_position, button, ball_possession, player_name)
+                without_ball(scene, button, player_name)
             }
 
             if (player_name === "opponent" && ball_possession !== "opponent"){
-                without_ball(scene, ball_position, button, ball_possession, player_name)
+                without_ball(scene, button, player_name)
             }
 
         }
 
-        var who_goes_first
-        let ball_possession
+
 
         function with_ball(scene, ball_position, button, ball_possession, player_name, past){
 
@@ -959,11 +946,9 @@ export class PlayOnline extends Scene
                 }
 
             }
-
-
         }
 
-        function without_ball(scene, ball_position, button, ball_possession, player_name){
+        function without_ball(scene, button, player_name){
 
             if (button == dict_match[player_name + "_last_position"]){
                 'pass'
@@ -1011,7 +996,7 @@ export class PlayOnline extends Scene
 
 
         function start_match_timer(scene) {
-            let countdown = 10;
+            let countdown = 600; // krishan change this back to 10
 
             if (matchTimer !== null) {
                 clearInterval(matchTimer);
@@ -1034,7 +1019,7 @@ export class PlayOnline extends Scene
                     matchTimer = null; 
 
                     if (dict_match["you_decided"] == false){
-                        decision_made(scene, "you", true, dict_match["you_last_position"])
+                        decision_made("you", true, dict_match["you_last_position"])
                     }
 
                     if (dict_match["opponent_decided"] == false){
@@ -1355,7 +1340,6 @@ export class PlayOnline extends Scene
 
         check_both_players_in_game(this)
         
-
         async function check_both_players_in_game(scene) { 
             for (let i = 0; i < 5; i++) {
                 multiplayer_game_data = await get_game_w_session_id();
@@ -1364,9 +1348,14 @@ export class PlayOnline extends Scene
                     
                     let session_id = multiplayer_game_data[0]["session_id"]
                     play_data = await get_play(session_id)
+                    ball_possession = play_data[0]["ball_possession"]
+                    you_name = play_data[0]["you"]
+                    opponent_name = play_data[0]["opponent"]
 
-                    console.log("you is ", play_data[0]["you"], "opponent is ", play_data[0]["opponent"])
-                    console.log("ball possessed by ", play_data[0]["ball_possession"])
+                    console.log("check ball possession here ", play_data)
+
+                    console.log("you is ", you_name, "opponent is ", opponent_name)
+                    console.log("ball possessed by ", ball_possession)
 
                     gameData["opponent"] = play_data[0]["opponent"]
                     gameData["opponent_id"] = play_data[0]["opponent_id"]

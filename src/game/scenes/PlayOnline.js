@@ -600,21 +600,22 @@ export class PlayOnline extends Scene
         .on('pointerdown', async () => {
             if (use_controls) { 
 
-
-                
-
                 right.setStyle({ fill: '#ffff00' });
                 dict_match = decision_made("you", true, "right");
 
                 dict_match["a_rally"] += 1; 
                 dict_match["a_uploader"] = gameData["playerName"]
 
-                if (playerName === you_name){
-                    dict_match["a_you_pressed"] = "right"
-                }
+                if (playerName === dict_match["opponent"]){ 
 
-                if (playerName === opponent_name){ // only if you have the ball
-                    dict_match["ball_position_new"] = "right"
+
+                    if (dict_match["ball_possession"] === "opponent"){ //flipped (you has the ball)
+                        console.log("opponent position right")
+                        dict_match["opponent_position"] = "right"
+                    } 
+                    if (dict_match["ball_possession"] !== "opponent"){ //flipped (opponent has the ball)
+                        dict_match["ball_position_new"] = "right"
+                    }
                 }
 
                 await post_play(dict_match) 
@@ -641,16 +642,20 @@ export class PlayOnline extends Scene
 
                 left.setStyle({ fill: '#ffff00' });
                 dict_match = decision_made("you", true, "left");
+                
                 dict_match["a_rally"] += 1; 
                 dict_match["a_uploader"] = gameData["playerName"]
                 // dict_match = edit_dict_match_opponent(dict_match)
 
-                if (playerName === you_name){
-                    dict_match["a_you_pressed"] = "left"
-                }
+                if (playerName === dict_match["opponent"]){ 
 
-                if (playerName === opponent_name){
-                    dict_match["ball_position_new"] = "left"
+                    if (dict_match["ball_possession"] === "opponent"){ //flipped (you has the ball)
+                        console.log("opponent position left")
+                        dict_match["opponent_position"] = "left"
+                    } 
+                    if (dict_match["ball_possession"] !== "opponent"){ //flipped (opponent has the ball)
+                        dict_match["ball_position_new"] = "left"
+                    }
                 }
 
                 await post_play(dict_match)
@@ -664,13 +669,8 @@ export class PlayOnline extends Scene
         async function edit_dict_match_opponent(dict_match){
             gameData = await readLocally()
 
-            console.log("gameData", gameData);
-
             dict_match["opponent"] = gameData["opponent"]
             dict_match["opponent_id"] = gameData["opponent_id"]
-
-            console.log("edited dict_match", dict_match)
-
             return dict_match
         }
 
@@ -702,8 +702,6 @@ export class PlayOnline extends Scene
         
                     const matching_rows = play_data.filter(row => row.session_id === session_id && row.a_rally === a_rally);
 
-                    console.log(matching_rows);
-
                     let ball_possession_name = matching_rows[0]["ball_possession"];
                     let no_ball_name = (ball_possession_name === "you") ? "opponent" : "you";
         
@@ -712,13 +710,14 @@ export class PlayOnline extends Scene
                         left.setStyle({ fill: '#0f0' });
                         right.setStyle({ fill: '#0f0' });
 
+                        console.log("matching_rows", matching_rows)
+
                         for (let i = 0; i < matching_rows.length; i++) {
                             const row = matching_rows[i];
 
-                            if (playerName === row["you"] && playerName === row["a_uploader"]){
+                            if (playerName === row["you"] && playerName === row["a_uploader"]){ // controlled by player you,
 
                                 
-
                                 if (row["ball_possession"] === "you"){
 
                                     player_action(scene, row["ball_position"], row["ball_position_new"], row["ball_possession"], row["ball_possession"], past);
@@ -730,10 +729,7 @@ export class PlayOnline extends Scene
                                 }
                             }
 
-                            if (playerName === row["opponent"] && playerName === row["a_uploader"]){
-
-
-                                console.log("run ", row["ball_position"], row["you_position"], row["ball_possession"], "you", past, no_ball_name)
+                            if (playerName === row["opponent"] && playerName === row["a_uploader"]){ // controlled by player opponent
 
                                 if (row["ball_possession"] === "you"){ //flipped
 
@@ -742,10 +738,38 @@ export class PlayOnline extends Scene
                                 } else {
 
                                     // player_action(scene, row["ball_position"], row[no_ball_name + "_position"], row["ball_possession"], no_ball_name, past);
+                                 // player_action(scene, ball_position, button, ball_possession, player_name, past)
                                     player_action(scene, row["ball_position"], row["you_position"], "opponent", "you", past); //flipped
 
                                 }
                             }
+
+                            if (playerName !== row["a_uploader"] && playerName !== row["opponent"]){ //animated player for you so you runs in the right direction on the opponents screen. data is in opponents dict
+
+
+                                if (row["ball_possession"] === "opponent"){ // if you have the ball, this is how we animate the opponent flipped remember
+
+                                    let flipped_direction = row["opponent_position"] === "left" ? "right" : "left";
+                                //    dict_match["opponent_last_position"] = dict_match["opponent_last_position"] === "left" ? "right" : "left";
+
+                                    console.log(row["opponent_position"])
+                                //    console.log("opponent is running ", flipped_direction)
+
+                                    player_action(scene, row["ball_position"], flipped_direction, "you", "opponent", past);
+
+                                }
+                            }
+
+                            // if (playerName !== row["a_uploader"] && playerName !== row["you"]){ //animated player for opponent
+
+                            //     let flipped_direction = row["ball_position"] === "left" ? "right" : "left";
+
+                            //     console.log("animate for o", row["ball_position"], row["opponent_position"], "opponent", "opponent", past)
+
+                            //     player_action(scene, row["ball_position"], row["opponent_position"], "opponent", "opponent", past)
+
+                            // }
+
                           }
 
                         clearInterval(interval);
@@ -1351,8 +1375,6 @@ export class PlayOnline extends Scene
                     ball_possession = play_data[0]["ball_possession"]
                     you_name = play_data[0]["you"]
                     opponent_name = play_data[0]["opponent"]
-
-                    console.log("check ball possession here ", play_data)
 
                     console.log("you is ", you_name, "opponent is ", opponent_name)
                     console.log("ball possessed by ", ball_possession)

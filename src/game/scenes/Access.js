@@ -440,8 +440,6 @@ export async function get_play(session_id){
 export async function post_play(dict_match){
     try {
 
-        console.log("making the post play request")
-
         const id_play = generateRandomId();
 
         dict_match["id"] = id_play

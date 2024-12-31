@@ -642,7 +642,7 @@ export class PlayOnline extends Scene
 
                 left.setStyle({ fill: '#ffff00' });
                 dict_match = decision_made("you", true, "left");
-                
+
                 dict_match["a_rally"] += 1; 
                 dict_match["a_uploader"] = gameData["playerName"]
                 // dict_match = edit_dict_match_opponent(dict_match)
@@ -744,21 +744,51 @@ export class PlayOnline extends Scene
                                 }
                             }
 
-                            if (playerName !== row["a_uploader"] && playerName !== row["opponent"]){ //animated player for you so you runs in the right direction on the opponents screen. data is in opponents dict
+                            if (playerName !== row["opponent"] && playerName !== row["a_uploader"]){ //animated player for you so you runs in the right direction on the opponents screen. data is in opponents dict
 
 
-                                if (row["ball_possession"] === "opponent"){ // if you have the ball, this is how we animate the opponent flipped remember
+                                if (row["ball_possession"] === "opponent"){ // if you have the ball on you screen, this is how we animate the opponent flipped remember
 
-                                    let flipped_direction = row["opponent_position"] === "left" ? "right" : "left";
+                                    let flipped_opponent_position = row["opponent_position"] === "left" ? "right" : "left";
                                 //    dict_match["opponent_last_position"] = dict_match["opponent_last_position"] === "left" ? "right" : "left";
 
-                                    console.log(row["opponent_position"])
                                 //    console.log("opponent is running ", flipped_direction)
 
-                                    player_action(scene, row["ball_position"], flipped_direction, "you", "opponent", past);
+                                    player_action(scene, row["ball_position"], flipped_opponent_position, "you", "opponent", past);
+                                } else {
+
+                                    let flipped_you_position = row["you_position"] === "left" ? "right" : "left";
+                                    let flipped_ball_position = row["ball_position"] === "left" ? "right" : "left";
+
+                                    console.log(flipped_you_position)
+
+                                    player_action(scene, flipped_ball_position, flipped_you_position, "opponent", "opponent", past);
+                                    // right opponent
+                                    console.log(flipped_ball_position, flipped_you_position)
 
                                 }
                             }
+
+                            if (playerName !== row["you"] && playerName !== row["a_uploader"]){
+
+                                if (row["ball_possession"] === "you"){ // on opponents screen where you has the ball. watching the ball
+
+                                    let flipped_opponent_position = row["opponent_position"] === "left" ? "right" : "left";
+                                    let flipped_ball_position = row["ball_position"] === "left" ? "right" : "left";
+
+                                    player_action(scene, flipped_ball_position, flipped_opponent_position, "opponent", "opponent", past);
+    
+                                } else {
+                                    let flipped_you_position = row["you_position"] === "left" ? "right" : "left";
+
+                                    player_action(scene, row["ball_position"], flipped_you_position, "you", "opponent", past);
+
+                                }
+
+
+                            }
+
+                            // krishan careful of all the fucking flips. also decision_made is a fucker
 
                             // if (playerName !== row["a_uploader"] && playerName !== row["you"]){ //animated player for opponent
 
@@ -944,6 +974,7 @@ export class PlayOnline extends Scene
 
                 if (ball_position === "right"){
 
+
                     if (button === "left" && player_name === "opponent"){
 
                         dict_match["ball_position"] = "left"
@@ -975,7 +1006,7 @@ export class PlayOnline extends Scene
         function without_ball(scene, button, player_name){
 
             if (button == dict_match[player_name + "_last_position"]){
-                'pass'
+                console.log("pass")
             } else {
 
             if (player_name === "you"){

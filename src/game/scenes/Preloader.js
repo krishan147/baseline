@@ -7,6 +7,7 @@ import { getToken } from './Access.js'
 import { writeLocally } from './Access.js'
 import { readLocally } from './Access.js'
 import { resetGameLocally } from './Access.js'
+import { resetPlayLocally } from './Access.js'
 import { getPlayerWithEmail } from './Access.js'
 
 export class Preloader extends Scene
@@ -39,6 +40,7 @@ export class Preloader extends Scene
 
         async function signOutCheck(){
             resetGameLocally()
+            resetPlayLocally()
             await signOut({ global: true });
           }
 
@@ -46,7 +48,7 @@ export class Preloader extends Scene
 
         if (result) {
             var { idToken } = result;
-            console.log("Preloader.js Token obtained");
+            "pass"
         } else {
             console.log("Failed to fetch session");
         }
@@ -64,13 +66,16 @@ export class Preloader extends Scene
         else if (token_check.valid == true){
 
             var gameData = await readLocally()
-
             var email = gameData["email"]
             var data = await getPlayerWithEmail(email)
 
             await writeLocally(data);
 
             if (data["playerName"] === "Player1" || data["playerName"] === undefined) {
+
+
+                console.log(data)
+
                 this.scene.start('EnterName');
             }else {
                 this.scene.start('Menu');          //Menu      

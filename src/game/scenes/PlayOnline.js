@@ -473,10 +473,6 @@ export class PlayOnline extends Scene
             "a_uploader":"name"
         }
 
-        if (gameData["game_type"] == "online_play"){ // krishan need to work here
-            opponent_name = 'jimmy'
-        }
-
         function createBotAnimation(scene, animationKey, frameKey, startFrame, endFrame, frameRate, repeat) {
             // Create animation (does not play immediately)
             scene.anims.create({
@@ -561,7 +557,6 @@ export class PlayOnline extends Scene
                 onComplete: () => {
                     player_sprite.stop();
                     player_sprite.play("1_female_idle_right");
-                  //  dict_match["you_position"] = "right"
                 } 
             });
 
@@ -579,7 +574,6 @@ export class PlayOnline extends Scene
                 onComplete: () => {
                     player_sprite.stop();
                     player_sprite.play("1_female_idle_left");
-                 //   dict_match["you_position"] = "left"
                 } 
             });
 
@@ -610,7 +604,6 @@ export class PlayOnline extends Scene
 
 
                     if (dict_match["ball_possession"] === "opponent"){ //flipped (you has the ball)
-                        console.log("opponent position right")
                         dict_match["opponent_position"] = "right"
                     } 
                     if (dict_match["ball_possession"] !== "opponent"){ //flipped (opponent has the ball)
@@ -618,11 +611,23 @@ export class PlayOnline extends Scene
                     }
                 }
 
+
+                if (playerName === dict_match["you"]){ 
+
+
+                    if (dict_match["ball_possession"] === "you"){ //flipped (opponent has the ball)
+                       // dict_match["you_position"] = "right"
+                       dict_match["ball_position_new"] = "right"
+                    } 
+                    if (dict_match["ball_possession"] !== "you"){ //flipped (you has the ball)
+                       // dict_match["ball_position_new"] = "right"
+                       dict_match["you_position"] = "right"
+                    }
+                }
+
                 await post_play(dict_match) 
 
                 check_opponent_decision(this, dict_match)
-
-                
 
             }
         });
@@ -650,11 +655,22 @@ export class PlayOnline extends Scene
                 if (playerName === dict_match["opponent"]){ 
 
                     if (dict_match["ball_possession"] === "opponent"){ //flipped (you has the ball)
-                        console.log("opponent position left")
                         dict_match["opponent_position"] = "left"
                     } 
                     if (dict_match["ball_possession"] !== "opponent"){ //flipped (opponent has the ball)
                         dict_match["ball_position_new"] = "left"
+                    }
+                }
+
+
+                if (playerName === dict_match["you"]){ 
+
+                    if (dict_match["ball_possession"] === "you"){ //flipped (opponent has the ball)
+                        dict_match["ball_position_new"] = "left"
+                        
+                    } 
+                    if (dict_match["ball_possession"] !== "you"){ //flipped (you has the ball)
+                        dict_match["you_position"] = "left"
                     }
                 }
 
@@ -683,7 +699,6 @@ export class PlayOnline extends Scene
         
             const interval = setInterval(async () => {
                 if (requestCount >= 10) {
-                    console.log("Failed to get request");
                     clearInterval(interval);
                     return;
                 }
@@ -710,75 +725,66 @@ export class PlayOnline extends Scene
                         left.setStyle({ fill: '#0f0' });
                         right.setStyle({ fill: '#0f0' });
 
-                        console.log("matching_rows", matching_rows)
-
                         for (let i = 0; i < matching_rows.length; i++) {
                             const row = matching_rows[i];
 
-                            if (playerName === row["you"] && playerName === row["a_uploader"]){ // controlled by player you,
+                            if (playerName === row["you"] && playerName === row["a_uploader"]){ 
 
                                 
-                                if (row["ball_possession"] === "you"){
+                                if (row["ball_possession"] === "you"){ //"screen=you, animate=you, ball_pos=you"
 
                                     player_action(scene, row["ball_position"], row["ball_position_new"], row["ball_possession"], row["ball_possession"], past);
 
-                                } else {
+                                } else { //("screen=you,animate=you, ball_pos=opponent"
 
-                                    player_action(scene, row["ball_position"], row["you_position"], row["ball_possession"], "you", past); // flipped
-
-                                }
-                            }
-
-                            if (playerName === row["opponent"] && playerName === row["a_uploader"]){ // controlled by player opponent
-
-                                if (row["ball_possession"] === "you"){ //flipped
-
-                                    player_action(scene, row["ball_position"], row["ball_position_new"], "you", "you", past); //flipped
-
-                                } else {
-
-                                    // player_action(scene, row["ball_position"], row[no_ball_name + "_position"], row["ball_possession"], no_ball_name, past);
-                                 // player_action(scene, ball_position, button, ball_possession, player_name, past)
-                                    player_action(scene, row["ball_position"], row["you_position"], "opponent", "you", past); //flipped
+                                    player_action(scene, row["ball_position"], row["you_position"], row["ball_possession"], "you", past);
 
                                 }
                             }
 
-                            if (playerName !== row["opponent"] && playerName !== row["a_uploader"]){ //animated player for you so you runs in the right direction on the opponents screen. data is in opponents dict
+                            if (playerName === row["opponent"] && playerName === row["a_uploader"]){
+
+                                if (row["ball_possession"] === "you"){ //"screen=opponent, animate=opponent, ball_pos=opponent"
+
+                                    player_action(scene, row["ball_position"], row["ball_position_new"], "you", "you", past);
+
+                                } else { //"screen=opponent, animate=opponent, ball_pos=you"
+
+                                    player_action(scene, row["ball_position"], row["opponent_position"], "opponent", "you", past);
+
+                                }
+                            }
+
+                            if (playerName !== row["opponent"] && playerName !== row["a_uploader"]){
 
 
-                                if (row["ball_possession"] === "opponent"){ // if you have the ball on you screen, this is how we animate the opponent flipped remember
+                                if (row["ball_possession"] === "opponent"){ //"screen=you, animate=opponent, ball_pos=you"
 
                                     let flipped_opponent_position = row["opponent_position"] === "left" ? "right" : "left";
-                                //    dict_match["opponent_last_position"] = dict_match["opponent_last_position"] === "left" ? "right" : "left";
-
-                                //    console.log("opponent is running ", flipped_direction)
 
                                     player_action(scene, row["ball_position"], flipped_opponent_position, "you", "opponent", past);
-                                } else {
 
-                                    let flipped_you_position = row["you_position"] === "left" ? "right" : "left";
+                                } else { 
+
+                                    let flipped_ball_position_new = row["ball_position_new"] === "left" ? "right" : "left";
                                     let flipped_ball_position = row["ball_position"] === "left" ? "right" : "left";
+                                    
+                                    player_action(scene, flipped_ball_position, flipped_ball_position_new, "opponent", "opponent", past);
 
-                                    console.log(flipped_you_position)
-
-                                    player_action(scene, flipped_ball_position, flipped_you_position, "opponent", "opponent", past);
-                                    // right opponent
-                                    console.log(flipped_ball_position, flipped_you_position)
 
                                 }
                             }
 
-                            if (playerName !== row["you"] && playerName !== row["a_uploader"]){
+                            if (playerName !== row["you"] && playerName !== row["a_uploader"]){ 
 
-                                if (row["ball_possession"] === "you"){ // on opponents screen where you has the ball. watching the ball
+                                if (row["ball_possession"] === "you"){ //"screen=opponent, animate=you, ball_pos=you"
 
-                                    let flipped_opponent_position = row["opponent_position"] === "left" ? "right" : "left";
+                                    let flipped_ball_position_new = row["ball_position_new"] === "left" ? "right" : "left";
                                     let flipped_ball_position = row["ball_position"] === "left" ? "right" : "left";
 
-                                    player_action(scene, flipped_ball_position, flipped_opponent_position, "opponent", "opponent", past);
+                                    player_action(scene, flipped_ball_position, flipped_ball_position_new, "opponent", "opponent", past);
     
-                                } else {
+                                } else { //"screen=opponent, animate=you, ball_pos=opponent"
                                     let flipped_you_position = row["you_position"] === "left" ? "right" : "left";
 
                                     player_action(scene, row["ball_position"], flipped_you_position, "you", "opponent", past);
@@ -787,18 +793,6 @@ export class PlayOnline extends Scene
 
 
                             }
-
-                            // krishan careful of all the fucking flips. also decision_made is a fucker
-
-                            // if (playerName !== row["a_uploader"] && playerName !== row["you"]){ //animated player for opponent
-
-                            //     let flipped_direction = row["ball_position"] === "left" ? "right" : "left";
-
-                            //     console.log("animate for o", row["ball_position"], row["opponent_position"], "opponent", "opponent", past)
-
-                            //     player_action(scene, row["ball_position"], row["opponent_position"], "opponent", "opponent", past)
-
-                            // }
 
                           }
 
@@ -822,16 +816,16 @@ export class PlayOnline extends Scene
 
             
             if (ball_possession_name == name){ // if you have ball
-                dict_match["ball_position_new"] = button
+              //  dict_match["ball_position_new"] = button
                 dict_match[name + "_last_position"] = dict_match[name + "_position"]
             } 
             
-            if (no_ball_name == name){ // if you dont have ball
-                dict_match[name + "_last_position"] = dict_match[name + "_position"]
-                dict_match[name + "_position"] = button
+            if (no_ball_name == name){ // if you dont have ball   
+             //   dict_match[name + "_position"] = button
+             //   dict_match[name + "_last_position"] = dict_match[name + "_position"]
             }
 
-            dict_match[name + "_decided"] = decided
+          //  dict_match[name + "_decided"] = decided
             
            
             // if (dict_match["you_decided"] == true && dict_match["opponent_decided"] == true){
@@ -1005,10 +999,6 @@ export class PlayOnline extends Scene
 
         function without_ball(scene, button, player_name){
 
-            if (button == dict_match[player_name + "_last_position"]){
-                console.log("pass")
-            } else {
-
             if (player_name === "you"){
 
                 if (button === "left"){
@@ -1027,14 +1017,13 @@ export class PlayOnline extends Scene
                 if (button === "right"){
                     opponent_goes_right(scene)
                 }
-            }
+            } 
         }
-    }
 
 
 
         let timer_text 
-        const timerText = this.add.text(350, 150, timer_text, { 
+        let timerText = this.add.text(350, 150, timer_text, { 
             fill: '#0f0', 
             fontSize: '20px', 
             strokeThickness: 1, 
@@ -1109,9 +1098,9 @@ export class PlayOnline extends Scene
             { fill: '#0f0', fontSize: '20px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding: { right: 35 } }
         );
 
-        function update_scores() {
-            this.score_username.setText(playerName + ' : ' + score_username_fig.toString());
-            this.score_oppenent.setText(opponent_name + ' : ' + score_oppenent_fig.toString());
+        function update_scores(scene, playerName, opponent_name, score_username_fig, score_oppenent_fig) {
+            scene.score_username.setText(playerName + ' : ' + score_username_fig.toString());
+            scene.score_oppenent.setText(opponent_name + ' : ' + score_oppenent_fig.toString());
         }
         
         
@@ -1407,8 +1396,11 @@ export class PlayOnline extends Scene
                     you_name = play_data[0]["you"]
                     opponent_name = play_data[0]["opponent"]
 
-                    console.log("you is ", you_name, "opponent is ", opponent_name)
-                    console.log("ball possessed by ", ball_possession)
+                    if (playerName === opponent_name){
+                        update_scores(scene, playerName, you_name, 0, 0)
+                    } else {
+                        update_scores(scene, playerName, opponent_name, 0, 0)
+                    }
 
                     gameData["opponent"] = play_data[0]["opponent"]
                     gameData["opponent_id"] = play_data[0]["opponent_id"]
@@ -1474,6 +1466,12 @@ export class PlayOnline extends Scene
                 const timeSinceLastClick = currentTime - lastClickTime;
         
                 if (timeSinceLastClick < 2000 && clickedOnce) { // Second click within 2 seconds
+
+                    if (timerText) {
+                        timerText.destroy();
+                        timerText = null;
+                    }
+
                     backButton.setStyle({ fill: '#ffff00' });
                     audioButton(isChecked);
                     this.scene.start('Menu');

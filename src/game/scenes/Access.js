@@ -503,7 +503,7 @@ export async function readPlayLocally() {
     if (gameDataString) {
         try {
             var gameData = JSON.parse(gameDataString);
-            writeLocally(gameData);
+            writePlayLocally(gameData);
             return gameData;
         } catch (error) {
             return originalPlayData;

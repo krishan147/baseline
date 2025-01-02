@@ -666,8 +666,6 @@ export class Play extends Scene
 
         function decision_made(scene, name, decided, button){ // start again sort of and change position to button? perhaps we need ball_next_position, ball_current_position?
 
-
-
             let ball_possession_name = dict_match["ball_possession"];
             let no_ball_name = (ball_possession_name === "you") ? "opponent" : "you";
             var past = "no"

@@ -912,11 +912,11 @@ export class Play extends Scene
 
 
         let timer_text 
-        const timerText = this.add.text(350, 150, timer_text, { 
-            fill: '#0f0', 
+        let timerText = this.add.text(350, 150, timer_text, { 
+            fill: 'white', 
             fontSize: '20px', 
             strokeThickness: 1, 
-            stroke: '#0f0', 
+            stroke: 'white', 
             fontFamily: 'playwritereg', 
             padding: { right: 35 }
         });
@@ -929,27 +929,23 @@ export class Play extends Scene
 
 
         function start_match_timer(scene, you_decided, opponent_decided) {
-            let countdown = 100; // krishan change this back to ten
+            let countdown = 10; 
 
             if (matchTimer !== null) {
                 clearInterval(matchTimer);
                 matchTimer = null; 
             }
         
-            if (typeof timerText !== 'undefined') {
+            if (typeof timerText !== 'undefined' && timerText !== null) { 
                 timerText.setText('TIMER:' + countdown);
-            } else {
-                console.log('TIMER:' + countdown); 
-            }
+            } 
         
             matchTimer = setInterval(() => {
                 countdown--;
         
-                if (typeof timerText !== 'undefined') {
+                if (typeof timerText !== 'undefined' && timerText !== null) { 
                     timerText.setText('TIMER:' + countdown);
-                } else {
-                    console.log('TIMER:' + countdown); 
-                }
+                } 
         
                 if (countdown === 0) {
                     clearInterval(matchTimer);
@@ -986,13 +982,13 @@ export class Play extends Scene
         this.score_username = this.add.text(
             10, 150,
             playerName + ' : ' + score_username_fig.toString(),
-            { fill: '#0f0', fontSize: '20px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding: { right: 35 } }
+            { fill: 'white', fontSize: '20px', strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg', padding: { right: 35 } }
         );
         
         this.score_oppenent = this.add.text(
             10, 125,
             opponent_name + ' : ' + score_oppenent_fig.toString(),
-            { fill: '#0f0', fontSize: '20px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding: { right: 35 } }
+            { fill: 'white', fontSize: '20px', strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg', padding: { right: 35 } }
         );
 
         function update_scores() {
@@ -1126,7 +1122,7 @@ export class Play extends Scene
                 scene.scene.start('Menu');
             }, 5000);
         }
-
+        
 
         function match_end(scene){ 
 
@@ -1333,7 +1329,11 @@ export class Play extends Scene
                 if (timeSinceLastClick < 2000 && clickedOnce) { // Second click within 2 seconds
                     backButton.setStyle({ fill: '#ffff00' });
                     audioButton(isChecked);
-                    this.scene.start('Menu');
+                    dict_match["you_score"] = 5
+                    dict_match["opponent_score"] = 7
+                    timerText.destroy();
+                    timerText = null;
+                    match_end(this)
                 } else {
                     // First click, show message and set clickedOnce flag
                     if (!clickedOnce) {

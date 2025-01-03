@@ -66,6 +66,10 @@ export class Bet extends Scene
         var playerName = gameData["playerName"]
         var str_coins = gameData["gold_cpu"]
 
+        if (gameData["game_type"] === "online_play"){
+            str_coins =  gameData["gold_multi"]
+        }
+        
         this.cameras.main.setBackgroundColor(0x000000);
 
         const title = this.add.text(50, 110, 'BET', { fill: '#0f0', fontSize: '60px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
@@ -123,7 +127,7 @@ export class Bet extends Scene
         let currentBet = null;
         var bet_to_execute = null
 
-        const buttons = [
+        let buttons = [
             { text: 'NONE', y: 530, x: 50 , frequency:1000, bet_x:110, bet_y:550},
             { text: '100', y: 530, x: 200, frequency:24, bet_x:260, bet_y:550 },
             { text: '200', y: 530, x: 350, frequency:16, bet_x:380, bet_y:550 },
@@ -131,6 +135,8 @@ export class Bet extends Scene
             { text: '1000', y: 610, x: 200, frequency:6, bet_x:240, bet_y:630 },
             { text: '2000', y: 610, x: 350, frequency:2, bet_x:400, bet_y:630 }
         ];
+
+        buttons = buttons.filter(button => parseInt(button.text) <= parseInt(str_coins) || button.text === 'NONE');
 
         buttons.forEach(button => {
             const newButton = this.add.text(button.x, button.y, button.text, {

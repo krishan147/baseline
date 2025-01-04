@@ -38,11 +38,11 @@ export class Richest extends Scene {
         data.forEach((row, index) => {
             const y = startY + (index + 1) * rowHeight;
     
-            this.add.text(startX, y, row.rank.toString(), { fill: '#fff', fontSize: '18px', fontFamily: 'playwritereg' });
+            this.add.text(startX, y, row.rank.toString(), { fill: '#fff', fontSize: '18px', fontFamily: 'playwritereg',padding: { right: 35} });
     
-            this.add.text(startX + 100, y, row.playerName, { fill: '#fff', fontSize: '18px', fontFamily: 'playwritereg' });
+            this.add.text(startX + 100, y, row.playerName, { fill: '#fff', fontSize: '18px', fontFamily: 'playwritereg',padding: { right: 35} });
     
-            this.add.text(startX + 300, y, row.gold_multi.toString(), { fill: '#fff', fontSize: '18px', fontFamily: 'playwritereg' });
+            this.add.text(startX + 300, y, row.gold_multi.toString(), { fill: '#fff', fontSize: '18px', fontFamily: 'playwritereg',padding: { right: 35} });
         });
 
         

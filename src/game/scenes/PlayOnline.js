@@ -1188,8 +1188,8 @@ export class PlayOnline extends Scene
 
 
         function start_match_timer(scene) {
-            let countdown = 600; // krishan change to 20 maybe?
-
+            let countdown = 600; // krishan change to 20 
+        
             if (matchTimer !== null) {
                 clearInterval(matchTimer);
                 matchTimer = null; 
@@ -1199,7 +1199,7 @@ export class PlayOnline extends Scene
                 timerText.setText('TIMER:' + countdown);
             } 
         
-            matchTimer = setInterval(() => {
+            matchTimer = setInterval(async () => {
                 countdown--;
         
                 if (typeof timerText !== 'undefined' && timerText !== null) { 
@@ -1209,21 +1209,46 @@ export class PlayOnline extends Scene
                 if (countdown === 0) {
                     clearInterval(matchTimer);
                     matchTimer = null; 
-
-                    if (dict_match["you_decided"] == false){
-                        decision_made("you", true, dict_match["you_last_position"])
+        
+                    // Start another 20-second countdown
+                    let secondaryCountdown = 20;
+        
+                    if (typeof timerText !== 'undefined' && timerText !== null) { 
+                        timerText.setText('TIMER:' + secondaryCountdown);
                     }
-
-                    if (dict_match["opponent_decided"] == false){
-                        
-                        console.log("start_match_timer end")
-                        //check_opponent_decision(scene)
-                        
-                    }
-
+        
+                    let secondaryTimer = setInterval(async () => {
+                        secondaryCountdown--;
+        
+                        if (typeof timerText !== 'undefined' && timerText !== null) { 
+                            timerText.setText('TIMER:' + secondaryCountdown);
+                        }
+        
+                        if (secondaryCountdown === 0) {
+                            clearInterval(secondaryTimer);
+        
+                            if (playerName === you_name) {
+                                score_username_fig = 5;
+                                score_oppenent_fig = 7;
+                                dict_match["forfeit"] = you_name;
+                            } else {
+                                score_username_fig = 7;
+                                score_oppenent_fig = 5;
+                                dict_match["forfeit"] = opponent_name;
+                            }
+        
+                            dict_match["you_score"] = 7;
+                            dict_match["opponent_score"] = 5;
+                            dict_match["a_rally"] += 1;
+        
+                            await post_play(dict_match);
+                            match_end(this);
+                        }
+                    }, 1000); // Secondary countdown interval
                 }
-            }, 1000);
+            }, 1000); // Initial countdown interval
         }
+        
 
         function stop_match_timer() {
             if (matchTimer !== null) {

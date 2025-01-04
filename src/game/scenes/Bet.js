@@ -263,8 +263,8 @@ export class Bet extends Scene
 
         
 
-        const coins = this.add.text(10, 770, 'COINS: ' + str_coins, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
-        const username = this.add.text(10, 800, 'YOU: ' + playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
+        const coins = this.add.text(10, 770, 'COINS: ' + str_coins, { fill: 'white', fontSize: '20px' ,strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
+        const username = this.add.text(10, 800, 'YOU: ' + playerName, { fill: 'white', fontSize: '20px' ,strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
     
         this.tweens.add({
             targets: [username, coins, backButton, confirm, title],    

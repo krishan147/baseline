@@ -1,6 +1,6 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
-import { audioButton } from './Options.js';
+import { audioButton, playSound } from './Options.js';
 import Phaser from 'phaser';
 import { readLocally, patch_player, writeLocally } from './Access.js'
 
@@ -276,6 +276,8 @@ export class Play extends Scene
 
         
         function run_victory() {
+
+            playSound("victory", isChecked)
         
             const particles_obj = this.add.particles('particle');
             const emitters = [];
@@ -380,6 +382,9 @@ export class Play extends Scene
 
 
         function run_defeat() {
+
+            playSound("defeat", isChecked)
+
             const defeat = this.add.text(100, 200, 'DEFEAT', { fill: 'black', fontSize: '240px' ,strokeThickness: 10, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
             
             this.tweens.add({
@@ -761,6 +766,8 @@ export class Play extends Scene
         var ball_possession
 
         function with_ball(scene, ball_position, button, ball_possession, player_name, past){
+            
+            playSound("hit", isChecked)
 
             if (ball_possession === "you"){
 
@@ -1058,6 +1065,10 @@ export class Play extends Scene
                 
                 ballEnd.x += dx * 0.5;
                 ballEnd.y += dy * 0.5;
+
+                playSound("past", isChecked)
+            } else {
+                playSound("stopping", isChecked)
             }
         
             const ball_trail = scene.add.particles(200, 200, "test_particle", {

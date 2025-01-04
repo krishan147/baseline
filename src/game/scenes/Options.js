@@ -7,9 +7,15 @@ import { patchPlayer } from './Access.js'
 import { resetGameLocally } from './Access.js'
 import { signOut } from 'aws-amplify/auth';
 
-var audio_music = new Audio('/sounds/music.mp3')
-// audio_music.play()
 var audio_button = new Audio('/sounds/menu_button.wav')
+
+const sounds = {
+    stopping: new Audio('/sounds/stopping.wav'),
+    hit: new Audio('/sounds/hit.wav'),
+    defeat: new Audio('/sounds/defeat.wav'),
+    past: new Audio('/sounds/past.wav'),
+    victory: new Audio('/sounds/victory.wav'),
+};
 
 
 
@@ -222,24 +228,16 @@ export class Options extends Scene
         checkMute(volume, isChecked);
         });
 
-        function checkMute(volume, isChecked){
+        function checkMute(volume, isChecked) {
 
-            if (isChecked == true){
-                audio_music.volume = 0
-                audio_button.volume = 0
-
-                gameData["mute"] = true
-                writeLocally(gameData);
-            }
-
-            if (isChecked == false){
-                audio_music.volume = volume
-                audio_button.volume = volume
-
-                gameData["mute"] = false
-                writeLocally(gameData);
-            }
-
+            audio_button.volume = isChecked ? 0 : volume;
+        
+            Object.values(sounds).forEach((sound) => {
+                sound.volume = isChecked ? 0 : volume;
+            });
+        
+            gameData["mute"] = isChecked;
+            writeLocally(gameData);
         }
 
         async function signOutCheck() {
@@ -278,7 +276,7 @@ export class Options extends Scene
             privacyPolicy.setStyle({ fill: '#0f0' });
         });
 
-        const byText = this.add.text(20, 740, 'MADE BY ', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg' });
+        const byText = this.add.text(20, 740, 'MADE BY ', { fill: 'white', fontSize: '30px', strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg' });
 
         const krishgames = this.add.text(byText.x + byText.width, 740, 'KRISHGAMES', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:30}})
             .setInteractive()
@@ -340,5 +338,17 @@ export async function audioButton(isChecked) {
         }
     } catch (error) {
         console.error("Audio playback failed:", error);
+    }
+}
+
+
+
+export async function playSound(soundType, isChecked) {
+    try {
+        if (!isChecked && sounds[soundType]) {
+            await sounds[soundType].play();
+        }
+    } catch (error) {
+        console.error(`Audio playback failed for "${soundType}":`, error);
     }
 }

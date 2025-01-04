@@ -528,3 +528,33 @@ export async function resetPlayLocally() {
 
     return originalPlayData;
 }
+
+export async function get_top_ten() {
+
+    const { idToken } = await getToken()
+    
+    const url = 'https://dpnpfzxvnk.execute-api.eu-west-1.amazonaws.com/production/usernametable?type=topten';
+
+    const headers = {
+        'Content-Type': 'application/json',
+        "Authorization": `Bearer ${idToken}`
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: headers
+        });
+
+        if (!response.ok) {
+           return "no data found";
+        }
+
+        const data = await response.json();
+
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    } 
+}

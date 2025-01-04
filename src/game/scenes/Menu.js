@@ -71,7 +71,7 @@ export class Menu extends Scene
         const version = this.add.text(10, 40, game_version, { fill: '#0f0', fontSize: '10px', fontFamily: 'playwritereg',padding: { right: 35}})
 
 
-        const title = this.add.text(50, 110, 'BASELINE', { fill: '#0f0', fontSize: '60px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
+        const title = this.add.text(50, 110, 'BREAKPOINT', { fill: '#0f0', fontSize: '50px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
   
 
         const grassImages = [];

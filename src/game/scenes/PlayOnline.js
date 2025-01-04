@@ -1,6 +1,6 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
-import { audioButton } from './Options.js';
+import { audioButton, playSound } from './Options.js';
 import Phaser from 'phaser';
 import { readLocally, patch_player, writeLocally, get_game_w_session_id, get_play, post_play, readPlayLocally, writePlayLocally} from './Access.js'
 
@@ -281,6 +281,8 @@ export class PlayOnline extends Scene
 
         
         function run_victory() {
+
+            playSound("victory", isChecked)
         
             const particles_obj = this.add.particles('particle');
             const emitters = [];
@@ -385,6 +387,9 @@ export class PlayOnline extends Scene
 
 
         function run_defeat() {
+
+            playSound("defeat", isChecked)
+
             const defeat = this.add.text(100, 200, 'DEFEAT', { fill: 'black', fontSize: '240px' ,strokeThickness: 10, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
             
             this.tweens.add({
@@ -1020,6 +1025,8 @@ export class PlayOnline extends Scene
 
         function with_ball(scene, ball_position, button, ball_possession, player_name, past){
 
+            playSound("hit", isChecked)
+
             if (ball_possession === "you"){
 
                 if (ball_position === "left"){
@@ -1310,6 +1317,10 @@ export class PlayOnline extends Scene
                 
                 ballEnd.x += dx * 0.5;
                 ballEnd.y += dy * 0.5;
+
+                playSound("past", isChecked)
+            } else {
+                playSound("stopping", isChecked)
             }
         
             const ball_trail = scene.add.particles(200, 200, "test_particle", {
@@ -1386,7 +1397,7 @@ export class PlayOnline extends Scene
             dict_match["you_last_position"] = "right"
             
 
-            if (dict_match["you_score"] >= 0  || dict_match["opponent_score"] >= 0){ //change back to 5
+            if (dict_match["you_score"] >= 5  || dict_match["opponent_score"] >= 5){ 
 
                 if (Math.abs(dict_match["you_score"] - dict_match["opponent_score"]) >= 2) {
                     use_controls = false; 

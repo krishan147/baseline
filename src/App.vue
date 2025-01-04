@@ -15,12 +15,12 @@
     </template>
 
     <template v-slot:header>
-      <h1>BASELINE</h1>
+      <h1>BREAKPOINT</h1>
       <h2>TURN-BASED TENNIS FOR WINNERS</h2>
     </template>
 
     <template v-slot:footer>
-      <h3>By signing in, you consent to the following <a href="https://krishgames.com/privacyPolicy.html" style="color: yellow;">terms & conditions + privacy policy</a> which describes the rules and conditions that apply to you when playing the game. We value being transparent about how we connect and use your persoanl data. Thanks!</h3>
+      <h3>By signing in, you consent to the following <a href="https://krishgames.com/privacyPolicy.html" style="color: yellow;">terms & conditions + privacy policy</a> which describes the rules and conditions that apply to you when playing the game. We value being transparent about how we collect and use your persoanl data. Thanks!</h3>
     </template>
 
     

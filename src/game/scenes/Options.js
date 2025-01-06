@@ -245,7 +245,7 @@ export class Options extends Scene
             await signOut({ global: true });
         }
         
-        const signOutText = this.add.text(150, 640, 'SIGN OUT ', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg' })
+        const signOutText = this.add.text(150, 630, 'SIGN OUT ', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg' })
             .setInteractive()
             .on('pointerdown', () => {
                 signOutText.setStyle({ fill: '#ffff00' });
@@ -260,7 +260,7 @@ export class Options extends Scene
             });
         
 
-        const privacyPolicy = this.add.text(100, 690, 'PRIVACY POLICY ', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg' })            .setInteractive()
+        const privacyPolicy = this.add.text(100, 680, 'PRIVACY POLICY ', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg' })            .setInteractive()
         .on('pointerdown', () => {
             privacyPolicy.setStyle({ fill: '#ffff00' });
             setTimeout(() => {
@@ -276,9 +276,9 @@ export class Options extends Scene
             privacyPolicy.setStyle({ fill: '#0f0' });
         });
 
-        const byText = this.add.text(20, 740, 'MADE BY ', { fill: 'white', fontSize: '30px', strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg' });
+        const byText = this.add.text(20, 730, 'MADE BY ', { fill: 'white', fontSize: '30px', strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg' });
 
-        const krishgames = this.add.text(byText.x + byText.width, 740, 'KRISHGAMES', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:30}})
+        const krishgames = this.add.text(byText.x + byText.width, 730, 'KRISHGAMES', { fill: '#0f0', fontSize: '30px', strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:30}})
             .setInteractive()
             .on('pointerdown', () => {
                 krishgames.setStyle({ fill: '#ffff00' });
@@ -296,7 +296,7 @@ export class Options extends Scene
             });
         
 
-        const username = this.add.text(10, 800, 'YOU: ' + playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
+        const username = this.add.text(10, 790, 'YOU: ' + playerName, { fill: '#0f0', fontSize: '20px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg',padding: { right: 35}})
         .setInteractive()
         .on('pointerdown', () => {
             username.setStyle({ fill: '#ffff00'});
@@ -311,7 +311,7 @@ export class Options extends Scene
             username.setStyle({ fill: '#0f0' });
         })
   
-        const backButton = this.add.text(350, 785, 'BACK', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
+        const backButton = this.add.text(350, 770, 'BACK', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
         .setInteractive()
         .on('pointerdown', () => {
             backButton.setStyle({ fill: '#ffff00'});

@@ -41,9 +41,6 @@
     "usernameAttributes": [
       "email"
     ],
-    "hostedUIDomainName": "authtestbf2af1a7-bf2af1a7",
-    "authProvidersUserPool": [],
-    "hostedUIProviderMeta": "[]",
     "userPoolGroupList": [],
     "serviceName": "Cognito",
     "usernameCaseSensitive": false,
@@ -62,6 +59,13 @@
     },
     "breakCircularDependency": true,
     "dependsOn": [],
-    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"https://authtestbf2af1a7-bf2af1a7-dev.auth.eu-west-1.amazoncognito.com/\",\"https://dev.d17do0l0q81sfz.amplifyapp.com/\",\"http://localhost:8080/\",\"https://breakpoint.im/\",\"https://www.breakpoint.im/\"],\"LogoutURLs\":[\"https://authtestbf2af1a7-bf2af1a7-dev.auth.eu-west-1.amazoncognito.com/\",\"http://localhost:8080/\",\"https://dev.d17do0l0q81sfz.amplifyapp.com/\",\"https://breakpoint.im/\",\"https://www.breakpoint.im/\"]}"
+    "hostedUIDomainName": "authtest4efd4a1b-4efd4a1b",
+    "authProvidersUserPool": [
+      "Google",
+      "SignInWithApple"
+    ],
+    "hostedUIProviderMeta": "[{\"ProviderName\":\"Google\",\"authorize_scopes\":\"openid email profile\",\"AttributeMapping\":{\"email\":\"email\",\"username\":\"sub\"}},{\"ProviderName\":\"SignInWithApple\",\"authorize_scopes\":\"email\",\"AttributeMapping\":{\"email\":\"email\"}}]",
+    "authProviders": [],
+    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"https://www.breakpoint.im/\",\"https://dev.d17do0l0q81sfz.amplifyapp.com/\",\"https://breakpoint.im/\"],\"LogoutURLs\":[\"https://www.breakpoint.im/\",\"https://dev.d17do0l0q81sfz.amplifyapp.com/\",\"https://breakpoint.im/\"]}"
   }
 }

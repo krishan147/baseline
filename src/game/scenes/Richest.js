@@ -49,7 +49,7 @@ export class Richest extends Scene {
 
         
 
-        const backButton = this.add.text(350, 785, 'BACK', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
+        const backButton = this.add.text(350, 770, 'BACK', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
         .setInteractive()
         .on('pointerdown', () => {
             backButton.setStyle({ fill: '#ffff00'});

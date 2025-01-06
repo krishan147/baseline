@@ -15,7 +15,10 @@
         "signupAttributes": [
           "EMAIL"
         ],
-        "socialProviders": [],
+        "socialProviders": [
+          "GOOGLE",
+          "APPLE"
+        ],
         "usernameAttributes": [
           "EMAIL"
         ],

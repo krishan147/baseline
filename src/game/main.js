@@ -12,18 +12,17 @@ import { Bank } from './scenes/Bank';
 import { Wait } from './scenes/Wait';
 import { Nomatch } from './scenes/Nomatch';
 
-const config = {
+const desktopConfig = {
     type: Phaser.AUTO,
-    width: 489, // Design width 489
-    height: 900, // Design height 870
+    width: 489, 
+    height: 900, 
     parent: 'game-container',
-    // backgroundColor: '#000000',
     scale: {
         mode: Phaser.Scale.FIT,
     },
     input: {
         activePointers: 1,
-        touch: true
+        touch: true,
     },
     scene: [
         Boot,
@@ -37,19 +36,22 @@ const config = {
         Bet,
         Bank,
         Wait,
-        Nomatch
+        Nomatch,
     ],
     dom: {
-        createContainer: true
+        createContainer: true,
     },
 };
 
-const game = new Phaser.Game(config);
+const game = new Phaser.Game(desktopConfig);
+
+
 
 window.addEventListener('resize', () => {
     game.scale.resize(window.innerWidth, window.innerHeight);
 });
 
 export default function StartGame(parent) {
-    return new Phaser.Game({ ...config, parent });
+    return new Phaser.Game({ ...desktopConfig, parent });
 }
+ 

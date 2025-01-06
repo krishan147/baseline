@@ -245,7 +245,7 @@ export class Bet extends Scene
         }
 
   
-        const backButton = this.add.text(350, 785, 'BACK', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
+        const backButton = this.add.text(350, 770, 'BACK', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})
             .setInteractive()
             .on('pointerdown', () => {
                 backButton.setStyle({ fill: '#ffff00'});
@@ -263,8 +263,8 @@ export class Bet extends Scene
 
         
 
-        const coins = this.add.text(10, 770, 'COINS: ' + str_coins, { fill: 'white', fontSize: '20px' ,strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
-        const username = this.add.text(10, 800, 'YOU: ' + playerName, { fill: 'white', fontSize: '20px' ,strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
+        const coins = this.add.text(10, 760, 'COINS: ' + str_coins, { fill: 'white', fontSize: '20px' ,strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
+        const username = this.add.text(10, 790, 'YOU: ' + playerName, { fill: 'white', fontSize: '20px' ,strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg',padding: { right: 35}}).setAlpha(0)
     
         this.tweens.add({
             targets: [username, coins, backButton, confirm, title],    

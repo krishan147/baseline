@@ -3,7 +3,7 @@ import { Scene } from 'phaser';
 import { audioButton } from './Options.js';
 import { readLocally, writeLocally, get_game_w_session_id, get_play, post_play } from './Access.js'
 
-var game_version = 'v0.121'
+var game_version = 'v0.122'
 
 export class Menu extends Scene
 {

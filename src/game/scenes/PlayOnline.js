@@ -173,6 +173,7 @@ export class PlayOnline extends Scene
         var opponent_name = 'CPU'
         var who_goes_first
         let ball_possession
+        let ball_possession_unique //to make multiplayer work
         let you_name
         let player_type
 
@@ -760,10 +761,10 @@ export class PlayOnline extends Scene
                         left.setStyle({ fill: '#0f0' });
                         right.setStyle({ fill: '#0f0' });
 
-                        ball_possession = matching_rows.filter(row => row.a_uploader === row.you)
-                        ball_possession = ball_possession[0]["ball_possession"]
+                        ball_possession_unique = matching_rows.filter(row => row.a_uploader === row.you)
+                        ball_possession_unique = ball_possession_unique[0]["ball_possession"]
 
-                        let { dict_ball, dict_no_ball } = dict_ball_creator(matching_rows, ball_possession)
+                        let { dict_ball, dict_no_ball } = dict_ball_creator(matching_rows, ball_possession_unique)
 
                         if (gameData["playerName"] === you_name){
                             past = past_check_you(this, dict_ball, dict_no_ball) 
@@ -851,22 +852,21 @@ export class PlayOnline extends Scene
             }, 3000);
         }
 
-        function dict_ball_creator(matching_rows, ball_possession){
+        function dict_ball_creator(matching_rows, ball_possession_unique){
 
             let dict_ball
             let dict_no_ball
-            let no_ball_name_1 = ball_possession === "you" ? "opponent" : "you";
             
             for (let i = 0; i < matching_rows.length; i++) { 
 
 
-                if (ball_possession === matching_rows[i]["player_type"]){
+                if (ball_possession_unique === matching_rows[i]["player_type"]){
 
                     dict_ball = matching_rows[i]
 
                 }
 
-                if (ball_possession !== matching_rows[i]["player_type"]){
+                if (ball_possession_unique !== matching_rows[i]["player_type"]){
 
                     dict_no_ball = matching_rows[i]
 
@@ -936,7 +936,7 @@ export class PlayOnline extends Scene
             } else {
                 past = "yes"
     
-                if (ball_possession === "you"){
+                if (ball_possession_unique === "you"){
                     score_username_fig += 1;
                     dict_match["you_score"] = score_username_fig
                 }
@@ -1164,7 +1164,7 @@ export class PlayOnline extends Scene
 
 
         function start_match_timer(scene) {
-            let countdown = 600; // krishan change to 20 
+            let countdown = 20; // krishan change to 20 
         
             if (matchTimer !== null) {
                 clearInterval(matchTimer);

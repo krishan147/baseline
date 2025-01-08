@@ -164,6 +164,7 @@ export class Play extends Scene
 
     async create ()
     {
+
         var gameData = await readLocally()
         var volume = gameData["volume"]
         var isChecked = gameData["mute"]
@@ -932,11 +933,8 @@ export class Play extends Scene
 
         let matchTimer = null; 
 
-
-
-
         function start_match_timer(scene, you_decided, opponent_decided) {
-            let countdown = 10; 
+            let countdown = 600; // krishan change this 
 
             if (matchTimer !== null) {
                 clearInterval(matchTimer);

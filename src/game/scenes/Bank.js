@@ -29,7 +29,7 @@ export class Bank extends Scene {
         const online_total = this.add.text(50, 500, gameData["gold_multi"], { fill: 'white', fontSize: '30px', strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg',padding: { right: 35}});
         const offline_total_txt = this.add.text(50, 570, 'TOTAL OFFLINE COINS:', { fill: 'white', fontSize: '30px', strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg',padding: { right: 35}});
         const offline_total = this.add.text(50, 620, gameData["gold_cpu"], { fill: 'white', fontSize: '30px', strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg',padding: { right: 35}});
-        const note = this.add.text(50, 680, 'IF OFFLINE/ONLINE COINS ARE UNDER 500,\n THEY RESET TO 1000 AT MIDNIGHT UTC', { fill: 'white', fontSize: '16px', strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg',padding: { right: 35}});
+        const note = this.add.text(50, 680, 'IF OFFLINE/ONLINE COINS ARE UNDER 200,\n THEY RESET TO 1000 AT MIDNIGHT UTC', { fill: 'white', fontSize: '16px', strokeThickness: 1, stroke: 'white', fontFamily: 'playwritereg',padding: { right: 35}});
 
 
         const backButton = this.add.text(350, 785, 'BACK', { fill: '#0f0', fontSize: '30px' ,strokeThickness: 1, stroke: '#0f0', fontFamily: 'playwritereg', padding:{right:50}})

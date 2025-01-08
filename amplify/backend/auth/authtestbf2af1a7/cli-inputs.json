@@ -66,6 +66,6 @@
     ],
     "hostedUIProviderMeta": "[{\"ProviderName\":\"Google\",\"authorize_scopes\":\"openid email profile\",\"AttributeMapping\":{\"email\":\"email\",\"username\":\"sub\"}},{\"ProviderName\":\"SignInWithApple\",\"authorize_scopes\":\"email\",\"AttributeMapping\":{\"email\":\"email\"}}]",
     "authProviders": [],
-    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"https://www.breakpoint.im/\",\"https://dev.d17do0l0q81sfz.amplifyapp.com/\",\"https://breakpoint.im/\"],\"LogoutURLs\":[\"https://www.breakpoint.im/\",\"https://dev.d17do0l0q81sfz.amplifyapp.com/\",\"https://breakpoint.im/\"]}"
+    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"https://www.breakpoint.im/\",\"http://localhost:8080/\",\"https://breakpoint.im/\",\"https://dev.d17do0l0q81sfz.amplifyapp.com/\"],\"LogoutURLs\":[\"https://www.breakpoint.im/\",\"http://localhost:8080/\",\"https://breakpoint.im/\",\"https://dev.d17do0l0q81sfz.amplifyapp.com/\"]}"
   }
 }

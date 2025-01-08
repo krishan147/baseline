@@ -174,6 +174,7 @@ export class PlayOnline extends Scene
         var who_goes_first
         let ball_possession
         let you_name
+        let player_type
 
         let play_data = await readPlayLocally()
 
@@ -631,6 +632,8 @@ export class PlayOnline extends Scene
                     }
                 }
 
+                dict_match["player_type"] = player_type
+
                 await post_play(dict_match) 
 
                 check_opponent_decision(this, dict_match)
@@ -680,6 +683,8 @@ export class PlayOnline extends Scene
                     }
                 }
 
+                dict_match["player_type"] = player_type
+
                 await post_play(dict_match)
 
                 check_opponent_decision(this, dict_match);
@@ -698,7 +703,7 @@ export class PlayOnline extends Scene
 
         let past = "no";
 
-        async function check_opponent_decision(scene, dict_match) { // krishan working here
+        async function check_opponent_decision(scene, dict_match) { 
             
             let session_id = gameData["session_id"]
             let a_rally = Math.trunc(dict_match["a_rally"])
@@ -706,13 +711,14 @@ export class PlayOnline extends Scene
             let requestCount = 0;
         
             const interval = setInterval(async () => {
+
                 if (requestCount >= 10) {
                     clearInterval(interval);
                     return;
                 }
         
                 try {
-                    requestCount++; // Increment the request counter
+                    requestCount++; 
                     
                     play_data = await get_play(session_id);
                     writePlayLocally(play_data)
@@ -730,17 +736,17 @@ export class PlayOnline extends Scene
                           console.log("run victory");
 
                         if (playerName === you_name){
-                            score_username_fig = 7
-                            score_oppenent_fig = 5
+                            score_username_fig = 5
+                            score_oppenent_fig = 3
                         } 
                         
                         if (playerName === opponent_name){
-                            score_username_fig = 5
-                            score_oppenent_fig = 7
+                            score_username_fig = 3
+                            score_oppenent_fig = 5
                         }
 
-                        dict_match["you_score"] = 7
-                        dict_match["opponent_score"] = 5
+                        dict_match["you_score"] = 5
+                        dict_match["opponent_score"] = 3
 
                         match_end(scene)
                         clearInterval(interval);
@@ -756,17 +762,17 @@ export class PlayOnline extends Scene
 
                         ball_possession = matching_rows.filter(row => row.a_uploader === row.you)
                         ball_possession = ball_possession[0]["ball_possession"]
-    
-                        if (playerName === you_name){
-                            past = past_check_you(this, matching_rows, ball_possession) //past_check_you
-                         //  past = past_check(scene, matching_rows, ball_possession, true);
-                        }
-    
-                        if (playerName === opponent_name){
-                            past = past_check_opponent(this, matching_rows, ball_possession) //past_check_opponent
-                         // past = past_check(scene, matching_rows, ball_possession, false);
+
+                        let { dict_ball, dict_no_ball } = dict_ball_creator(matching_rows, ball_possession)
+
+                        if (gameData["playerName"] === you_name){
+                            past = past_check_you(this, dict_ball, dict_no_ball) 
                         }
 
+                        if (gameData["playerName"] === opponent_name){
+                            past = past_check_opponent(this, dict_ball, dict_no_ball) 
+                        }
+    
                         for (let i = 0; i < matching_rows.length; i++) {
                             const row = matching_rows[i];
 
@@ -845,194 +851,132 @@ export class PlayOnline extends Scene
             }, 3000);
         }
 
-
-        
-        // function past_check(scene, matching_rows, ball_possession, is_you) {
-        //     let dict_ball;
-        //     let dict_no_ball;
-        //     let no_ball_name = ball_possession === "you" ? "opponent" : "you";
-
-        //     for (let i = 0; i < matching_rows.length; i++) {
-        //         const row = matching_rows[i];
-
-        //         console.log(row["ball_possession"], ball_possession, playerName, row["a_uploader"], is_you);
-        
-        //         if (row["ball_possession"] === ball_possession && playerName === row["a_uploader"]) { 
-        //             dict_ball = { ...row };
-
-        //             console.log(1)
-        
-        //             if (row["ball_possession"] === "opponent" && ball_possession === "opponent") {
-        //                 console.log(1, "flip")
-        //                 dict_ball.ball_position_new = dict_ball.ball_position_new === "left" ? "right" : "left";
-        //             }
-        //         }
-        
-        //         if (row["ball_possession"] !== ball_possession && playerName !== row["a_uploader"]) {
-        //             dict_no_ball = { ...row };
-
-        //             console.log(2)
-        
-        //             if (row["ball_possession"] === "opponent" && ball_possession === "you") {
-
-        //                 console.log(2, "flip")
-
-        //                 dict_no_ball.opponent_position = dict_no_ball.opponent_position === "left" ? "right" : "left";
-        //             }
-        //         }
-        //     }
-        
-        //     let past = dict_no_ball[no_ball_name + "_position"] === dict_ball["ball_position_new"] ? "no" : "yes";
-            
-        //     if (past === "yes") {
-        //         if (ball_possession === (is_you ? "you" : "opponent")) {
-        //             if (is_you) {
-        //                 score_username_fig += 1;
-        //                 dict_match["you_score"] = score_username_fig;
-        //             } else {
-        //                 score_oppenent_fig += 1;
-        //                 dict_match["opponent_score"] = score_oppenent_fig;
-        //             }
-        //             update_scores.call(scene);
-        //         }
-        //     }
-        
-        //     return past;
-        // }
-        
-        
-
-        function past_check_you(scene, matching_rows, ball_possession){ 
+        function dict_ball_creator(matching_rows, ball_possession){
 
             let dict_ball
             let dict_no_ball
             let no_ball_name_1 = ball_possession === "you" ? "opponent" : "you";
+            
+            for (let i = 0; i < matching_rows.length; i++) { 
 
-            for (let i = 0; i < matching_rows.length; i++) {
 
-                const row_1 = matching_rows[i]
+                if (ball_possession === matching_rows[i]["player_type"]){
 
-                console.log(row_1["ball_possession"], ball_possession, playerName, row_1["a_uploader"])
-
-                if (row_1["ball_possession"] === ball_possession && playerName === row_1["a_uploader"]){ //ball_poss=you
-                    dict_ball = { ...row_1 }; 
-
-                    if (row_1["ball_possession"] === "opponent" & ball_possession === "opponent"){ //ball_poss=opponent
-                        console.log(1, "flip")
-                        dict_ball.ball_position_new = dict_ball.ball_position_new === "left" ? "right" : "left";
-                    }
-
+                    dict_ball = matching_rows[i]
 
                 }
-                if (row_1["ball_possession"] !== ball_possession && playerName !== row_1["a_uploader"]){ //ball_poss=opponent
-                    dict_no_ball = { ...row_1 };
 
-                    console.log(2, row_1["ball_possession"], ball_possession)
+                if (ball_possession !== matching_rows[i]["player_type"]){
 
-                    if (row_1["ball_possession"] === "opponent" & ball_possession === "you"){
-                        console.log(2, "flip")
-                        dict_no_ball.opponent_position = dict_no_ball.opponent_position === "left" ? "right" : "left";
-                    }
-
-                    // if (row_1["ball_possession"] === "you" & ball_possession === "opponent"){
-                    //     console.log(2, "flip")
-                    //     dict_no_ball.opponent_position = dict_no_ball.opponent_position === "left" ? "right" : "left";
-                    // }
-
-
-
-               //     dict_no_ball.opponent_position = dict_no_ball.opponent_position === "left" ? "right" : "left"; //player=opponent ball_possession=you
+                    dict_no_ball = matching_rows[i]
 
                 }
-              
+
             }
 
-        console.log(dict_no_ball[no_ball_name_1 + "_position"], dict_ball["ball_position_new"])
+            return { dict_ball, dict_no_ball }
 
-        if (dict_no_ball[no_ball_name_1 + "_position"] === dict_ball["ball_position_new"]){
-            past = "no"
-        } else {
-            past = "yes"
-
-            if (ball_possession === "you"){
-                score_username_fig += 1;
-                dict_match["you_score"] = score_username_fig
-            }
-
-            else {
-                score_oppenent_fig += 1;
-                dict_match["opponent_score"] = score_oppenent_fig
-            }
-
-              update_scores.call(scene)
         }
 
-    return past
-}
+        function past_check_you(scene, dict_ball, dict_no_ball){
 
-        function past_check_opponent(scene, matching_rows, ball_possession){
-
-            let dict_ball
-            let dict_no_ball
-            let no_ball_name_2 = ball_possession === "you" ? "opponent" : "you";
-
-            for (let i = 0; i < matching_rows.length; i++) {
-
-                const row_2 = matching_rows[i]
-
-                console.log(row_2["ball_possession"], ball_possession, playerName, row_2["a_uploader"])
-
-                if (row_2["ball_possession"] !== ball_possession && playerName === row_2["a_uploader"]){ //player=opponent ball_poss=you
-                    dict_no_ball = { ...row_2 };
-                    console.log(7, row_2["ball_possession"], ball_possession)
-
-                    if (row_2["ball_possession"] === "opponent" & ball_possession === "you"){
-                        console.log(7, "flip")
-                        dict_no_ball.opponent_position = dict_no_ball.opponent_position === "left" ? "right" : "left";
-                    }
-
-                    // if (row_2["ball_possession"] === "you" & ball_possession === "opponent"){
-                    //     console.log(7, "flip2")
-                    //     dict_no_ball.opponent_position = dict_no_ball.opponent_position === "left" ? "right" : "left";
-                    // }
-
-                }
-
-                if (row_2["ball_possession"] === ball_possession && playerName !== row_2["a_uploader"]){ //ball_poss=opponent
-                    dict_ball = { ...row_2 };
-                    console.log(8, row_2["ball_possession"], ball_possession)
-
-                    if (row_2["ball_possession"] === "opponent" & ball_possession === "opponent"){
-                        console.log(8, "flip")
-                        dict_ball.ball_position_new = dict_ball.ball_position_new === "left" ? "right" : "left";
-                    }
-                }                 
+            if (dict_no_ball["player_type"] === "opponent"){
+                dict_no_ball["you_position"] = dict_no_ball["opponent_position"] 
+                dict_no_ball["you_last_position"] = dict_no_ball["opponent_last_position"]
             }
 
-            console.log(dict_no_ball[no_ball_name_2 + "_position"], dict_ball["ball_position_new"])
+            console.log("check you")
+            console.log(dict_ball["a_uploader"], dict_ball["player_type"])
+            console.log(dict_no_ball["a_uploader"], dict_no_ball["player_type"])
 
-            if (dict_no_ball[no_ball_name_2 + "_position"] === dict_ball["ball_position_new"]){
+            console.log("no_edits")
+            console.log(dict_ball["opponent_position"])
+            console.log(dict_ball["opponent_last_position"])
+            console.log(dict_no_ball["you_position"])
+            console.log(dict_no_ball["you_last_position"])
+
+            dict_ball["opponent_position"] = dict_no_ball["you_position"];
+            dict_ball["opponent_last_position"] = dict_no_ball["you_last_position"];
+
+            console.log("into_dict_ball")
+            console.log(dict_ball["opponent_position"])
+            console.log(dict_ball["opponent_last_position"])
+
+            dict_ball.opponent_position = dict_ball.opponent_position === "left" ? "right" : "left";
+            dict_ball.opponent_last_position = dict_ball.opponent_last_position === "left" ? "right" : "left";
+
+            console.log("flipped_in_dict_ball")
+            console.log(dict_ball["opponent_position"])
+            console.log(dict_ball["opponent_last_position"])
+
+            past = past_check_overall(scene, dict_ball)
+            
+            return past
+
+        }
+
+        function past_check_opponent(scene, dict_ball, dict_no_ball){
+
+            console.log("check opponent")
+
+            console.log(dict_ball, dict_no_ball)
+
+            console.log(dict_ball["a_uploader"], dict_ball["player_type"])
+            console.log(dict_no_ball["a_uploader"], dict_no_ball["player_type"])
+
+            console.log("no_edits")
+            console.log(dict_ball["opponent_position"])
+            console.log(dict_ball["opponent_last_position"])
+            console.log(dict_no_ball["you_position"])
+            console.log(dict_no_ball["you_last_position"])
+
+            dict_ball["opponent_position"] = dict_no_ball["you_position"];
+            dict_ball["opponent_last_position"] = dict_no_ball["you_last_position"];
+
+            console.log("into_dict_ball")
+            console.log(dict_ball["opponent_position"])
+            console.log(dict_ball["opponent_last_position"])
+
+            dict_ball.opponent_position = dict_ball.opponent_position === "left" ? "right" : "left";
+            dict_ball.opponent_last_position = dict_ball.opponent_last_position === "left" ? "right" : "left";
+
+            console.log("flipped_in_dict_ball")
+            console.log(dict_ball["opponent_position"])
+            console.log(dict_ball["opponent_last_position"])
+
+            past = past_check_overall(scene, dict_ball)
+            
+            return past
+
+        }
+
+
+        function past_check_overall(scene, dict_ball){ // this is iffy init
+
+            console.log(dict_ball["ball_position_new"], dict_ball["opponent_position"])
+            
+            if (dict_ball["ball_position_new"] === dict_ball["opponent_position"]){
                 past = "no"
             } else {
                 past = "yes"
-
-                if (ball_possession === "opponent"){
-                    score_oppenent_fig += 1;
-                    dict_match["opponent_score"] = score_oppenent_fig
-                }
-
-                else {
+    
+                if (ball_possession === "you"){
                     score_username_fig += 1;
                     dict_match["you_score"] = score_username_fig
                 }
-
-              update_scores.call(scene)
-
+    
+                else {
+                    score_oppenent_fig += 1;
+                    dict_match["opponent_score"] = score_oppenent_fig
+                }
+    
+                  update_scores.call(scene)
             }
 
             return past
-        }
 
+        }
+      
         let score_username_fig = 0
         let score_oppenent_fig = 0
 
@@ -1654,8 +1598,23 @@ export class PlayOnline extends Scene
                     you_name = play_data[0]["you"]
                     opponent_name = play_data[0]["opponent"]
 
-                    console.log("you is ", you_name, "opponent is ", opponent_name)
-                    console.log("ball possessed by ", ball_possession)
+                 //   console.log("you is ", you_name, "opponent is ", opponent_name)
+                 //   console.log("ball possessed by ", ball_possession)
+
+                    console.log(you_name, opponent_name, gameData["playerName"])
+
+                    if (you_name === gameData["playerName"]){
+                        player_type = "you"
+                        console.log(player_type + " is ", you_name)
+                    }
+
+                    if (opponent_name === gameData["playerName"]){
+                        player_type = "opponent"
+                        console.log(player_type + " is ", opponent_name)
+                    }     
+                    
+                    
+
                     update_scores.call(scene)
 
                     gameData["opponent"] = play_data[0]["opponent"]

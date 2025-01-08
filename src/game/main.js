@@ -20,6 +20,7 @@ const desktopConfig = {
     scale: {
         mode: Phaser.Scale.FIT,
     },
+
     input: {
         activePointers: 1,
         touch: true,

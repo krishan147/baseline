@@ -776,7 +776,7 @@ export class PlayOnline extends Scene
                         for (let i = 0; i < matching_rows.length; i++) {
                             const row = matching_rows[i];
 
-                            if (playerName === row["you"] && playerName === row["a_uploader"]){ 
+                            if (gameData["playerName"] === row["you"] && gameData["playerName"] === row["a_uploader"]){ 
 
                                 
                                 if (row["ball_possession"] === "you"){ //"screen=you, animate=you, ball_pos=you"
@@ -790,7 +790,7 @@ export class PlayOnline extends Scene
                                 }
                             }
 
-                            if (playerName === row["opponent"] && playerName === row["a_uploader"]){
+                            if (gameData["playerName"] === row["opponent"] && gameData["playerName"] === row["a_uploader"]){
 
                                 if (row["ball_possession"] === "you"){ //"screen=opponent, animate=opponent, ball_pos=opponent"
 
@@ -803,7 +803,7 @@ export class PlayOnline extends Scene
                                 }
                             }
 
-                            if (playerName !== row["opponent"] && playerName !== row["a_uploader"]){
+                            if (gameData["playerName"] !== row["opponent"] && gameData["playerName"] !== row["a_uploader"]){
 
 
                                 if (row["ball_possession"] === "opponent"){ //"screen=you, animate=opponent, ball_pos=you"
@@ -823,7 +823,7 @@ export class PlayOnline extends Scene
                                 }
                             }
 
-                            if (playerName !== row["you"] && playerName !== row["a_uploader"]){ 
+                            if (gameData["playerName"] !== row["you"] && gameData["playerName"] !== row["a_uploader"]){ 
 
                                 if (row["ball_possession"] === "you"){ //"screen=opponent, animate=you, ball_pos=you"
 
@@ -880,34 +880,21 @@ export class PlayOnline extends Scene
 
         function past_check_you(scene, dict_ball, dict_no_ball){
 
-            if (dict_no_ball["player_type"] === "opponent"){
-                dict_no_ball["you_position"] = dict_no_ball["opponent_position"] 
-                dict_no_ball["you_last_position"] = dict_no_ball["opponent_last_position"]
+            if (dict_no_ball["player_type"] === "you"){
+                dict_ball["opponent_position"] = dict_no_ball["you_position"];
+                dict_ball["opponent_last_position"] = dict_no_ball["you_last_position"];
+
+                dict_ball.opponent_position = dict_ball.opponent_position === "left" ? "right" : "left";
+                dict_ball.opponent_last_position = dict_ball.opponent_last_position === "left" ? "right" : "left";
             }
 
-            console.log("check you")
-            console.log(dict_ball["a_uploader"], dict_ball["player_type"])
-            console.log(dict_no_ball["a_uploader"], dict_no_ball["player_type"])
-
-            console.log("no_edits")
-            console.log(dict_ball["opponent_position"])
-            console.log(dict_ball["opponent_last_position"])
-            console.log(dict_no_ball["you_position"])
-            console.log(dict_no_ball["you_last_position"])
-
-            dict_ball["opponent_position"] = dict_no_ball["you_position"];
-            dict_ball["opponent_last_position"] = dict_no_ball["you_last_position"];
-
-            console.log("into_dict_ball")
-            console.log(dict_ball["opponent_position"])
-            console.log(dict_ball["opponent_last_position"])
-
-            dict_ball.opponent_position = dict_ball.opponent_position === "left" ? "right" : "left";
-            dict_ball.opponent_last_position = dict_ball.opponent_last_position === "left" ? "right" : "left";
-
-            console.log("flipped_in_dict_ball")
-            console.log(dict_ball["opponent_position"])
-            console.log(dict_ball["opponent_last_position"])
+            if (dict_no_ball["player_type"] === "opponent"){
+                dict_ball["opponent_position"] = dict_no_ball["opponent_position"];
+                dict_ball["opponent_last_position"] = dict_no_ball["opponent_last_position"];
+    
+                dict_ball.opponent_position = dict_ball.opponent_position === "left" ? "right" : "left";
+                dict_ball.opponent_last_position = dict_ball.opponent_last_position === "left" ? "right" : "left";
+            }
 
             past = past_check_overall(scene, dict_ball)
             
@@ -917,33 +904,22 @@ export class PlayOnline extends Scene
 
         function past_check_opponent(scene, dict_ball, dict_no_ball){
 
-            console.log("check opponent")
+            if (dict_no_ball["player_type"] === "you"){
+                dict_ball["opponent_position"] = dict_no_ball["you_position"];
+                dict_ball["opponent_last_position"] = dict_no_ball["you_last_position"];
 
-            console.log(dict_ball, dict_no_ball)
+                dict_ball.opponent_position = dict_ball.opponent_position === "left" ? "right" : "left";
+                dict_ball.opponent_last_position = dict_ball.opponent_last_position === "left" ? "right" : "left";
+            }
 
-            console.log(dict_ball["a_uploader"], dict_ball["player_type"])
-            console.log(dict_no_ball["a_uploader"], dict_no_ball["player_type"])
-
-            console.log("no_edits")
-            console.log(dict_ball["opponent_position"])
-            console.log(dict_ball["opponent_last_position"])
-            console.log(dict_no_ball["you_position"])
-            console.log(dict_no_ball["you_last_position"])
-
-            dict_ball["opponent_position"] = dict_no_ball["you_position"];
-            dict_ball["opponent_last_position"] = dict_no_ball["you_last_position"];
-
-            console.log("into_dict_ball")
-            console.log(dict_ball["opponent_position"])
-            console.log(dict_ball["opponent_last_position"])
-
-            dict_ball.opponent_position = dict_ball.opponent_position === "left" ? "right" : "left";
-            dict_ball.opponent_last_position = dict_ball.opponent_last_position === "left" ? "right" : "left";
-
-            console.log("flipped_in_dict_ball")
-            console.log(dict_ball["opponent_position"])
-            console.log(dict_ball["opponent_last_position"])
-
+            if (dict_no_ball["player_type"] === "opponent"){
+                dict_ball["opponent_position"] = dict_no_ball["opponent_position"];
+                dict_ball["opponent_last_position"] = dict_no_ball["opponent_last_position"];
+    
+                dict_ball.opponent_position = dict_ball.opponent_position === "left" ? "right" : "left";
+                dict_ball.opponent_last_position = dict_ball.opponent_last_position === "left" ? "right" : "left";
+            }
+            
             past = past_check_overall(scene, dict_ball)
             
             return past
